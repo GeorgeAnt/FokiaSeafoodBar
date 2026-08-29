@@ -295,10 +295,35 @@ supplied:
 
 | | |
 |---|---|
-| Wood `#813A18` | accents, buttons, links, active states |
-| Deep Black `#181414` | text, dark section backgrounds |
-| Stone `#625E60` | secondary text |
-| Light Stone `#A09A91` | dividers and borders |
+| Wood `#813A18` | accents, buttons, links, active states, category rules |
+| Deep Black `#181414` | primary text, dark section backgrounds |
+| Stone `#625E60` | all secondary text on light sections, and the Find Us band |
+| Light Stone `#A09A91` | dividers, borders, secondary text on dark sections |
 
-On dark sections Wood is replaced by a lighter tint (`--wood-light`), because
-Wood on Deep Black is only 2.3:1 and fails accessibility contrast requirements.
+### Three surface tiers
+
+The page steps light → mid → dark, so Stone does structural work rather than
+only tinting text:
+
+| Class | Background | Sections |
+|---|---|---|
+| *(default)* | `--sand` | Menu, Team, Gallery |
+| `.section-stone` | `--stone` | Where to Find Us |
+| `.section-dark` | `--black` | Hero, Our Goal, Delivery & Reservations, footer |
+
+### The `--accent` token
+
+Wood is only legible on light ground — **2.3:1 on Deep Black and 1.3:1 on
+Stone**, both far below the 4.5:1 needed for text. So each tier redefines a
+single `--accent` token, and no rule references `--wood` directly for text:
+
+| Tier | `--accent` | Contrast |
+|---|---|---|
+| sand | `--wood` `#813A18` | 7.3:1 |
+| stone | `--wood-pale` `#F0DCCB` | 4.8:1 |
+| dark | `--wood-light` `#C97A4E` | 5.7:1 |
+
+Eyebrows, field labels, team roles, menu subheadings and focus rings all read
+`--accent`, so adding a section to any tier tints them correctly with no extra
+CSS. Every text/background pair on all three tiers has been measured against
+WCAG AA.

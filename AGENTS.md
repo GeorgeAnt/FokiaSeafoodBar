@@ -42,6 +42,13 @@ Node is installed but **not on the shell PATH**; prepend it first:
   gallery images render narrower than their column.
 - Reordering an alternating grid row needs the **track sizes swapped too**, not
   just `order` — otherwise the portrait lands in the wide column.
+- Never use `background: currentColor` in a block that also sets `color`.
+  `currentColor` resolves against that element's own computed `color`, so the
+  fill and the text come out identical and the control disappears. Ghost buttons
+  use the explicit `--ghost-hover-bg` / `--ghost-hover-fg` tokens instead.
+- Colours on a section come from tokens the surface tier sets (`--accent`,
+  `--text-muted`, `--ghost-hover-*`). Don't reference `--wood` directly for
+  text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
 - When screenshotting to verify, disable Chrome's HTTP cache, force
   `scroll-behavior: auto` before scrolling to trigger lazy images, and clear
   `localStorage['fokia:lang']` before testing the default locale.

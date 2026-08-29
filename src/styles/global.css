@@ -60,14 +60,23 @@
   --sand: #f4f0ea;
   --sand-deep: #e9e3d9;
 
-  /* Derived. --wood-light is the accent for dark sections: --wood on --black is
-     only 2.3:1, which fails AA, so it is never used for text there. */
+  /* Derived accents. Wood is only legible on light ground: it is 2.3:1 on Deep
+     Black and 1.3:1 on Stone, so each surface tier gets its own tint of it.
+       --wood-light  5.7:1 on Deep Black
+       --wood-pale   4.8:1 on Stone
+     Sections set --accent; nothing should reference --wood directly. */
   --wood-light: #c97a4e;
+  --wood-pale: #f0dccb;
   --paper: #fffdfa;
 
   --text: var(--black);
   --text-muted: var(--stone);
+  --accent: var(--wood);
   --bg: var(--sand);
+
+  /* Ghost-button hover fill: inverts against whichever surface it sits on. */
+  --ghost-hover-bg: var(--black);
+  --ghost-hover-fg: var(--sand);
   --rule: color-mix(in srgb, var(--light-stone) 45%, transparent);
 
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -178,13 +187,9 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--wood);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--radius);
-}
-
-.section-dark :focus-visible {
-  outline-color: var(--wood-light);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -221,7 +226,39 @@ button {
   background: var(--black);
   color: var(--sand);
   --text-muted: var(--light-stone);
+  --accent: var(--wood-light);
+  --ghost-hover-bg: var(--sand);
+  --ghost-hover-fg: var(--black);
   --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
+}
+
+/*
+  The third surface tier. Stone otherwise only ever appears as secondary text,
+  so the page steps straight from sand to black; this gives it one band of its
+  own and a rhythm of light / mid / dark.
+
+  Everything on it has to be re-tinted: Light Stone drops to 2.3:1 here and Wood
+  to 1.3:1, so the muted tone lightens and the accent becomes --wood-pale.
+*/
+.section-stone {
+  background: var(--stone);
+  color: var(--sand);
+  --text: var(--sand);
+  --text-muted: var(--sand-deep);
+  --accent: var(--wood-pale);
+  --ghost-hover-bg: var(--sand);
+  --ghost-hover-fg: var(--black);
+  --rule: color-mix(in srgb, var(--sand) 32%, transparent);
+}
+
+/* Wood as a button fill would nearly vanish into Stone (1.3:1). A light fill
+   reads as a control at 6.2:1 against the band. */
+.section-stone .btn--primary {
+  background: var(--paper);
+  color: var(--black);
+}
+.section-stone .btn--primary:hover {
+  background: var(--sand-deep);
 }
 
 .sr-only {
@@ -259,13 +296,9 @@ button {
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--wood);
+  color: var(--accent);
   margin-bottom: 0.9rem;
 }
-.section-dark .eyebrow {
-  color: var(--wood-light);
-}
-
 .section-head {
   margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.5rem);
 }
@@ -307,17 +340,22 @@ button {
   background: color-mix(in srgb, var(--wood) 84%, black);
 }
 
+/*
+  The hover fill must be a real colour, never `currentColor`.
+
+  `background: currentColor` resolves against the element's own computed `color`
+  — including a `color` set in the same block. Paired with `color: var(--black)`
+  it made the fill, the text and the border all Deep Black on the Deep Black
+  hero, so hovering the button made it disappear entirely.
+*/
 .btn--ghost {
   border-color: currentColor;
   color: inherit;
 }
 .btn--ghost:hover {
-  background: currentColor;
-  color: var(--black);
-}
-.section-dark .btn--ghost:hover,
-.hero .btn--ghost:hover {
-  color: var(--black);
+  background: var(--ghost-hover-bg);
+  border-color: var(--ghost-hover-bg);
+  color: var(--ghost-hover-fg);
 }
 
 /* --------------------------------------------------------------------------
@@ -374,8 +412,8 @@ button {
   white-space: nowrap;
 }
 .nav__links a:hover {
-  color: var(--wood);
-  border-bottom-color: var(--wood);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .nav__actions {
@@ -453,6 +491,9 @@ button {
   background: var(--black);
   color: var(--sand);
   --text-muted: var(--light-stone);
+  --accent: var(--wood-light);
+  --ghost-hover-bg: var(--sand);
+  --ghost-hover-fg: var(--black);
 }
 
 .hero__grid {
@@ -697,8 +738,8 @@ button {
     border-color 0.18s var(--ease);
 }
 .menu__jump a:hover {
-  color: var(--wood);
-  border-color: var(--wood);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Two columns on desktop. `columns` balances the categories automatically;
@@ -726,7 +767,7 @@ button {
   gap: 1rem;
   padding-bottom: 0.6rem;
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--wood);
+  border-bottom: 1px solid var(--accent);
 }
 .menu__category-head h3 {
   font-size: var(--step-2);
@@ -744,7 +785,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--wood);
+  color: var(--accent);
   margin: 1.75rem 0 1rem;
 }
 .menu__subhead:first-child {
@@ -902,7 +943,7 @@ button {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--wood);
+  color: var(--accent);
   margin: 0.5rem 0 1rem;
 }
 .team__bio {
@@ -1009,7 +1050,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--wood);
+  color: var(--accent);
   margin-bottom: 0.6rem;
 }
 .find__address {
@@ -1064,6 +1105,9 @@ button {
   background: var(--black);
   color: var(--sand);
   --text-muted: var(--light-stone);
+  --accent: var(--wood-light);
+  --ghost-hover-bg: var(--sand);
+  --ghost-hover-fg: var(--black);
   padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
 }
 
