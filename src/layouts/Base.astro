@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { dictionaries, defaultLocale, t, type Locale } from '../lib/i18n';
-import { foodCategories, drinkCategories, formatPrice } from '../lib/menu';
+import { foodCategories, drinkCategories } from '../lib/menu';
 import site from '../data/site.json';
 
 interface Props {
@@ -105,6 +105,19 @@ const dictJson = JSON.stringify(dictionaries);
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
 
+    {/*
+      All four font files are preloaded. This is a deliberate departure from
+      "preload only the hero image": measurement showed the page's entire
+      layout-shift score came from `font-display: swap` reflowing text as each
+      face arrived. The four files are the complete font payload (128 KB) — a
+      Greek page shows both scripts above the fold, so none of them is
+      speculative, and arriving before first paint removes the shift entirely.
+    */}
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-greek-wght-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin-wght-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-greek-wght-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-latin-wght-normal.woff2" crossorigin />
+
     <title data-i18n="meta.title">{t(locale, 'meta.title')}</title>
     <meta name="description" content={t(locale, 'meta.description')} data-i18n-content="meta.description" />
 
@@ -128,14 +141,14 @@ const dictJson = JSON.stringify(dictionaries);
 
     <meta name="theme-color" content="#181414" />
 
-    <script type="application/ld+json" set:html={JSON.stringify(restaurantSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(restaurantSchema)} />
   </head>
 
   <body>
     <a class="skip-link" href="#main" data-i18n="a11y.skipToContent">{t(locale, 'a11y.skipToContent')}</a>
     <slot />
 
-    <script type="application/json" id="i18n-dict" set:html={dictJson} />
+    <script is:inline type="application/json" id="i18n-dict" set:html={dictJson} />
 
     <script is:inline>
       /**

@@ -40,14 +40,19 @@ const { locale = defaultLocale } = Astro.props;
       {
         carouselPhotos.map((photo, index) => (
           <div class="hero__slide" data-active={index === 0 ? 'true' : 'false'}>
+            {/*
+              Widths are closely spaced on purpose: with only 600/900/1200
+              available, a 412px viewport at DPR 1.75 needs 721px and is served
+              900 — roughly 46% more bytes than it can use.
+            */}
             <Picture
               src={photo}
               formats={['avif', 'webp']}
-              widths={[600, 900, 1200, 1600]}
+              widths={[400, 600, 800, 1000, 1300, 1600]}
               sizes="(min-width: 60rem) 50vw, 100vw"
               alt=""
               loading={index === 0 ? 'eager' : 'lazy'}
-              decoding={index === 0 ? 'sync' : 'async'}
+              decoding="async"
               fetchpriority={index === 0 ? 'high' : 'auto'}
             />
           </div>
@@ -73,6 +78,13 @@ const { locale = defaultLocale } = Astro.props;
     const INTERVAL = 6000;
     let current = 0;
     let timer: number | undefined;
+
+    // Reveals slides 2..n, which until now were display:none so they would not
+    // download during the initial load. Deferred to the load event so they never
+    // compete with the LCP image.
+    const reveal = () => media.setAttribute('data-enhanced', 'true');
+    if (document.readyState === 'complete') reveal();
+    else window.addEventListener('load', reveal, { once: true });
 
     const show = (next: number) => {
       current = (next + slides.length) % slides.length;

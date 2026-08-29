@@ -22,7 +22,9 @@ const links = [
 <header class="nav">
   <nav class="wrap nav__inner" aria-label="Main">
     <a class="nav__brand" href="#top">
-      <Image src={logo} alt="" width={42} height={42} loading="eager" />
+      {/* Rendered at 2.1rem by CSS; the intrinsic size is larger so the mark
+          stays sharp on high-density screens. */}
+      <Image src={logo} alt="" width={96} height={96} loading="eager" />
       <span>{site.name}</span>
     </a>
 

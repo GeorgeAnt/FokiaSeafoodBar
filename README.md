@@ -200,19 +200,39 @@ first hero image loads eagerly; everything else is lazy.
 
 ## Performance
 
-Measured on the production build:
+Lighthouse, mobile, on the production build:
+
+| | |
+|---|---|
+| **Performance** | **98** |
+| **Accessibility** | **100** |
+| **Best Practices** | **100** |
+| **SEO** | **100** |
+| Largest Contentful Paint | 2.3 s |
+| Cumulative Layout Shift | **0** |
+| Total Blocking Time | 50 ms |
+| First Contentful Paint | 0.9 s |
 
 | | |
 |---|---|
 | HTML (inc. inlined CSS, structured data) | 129 KB raw, **29 KB gzipped** |
 | JavaScript requests | **0** — the ~2 KB of script is inlined |
 | Fonts | 4 files, 128 KB total (Greek + Latin, both families) |
-| Largest hero image | ~50 KB AVIF at typical widths |
-| Total `dist/` | 31 MB, of which almost all is image variants the browser picks between |
+| Total `dist/` | 33 MB, almost all image variants the browser chooses between |
 
 The Food/Drinks switch, the menu, and the whole page work with JavaScript
 disabled — verified. JavaScript only adds the hero crossfade, the mobile menu
 panel, and the language switch.
+
+Two things are load-bearing for those numbers; changing them will cost score:
+
+- **All four font files are preloaded** in `Base.astro`. Without it, `font-display:
+  swap` reflows text as each face arrives and CLS goes to 0.118. Preloading takes
+  it to 0.
+- **Hero slides 2–4 are `display: none` until the carousel is enhanced**
+  (`global.css`). They sit stacked inside the viewport, so `loading="lazy"` does
+  not defer them — all four would download during the initial load and slow the
+  LCP image by more than a second.
 
 ---
 
