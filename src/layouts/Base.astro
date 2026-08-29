@@ -1,0 +1,209 @@
+---
+import '../styles/global.css';
+import { dictionaries, defaultLocale, t, type Locale } from '../lib/i18n';
+import { foodCategories, drinkCategories, formatPrice } from '../lib/menu';
+import site from '../data/site.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.com').toString();
+
+/* ---------------------------------------------------------------------------
+   Structured data.
+
+   The menu is Greek-only, so Menu/MenuSection/MenuItem carry Greek values in
+   both locales — inventing English dish names purely for search engines would
+   describe food the restaurant does not serve under those names.
+   --------------------------------------------------------------------------- */
+const menuSections = [...foodCategories, ...drinkCategories].flatMap((category) => {
+  const groups = category.subcategories?.length
+    ? category.subcategories.map((sub) => ({
+        name: `${category.name} — ${sub.name}`,
+        items: sub.items ?? [],
+      }))
+    : [{ name: category.name, items: category.items ?? [] }];
+
+  return groups.map((group) => ({
+    '@type': 'MenuSection',
+    name: group.name,
+    hasMenuItem: group.items.map((item) => ({
+      '@type': 'MenuItem',
+      name: item.name,
+      ...(item.description ? { description: item.description } : {}),
+      ...(item.price !== null
+        ? {
+            offers: {
+              '@type': 'Offer',
+              price: item.price,
+              priceCurrency: 'EUR',
+            },
+          }
+        : {}),
+    })),
+  }));
+});
+
+const openingHours = site.hours.entries.map((entry) => ({
+  '@type': 'OpeningHoursSpecification',
+  dayOfWeek: entry.days,
+  opens: entry.opens,
+  closes: entry.closes,
+}));
+
+const restaurantSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: site.name,
+  description: t(locale, 'meta.description'),
+  url: canonical,
+  telephone: site.phone.href,
+  servesCuisine: site.seo.servesCuisine,
+  priceRange: site.seo.priceRange,
+  acceptsReservations: site.seo.acceptsReservations,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    postalCode: site.address.postalCode,
+    addressCountry: site.address.country,
+  },
+  // Omitted entirely while unknown — emitting null coordinates would be worse
+  // than emitting nothing.
+  ...(site.geo.latitude !== null && site.geo.longitude !== null
+    ? {
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: site.geo.latitude,
+          longitude: site.geo.longitude,
+        },
+      }
+    : {}),
+  openingHoursSpecification: openingHours,
+  hasMenu: {
+    '@type': 'Menu',
+    name: t(locale, 'menu.heading'),
+    inLanguage: 'el',
+    hasMenuSection: menuSections,
+  },
+};
+
+/* Both dictionaries ship inline. Together they are a few kilobytes — smaller
+   than the round trip a fetch would cost, and it means switching language never
+   waits on the network. */
+const dictJson = JSON.stringify(dictionaries);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title data-i18n="meta.title">{t(locale, 'meta.title')}</title>
+    <meta name="description" content={t(locale, 'meta.description')} data-i18n-content="meta.description" />
+
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="el" href={canonical} />
+    <link rel="alternate" hreflang="en" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
+
+    <meta property="og:type" content="restaurant.restaurant" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={t(locale, 'meta.title')} data-i18n-content="meta.title" />
+    <meta
+      property="og:description"
+      content={t(locale, 'meta.description')}
+      data-i18n-content="meta.description"
+    />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="el_GR" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#181414" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(restaurantSchema)} />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main" data-i18n="a11y.skipToContent">{t(locale, 'a11y.skipToContent')}</a>
+    <slot />
+
+    <script type="application/json" id="i18n-dict" set:html={dictJson} />
+
+    <script is:inline>
+      /**
+       * Language switcher.
+       *
+       * Greek is server-rendered, so the page is already correct before this
+       * runs; this only swaps chrome when the visitor has chosen English. The
+       * menu section is marked lang="el" in the markup and is never touched —
+       * its content is Greek in both locales.
+       */
+      (function () {
+        var KEY = 'fokia:lang';
+        var DEFAULT = 'el';
+        var node = document.getElementById('i18n-dict');
+        if (!node) return;
+        var dict = JSON.parse(node.textContent || '{}');
+
+        function apply(lang) {
+          var strings = dict[lang];
+          if (!strings) return;
+
+          document.documentElement.lang = lang;
+
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var value = strings[el.getAttribute('data-i18n')];
+            if (value != null) el.textContent = value;
+          });
+
+          document.querySelectorAll('[data-i18n-content]').forEach(function (el) {
+            var value = strings[el.getAttribute('data-i18n-content')];
+            if (value != null) el.setAttribute('content', value);
+          });
+
+          document.querySelectorAll('[data-i18n-alt]').forEach(function (el) {
+            var value = strings[el.getAttribute('data-i18n-alt')];
+            if (value != null) el.setAttribute('alt', value);
+          });
+
+          document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
+            var value = strings[el.getAttribute('data-i18n-label')];
+            if (value != null) el.setAttribute('aria-label', value);
+          });
+
+          document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
+            btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang-btn') === lang));
+          });
+
+          try {
+            localStorage.setItem(KEY, lang);
+          } catch (e) {
+            /* private mode — the choice simply does not persist */
+          }
+        }
+
+        var stored;
+        try {
+          stored = localStorage.getItem(KEY);
+        } catch (e) {
+          stored = null;
+        }
+        if (stored && stored !== DEFAULT) apply(stored);
+
+        document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            apply(btn.getAttribute('data-lang-btn'));
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

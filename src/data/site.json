@@ -1,0 +1,45 @@
+{
+  "$comment": "Restaurant identity and contact details. Fields marked PLACEHOLDER need confirming with the client before launch — see README.",
+  "name": "fokia",
+  "tagline": "seafood bar",
+  "phone": {
+    "display": "213 099 1571",
+    "href": "+302130991571",
+    "$comment": "PLACEHOLDER — taken from the menu's commercial-manager line. Confirm this is the reservations/takeaway number."
+  },
+  "address": {
+    "street": "PLACEHOLDER — οδός και αριθμός",
+    "city": "Αθήνα",
+    "postalCode": "PLACEHOLDER",
+    "country": "GR",
+    "countryName": { "el": "Ελλάδα", "en": "Greece" },
+    "$comment": "PLACEHOLDER — real address needed."
+  },
+  "geo": {
+    "latitude": null,
+    "longitude": null,
+    "$comment": "PLACEHOLDER — needed for JSON-LD and the map. Omitted from structured data while null."
+  },
+  "mapUrl": "",
+  "directionsUrl": "",
+  "hours": {
+    "$comment": "PLACEHOLDER — real opening hours needed. `days` uses schema.org day names for JSON-LD.",
+    "entries": [
+      { "days": ["Tuesday", "Wednesday", "Thursday"], "opens": "18:00", "closes": "00:00" },
+      { "days": ["Friday", "Saturday"], "opens": "13:00", "closes": "01:00" },
+      { "days": ["Sunday"], "opens": "13:00", "closes": "23:00" }
+    ],
+    "closed": ["Monday"]
+  },
+  "social": [
+    { "id": "instagram", "label": "Instagram", "url": "" },
+    { "id": "facebook", "label": "Facebook", "url": "" }
+  ],
+  "seo": {
+    "url": "https://example.com",
+    "priceRange": "€€",
+    "servesCuisine": ["Seafood", "Greek", "Japanese", "Sushi"],
+    "acceptsReservations": true,
+    "$comment": "PLACEHOLDER — `url` must be the real production domain before launch (canonical, OG, sitemap all derive from it)."
+  }
+}

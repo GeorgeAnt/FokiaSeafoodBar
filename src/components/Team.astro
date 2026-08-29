@@ -1,0 +1,57 @@
+---
+import { Picture } from 'astro:assets';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { teamPhoto } from '../lib/photos';
+import team from '../data/team.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+---
+
+<section class="section" id="team">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="eyebrow" data-i18n="nav.team">{t(locale, 'nav.team')}</p>
+      <h2 data-i18n="team.heading">{t(locale, 'team.heading')}</h2>
+      <p data-i18n="team.intro">{t(locale, 'team.intro')}</p>
+    </header>
+
+    <!--
+      One portrait plus a paragraph each, as alternating rows. The photo column
+      is a fixed 4:5 so the row heights stay even whether there are four members
+      or six, and every portrait gets the same crop and treatment.
+    -->
+    <div class="team__list">
+      {
+        team.members.map((member) => (
+          <article class="team__member">
+            <div class="team__photo">
+              <Picture
+                src={teamPhoto(member.photo)}
+                formats={['avif', 'webp']}
+                widths={[400, 600, 800]}
+                sizes="(min-width: 48rem) 40vw, 100vw"
+                alt={member.name}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+
+            <div class="team__text">
+              {/* Names are never translated. */}
+              <h3 class="team__name">{member.name}</h3>
+              <p class="team__role" data-i18n={`team.${member.id}.role`}>
+                {t(locale, `team.${member.id}.role`)}
+              </p>
+              <p class="team__bio" data-i18n={`team.${member.id}.bio`}>
+                {t(locale, `team.${member.id}.bio`)}
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

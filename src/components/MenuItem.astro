@@ -1,0 +1,53 @@
+---
+import { formatPrice, wineLine, type MenuItem } from '../lib/menu';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props {
+  item: MenuItem;
+  locale?: Locale;
+}
+const { item, locale = defaultLocale } = Astro.props;
+
+/* `unit` and `volume` never both appear on the same item, but the renderer does
+   not need to care which one a category uses. */
+const meta = [item.unit, item.volume].filter(Boolean).join(' · ');
+---
+
+<li class="menu__item">
+  <p class="menu__item-name">{item.name}</p>
+
+  {
+    item.price !== null ? (
+      <p class="menu__item-price">{formatPrice(item.price)}</p>
+    ) : (
+      /* Not priced by the client yet. The item still appears — it is on the
+         real menu — but shows an em dash rather than an empty cell. */
+      <p class="menu__item-price menu__item-price--none">
+        <span aria-hidden="true" data-i18n="menu.priceUnavailable">
+          {t(locale, 'menu.priceUnavailable')}
+        </span>
+        <span class="sr-only" data-i18n="a11y.priceOnRequest">
+          {t(locale, 'a11y.priceOnRequest')}
+        </span>
+      </p>
+    )
+  }
+
+  {item.description && <p class="menu__item-desc">{item.description}</p>}
+
+  {item.variants?.length && <p class="menu__item-variants">{item.variants.join(' / ')}</p>}
+
+  {item.wine && <p class="menu__item-wine">{wineLine(item.wine)}</p>}
+
+  {meta && <p class="menu__item-meta">{meta}</p>}
+
+  {
+    item.tags?.length && (
+      <ul class="menu__tags">
+        {item.tags.map((tag) => (
+          <li class="menu__tag">{tag}</li>
+        ))}
+      </ul>
+    )
+  }
+</li>

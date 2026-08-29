@@ -1,0 +1,20 @@
+---
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+---
+
+<section class="section section-dark" id="goal">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="nav.goal">{t(locale, 'nav.goal')}</p>
+    <h2 class="goal__lead" data-i18n="goal.lead">{t(locale, 'goal.lead')}</h2>
+
+    <div class="goal__grid">
+      <p data-i18n="goal.body">{t(locale, 'goal.body')}</p>
+      <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,76 @@
+{
+  "$comment": "English UI strings. Must contain exactly the same keys as el.json — `npm run check:i18n` enforces this. Menu dish names live in menu-*.json and are NEVER translated.",
+
+  "meta.title": "fokia — seafood bar | Fish, sushi and cocktails",
+  "meta.description": "fokia is a seafood bar pairing fresh Greek fish with Japanese technique. Sushi, raw plates, hot dishes and cocktails built on Greek spirits.",
+
+  "a11y.skipToContent": "Skip to content",
+  "a11y.openMenu": "Open navigation menu",
+  "a11y.closeMenu": "Close navigation menu",
+  "a11y.languageSwitcher": "Choose language",
+  "a11y.heroPrevious": "Previous photo",
+  "a11y.heroNext": "Next photo",
+  "a11y.heroGoTo": "Go to photo {n}",
+  "a11y.priceOnRequest": "Price not yet set",
+
+  "nav.goal": "Our Goal",
+  "nav.menu": "The Menu",
+  "nav.team": "The Team",
+  "nav.gallery": "Gallery",
+  "nav.contact": "Delivery & Reservations",
+  "nav.findUs": "Where to Find Us",
+  "nav.reserve": "Reserve",
+
+  "hero.tagline": "seafood bar",
+  "hero.intro": "Fresh fish, Japanese technique, a Greek table.",
+  "hero.cta": "Make a reservation",
+  "hero.ctaSecondary": "See the menu",
+
+  "goal.heading": "Our Goal",
+  "goal.lead": "To serve fish with the respect it deserves.",
+  "goal.body": "We started fokia on a simple idea: good fish does not need much. It needs to be fresh, cut properly, and reach the table without anything unnecessary in the way. We work Greek ingredients with techniques learned from the Japanese kitchen — raw, seared, cured — and pour cocktails built around Greek spirits alongside them.",
+  "goal.body2": "The menu shifts with what the sea brings in. Everything we serve raw follows the prescribed 24-hour freezing protocol, because safety is not negotiable.",
+
+  "menu.heading": "The Menu",
+  "menu.intro": "Our menu is written in Greek. Please ask us about anything on it.",
+  "menu.food": "Food",
+  "menu.drinks": "Drinks",
+  "menu.jumpTo": "Jump to a category",
+  "menu.legalHeading": "Menu notices",
+  "menu.priceUnavailable": "—",
+
+  "team.heading": "The Team",
+  "team.intro": "The people behind the counter and the bar.",
+
+  "gallery.heading": "Gallery",
+  "gallery.intro": "Moments from our table.",
+
+  "contact.heading": "Delivery & Reservations",
+  "contact.intro": "One number for everything — book a table or order to take away.",
+  "contact.takeawayTitle": "Delivery & Take away",
+  "contact.takeawayBody": "Order by phone and collect from the restaurant.",
+  "contact.reserveTitle": "Reservations",
+  "contact.reserveBody": "Call us to book a table. For larger groups, please let us know in advance.",
+  "contact.callUs": "Call us",
+  "contact.phoneLabel": "Phone",
+
+  "findUs.heading": "Where to Find Us",
+  "findUs.addressLabel": "Address",
+  "findUs.hoursLabel": "Opening hours",
+  "findUs.directions": "Get directions",
+  "findUs.viewOnMap": "View on map",
+  "findUs.closed": "Closed",
+
+  "hours.Monday": "Monday",
+  "hours.Tuesday": "Tuesday",
+  "hours.Wednesday": "Wednesday",
+  "hours.Thursday": "Thursday",
+  "hours.Friday": "Friday",
+  "hours.Saturday": "Saturday",
+  "hours.Sunday": "Sunday",
+  "hours.rangeSeparator": "–",
+
+  "footer.followUs": "Follow us",
+  "footer.rights": "All rights reserved.",
+  "footer.backToTop": "Back to top"
+}

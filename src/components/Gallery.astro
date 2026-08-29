@@ -1,0 +1,42 @@
+---
+import { Picture } from 'astro:assets';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { galleryPhoto } from '../lib/photos';
+import gallery from '../data/gallery.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+---
+
+<section class="section" id="gallery">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="eyebrow" data-i18n="nav.gallery">{t(locale, 'nav.gallery')}</p>
+      <h2 data-i18n="gallery.heading">{t(locale, 'gallery.heading')}</h2>
+      <p data-i18n="gallery.intro">{t(locale, 'gallery.intro')}</p>
+    </header>
+
+    <!-- Column masonry: the set is almost entirely portrait, so a fixed grid
+         would either crop the frames or leave gaps. -->
+    <div class="gallery__grid">
+      {
+        gallery.images.map((image) => (
+          <figure class="gallery__item">
+            <Picture
+              src={galleryPhoto(image.file)}
+              formats={['avif', 'webp']}
+              widths={[300, 500, 700]}
+              sizes="(min-width: 75rem) 22vw, (min-width: 48rem) 30vw, 45vw"
+              alt={t(locale, `gallery.${image.id}.alt`)}
+              data-i18n-alt={`gallery.${image.id}.alt`}
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

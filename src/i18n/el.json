@@ -1,0 +1,76 @@
+{
+  "$comment": "Greek UI strings — the default locale. Every key here must also exist in en.json. Menu dish names live in menu-*.json and are NEVER translated.",
+
+  "meta.title": "fokia — seafood bar | Ψάρι, sushi και κοκτέιλ",
+  "meta.description": "Το fokia είναι ένα seafood bar που συνδυάζει το φρέσκο ελληνικό ψάρι με ιαπωνική τεχνική. Sushi, ωμά, ζεστά πιάτα και κοκτέιλ με ελληνικά αποστάγματα.",
+
+  "a11y.skipToContent": "Μετάβαση στο περιεχόμενο",
+  "a11y.openMenu": "Άνοιγμα μενού πλοήγησης",
+  "a11y.closeMenu": "Κλείσιμο μενού πλοήγησης",
+  "a11y.languageSwitcher": "Επιλογή γλώσσας",
+  "a11y.heroPrevious": "Προηγούμενη φωτογραφία",
+  "a11y.heroNext": "Επόμενη φωτογραφία",
+  "a11y.heroGoTo": "Μετάβαση στη φωτογραφία {n}",
+  "a11y.priceOnRequest": "Η τιμή δεν έχει οριστεί ακόμη",
+
+  "nav.goal": "Ο Στόχος μας",
+  "nav.menu": "Το Μενού",
+  "nav.team": "Η Ομάδα",
+  "nav.gallery": "Gallery",
+  "nav.contact": "Delivery & Κρατήσεις",
+  "nav.findUs": "Πού θα μας βρείτε",
+  "nav.reserve": "Κράτηση",
+
+  "hero.tagline": "seafood bar",
+  "hero.intro": "Φρέσκο ψάρι, ιαπωνική τεχνική, ελληνικό τραπέζι.",
+  "hero.cta": "Κάντε κράτηση",
+  "hero.ctaSecondary": "Δείτε το μενού",
+
+  "goal.heading": "Ο Στόχος μας",
+  "goal.lead": "Να σερβίρουμε το ψάρι με τον σεβασμό που του αξίζει.",
+  "goal.body": "Ξεκινήσαμε το fokia με μια απλή ιδέα: ότι το καλό ψάρι δεν χρειάζεται πολλά. Χρειάζεται να είναι φρέσκο, να κοπεί σωστά και να φτάσει στο τραπέζι χωρίς περιττά. Δουλεύουμε την ελληνική πρώτη ύλη με τεχνικές που μάθαμε από την ιαπωνική κουζίνα — ωμό, καψαλισμένο, μαριναρισμένο — και τη συνοδεύουμε με κοκτέιλ φτιαγμένα γύρω από ελληνικά αποστάγματα.",
+  "goal.body2": "Το μενού αλλάζει με ό,τι φέρνει η θάλασσα. Ό,τι σερβίρουμε ωμό ακολουθεί το προβλεπόμενο πρωτόκολλο 24ωρης κατάψυξης, γιατί η ασφάλεια δεν είναι διαπραγματεύσιμη.",
+
+  "menu.heading": "Το Μενού",
+  "menu.intro": "Ο κατάλογος είναι στα ελληνικά. Ρωτήστε μας ελεύθερα για οτιδήποτε.",
+  "menu.food": "Φαγητό",
+  "menu.drinks": "Ποτά",
+  "menu.jumpTo": "Μετάβαση σε κατηγορία",
+  "menu.legalHeading": "Σημειώσεις καταλόγου",
+  "menu.priceUnavailable": "—",
+
+  "team.heading": "Η Ομάδα",
+  "team.intro": "Οι άνθρωποι πίσω από τον πάγκο και το bar.",
+
+  "gallery.heading": "Gallery",
+  "gallery.intro": "Στιγμές από το τραπέζι μας.",
+
+  "contact.heading": "Delivery & Κρατήσεις",
+  "contact.intro": "Ένα τηλέφωνο για όλα — κράτηση τραπεζιού ή παραγγελία για το σπίτι.",
+  "contact.takeawayTitle": "Delivery & Take away",
+  "contact.takeawayBody": "Παραγγείλτε τηλεφωνικά και παραλάβετε από το κατάστημα.",
+  "contact.reserveTitle": "Κρατήσεις",
+  "contact.reserveBody": "Καλέστε μας για να κρατήσετε τραπέζι. Για μεγάλες παρέες, ενημερώστε μας από πριν.",
+  "contact.callUs": "Καλέστε μας",
+  "contact.phoneLabel": "Τηλέφωνο",
+
+  "findUs.heading": "Πού θα μας βρείτε",
+  "findUs.addressLabel": "Διεύθυνση",
+  "findUs.hoursLabel": "Ώρες λειτουργίας",
+  "findUs.directions": "Οδηγίες πρόσβασης",
+  "findUs.viewOnMap": "Δείτε στον χάρτη",
+  "findUs.closed": "Κλειστά",
+
+  "hours.Monday": "Δευτέρα",
+  "hours.Tuesday": "Τρίτη",
+  "hours.Wednesday": "Τετάρτη",
+  "hours.Thursday": "Πέμπτη",
+  "hours.Friday": "Παρασκευή",
+  "hours.Saturday": "Σάββατο",
+  "hours.Sunday": "Κυριακή",
+  "hours.rangeSeparator": "–",
+
+  "footer.followUs": "Ακολουθήστε μας",
+  "footer.rights": "Με επιφύλαξη παντός δικαιώματος.",
+  "footer.backToTop": "Επιστροφή στην κορυφή"
+}

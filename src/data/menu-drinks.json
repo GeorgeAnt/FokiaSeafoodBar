@@ -1,0 +1,268 @@
+{
+  "$comment": "Greek-only menu content. Never translated. Dual category labels like 'Νερό | Water' are literal parts of the client's category name, not a translation mechanism.",
+  "categories": [
+    {
+      "id": "nero",
+      "name": "Νερό | Water",
+      "items": [
+        {
+          "id": "nero-kritis",
+          "name": "Φυσικό Μεταλλικό Νερό Κρήτης",
+          "volume": "1 lt",
+          "price": 2.5
+        },
+        {
+          "id": "xyno-nero-florinas",
+          "name": "Ξυνό Νερό Φλώρινας",
+          "volume": "250 ml",
+          "price": 5
+        }
+      ]
+    },
+    {
+      "id": "anapsyktika",
+      "name": "Αναψυκτικά | Soft Drinks",
+      "items": [
+        { "id": "lemonada", "name": "Λεμονάδα", "volume": "232 ml", "price": 3.9 },
+        { "id": "portokalada", "name": "Πορτοκαλάδα", "volume": "232 ml", "price": 3.9 },
+        {
+          "id": "portokalada-xoris-anthrakiko",
+          "name": "Πορτοκαλάδα χωρίς ανθρακικό",
+          "volume": "232 ml",
+          "price": 3.9
+        },
+        {
+          "id": "gkazoza-lemoni-lime",
+          "name": "Γκαζόζα με λεμόνι & lime",
+          "volume": "232 ml",
+          "price": 3.9
+        },
+        { "id": "soda", "name": "Σόδα", "volume": "232 ml", "price": 3.9 },
+        { "id": "coca-cola", "name": "Coca Cola", "volume": "250 ml", "price": 3.9 },
+        { "id": "coca-cola-zero", "name": "Coca Cola Zero", "volume": "250 ml", "price": 3.9 },
+        {
+          "id": "three-cents-pink-grapefruit",
+          "name": "Three Cents Pink Grapefruit",
+          "volume": "200 ml",
+          "price": 4.2
+        },
+        {
+          "id": "three-cents-aegean-tonic",
+          "name": "Three Cents Aegean Tonic Water",
+          "volume": "200 ml",
+          "price": 4.2
+        }
+      ]
+    },
+    {
+      "id": "mpyres",
+      "name": "Μπύρες | Beers",
+      "items": [
+        {
+          "id": "septem-mondays-pilsner",
+          "name": "Septem Monday’s Pilsner",
+          "volume": "330 ml",
+          "price": 5
+        },
+        {
+          "id": "septem-mylos-1888",
+          "name": "Septem Mylos 1888 Heretic Lager",
+          "volume": "330 ml",
+          "price": 5
+        },
+        { "id": "thria-double-ipa", "name": "Thria Double IPA", "volume": "330 ml", "price": 7 },
+        { "id": "hb-dunkel", "name": "HB Dunkel", "volume": "500 ml", "price": 7 },
+        { "id": "hb-weiss", "name": "HB Weiss", "volume": "500 ml", "price": 7 },
+        { "id": "hb-free", "name": "HB Free", "volume": "500 ml", "price": 6 },
+        { "id": "draft-mikri", "name": "Draft Μικρή", "volume": "300 ml", "price": 5 },
+        { "id": "draft-megali", "name": "Draft Μεγάλη", "volume": "500 ml", "price": 8 }
+      ]
+    },
+    {
+      "id": "krasi",
+      "name": "Κρασί",
+      "subcategories": [
+        {
+          "id": "krasi-potiri",
+          "name": "Ποτήρι",
+          "items": [
+            {
+              "id": "potiri-lefko",
+              "name": "Ποτήρι Λευκό",
+              "price": 5,
+              "wine": {
+                "producer": "Οινοποιία Γ. Λαφαζάνη",
+                "label": "Electus",
+                "grape": "Μοσχοφίλερο"
+              }
+            },
+            {
+              "id": "potiri-roze-xiro",
+              "name": "Ποτήρι Ροζέ Ξηρό",
+              "price": 5,
+              "wine": {
+                "producer": "Οινοποιία Γ. Λαφαζάνη",
+                "label": "Οινάνθη",
+                "grape": "Αγιωργίτικο, Syrah"
+              }
+            },
+            {
+              "id": "potiri-erythros-xiros",
+              "name": "Ποτήρι Ερυθρός Ξηρός",
+              "price": 5,
+              "wine": {
+                "producer": "Οινοποιία Γ. Λαφαζάνη",
+                "label": "Οινάνθη",
+                "grape": "Αγιωργίτικο, Μerlot"
+              }
+            },
+            {
+              "id": "potiri-lefkou-afrodous",
+              "name": "Ποτήρι Λευκού Αφρώδους",
+              "price": 7,
+              "wine": {
+                "producer": "Οινοποιία Γ. Λαφαζάνη",
+                "label": "Artisti",
+                "grape": "Moscato"
+              }
+            }
+          ]
+        },
+        {
+          "id": "krasi-fiali",
+          "name": "Φιάλη",
+          "items": [
+            {
+              "id": "fiali-lafazani-seirios",
+              "name": "Οινοποιία Γ. Λαφαζάνη",
+              "price": null,
+              "wine": { "label": "Σείριος", "grape": "Μαλαγουζιά" }
+            },
+            {
+              "id": "fiali-zafeiraki-natura",
+              "name": "Κτήμα Ζαφειράκη",
+              "price": 27,
+              "wine": {
+                "label": "Βιολογικό Κρασί Natura",
+                "style": "Λευκός",
+                "grape": "Μαλαγουζιά"
+              }
+            },
+            {
+              "id": "fiali-vivlia-chora",
+              "name": "Κτήμα Βιβλία Χώρα",
+              "price": 30,
+              "wine": { "style": "Λευκός", "grape": "Sauvignon Blanc, Ασύρτικο" }
+            },
+            {
+              "id": "fiali-lafazani-electus-lefkos",
+              "name": "Οινοποιία Γ. Λαφαζάνη",
+              "price": null,
+              "wine": { "label": "Electus", "style": "Λευκός", "grape": "Μοσχοφίλερο" }
+            },
+            {
+              "id": "fiali-tselepou-mantineia",
+              "name": "Κτήμα Τσέλεπου",
+              "price": 26,
+              "wine": { "label": "Μαντινεία", "style": "Λευκός", "grape": "Μοσχοφίλερο" }
+            },
+            {
+              "id": "fiali-chatzimichali-chouleveina",
+              "name": "Κτήμα Χατζημιχάλη",
+              "price": 24,
+              "wine": { "label": "Κρασί Χουλέβαινα", "style": "Λευκός", "grape": "Chardonnay" }
+            },
+            {
+              "id": "fiali-lafazani-oinanthi-erythros",
+              "name": "Οινοποιία Γ. Λαφαζάνη",
+              "price": null,
+              "wine": { "label": "Οινάνθη", "style": "Ερυθρός", "grape": "Αγιωργίτικο, Μerlot" }
+            },
+            {
+              "id": "fiali-papaioannou",
+              "name": "Κτήμα Παπαϊωάννου",
+              "price": 24,
+              "wine": { "style": "Ερυθρός", "grape": "Syrah" }
+            },
+            {
+              "id": "fiali-aleris-lav",
+              "name": "Aleris Lav",
+              "price": 22,
+              "wine": { "label": "ΠΟΠ Κορινθίας", "style": "Ερυθρός", "grape": "Αγιωργίτικο" }
+            },
+            {
+              "id": "fiali-lafazani-oinanthi-roze",
+              "name": "Οινοποιία Γ. Λαφαζάνη",
+              "price": null,
+              "wine": { "label": "Οινάνθη", "style": "Ροζέ", "grape": "Αγιωργίτικο, Syrah" }
+            },
+            {
+              "id": "fiali-lafazani-elysian-roze",
+              "name": "Οινοποιία Γ. Λαφαζάνη",
+              "price": null,
+              "wine": { "label": "Elýsian", "style": "Ροζέ", "grape": "Syrah" }
+            },
+            {
+              "id": "fiali-mparafaka-treis-magisses",
+              "name": "Κτήμα Μπαραφάκα",
+              "price": 28,
+              "wine": {
+                "label": "Τρείς Μάγισσες",
+                "style": "Ροζέ, Ημίγλυκο Ημιαφρώδες"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apostagmata",
+      "name": "Αποστάγματα",
+      "items": [
+        { "id": "sake-karafaki", "name": "Sake Καραφάκι", "volume": "120 ml", "price": 5 },
+        { "id": "ouzo-matarelli", "name": "Ούζο Ματαρέλλη", "volume": "200 ml", "price": 9 },
+        { "id": "tsipouro-agioneri", "name": "Τσίπουρο Αγιονέρι", "volume": "200 ml", "price": 12 },
+        { "id": "nikka-from-the-barrel", "name": "Nikka Whisky From The Barrel", "price": 12 },
+        { "id": "bushmills-original", "name": "Bushmills Original Whiskey", "price": 8 },
+        { "id": "bombay-gin", "name": "Bombay Gin", "price": 8 },
+        { "id": "titos-vodka", "name": "Tito’s Handmade Vodka", "price": 8 }
+      ]
+    },
+    {
+      "id": "cocktails",
+      "name": "Cocktails",
+      "items": [
+        {
+          "id": "cucubertini",
+          "name": "Cucubertini",
+          "description": "Gin, αγγούρι, lime, Aegean Tonic",
+          "price": 10
+        },
+        {
+          "id": "spicy-mango",
+          "name": "Spicy Mango",
+          "description": "Vodka, lime, mango, καυτερή πιπεριά",
+          "price": 12
+        },
+        {
+          "id": "pina-colada",
+          "name": "Piña colada",
+          "description": "Λευκό ρούμι, ανανάς, κρέμα καρύδας, lime",
+          "price": 12
+        },
+        {
+          "id": "paloma",
+          "name": "Paloma",
+          "description": "Λευκή tequila, Pink Grapefruit Soda, lime",
+          "price": 10
+        },
+        {
+          "id": "twisted-greek-negroni",
+          "name": "Twisted Greek Negroni",
+          "description": "Παλαιωμένο τσίπουρο, Otto’s Athens Vermouth, Campari, πορτοκάλι",
+          "price": 12
+        }
+      ]
+    }
+  ]
+}

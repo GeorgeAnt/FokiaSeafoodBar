@@ -1,0 +1,1090 @@
+/* ==========================================================================
+   fokia — seafood bar
+   Single stylesheet. Astro inlines it, so there is no blocking CSS request.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Fonts — self-hosted, Greek + Latin, one variable file per script per family.
+   Dish names mix scripts inside a single line ("Tuna tataki με jalapeño sauce"),
+   so both subsets must be present in the same family or the line renders in two
+   different typefaces.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-greek-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url('/fonts/eb-garamond-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url('/fonts/eb-garamond-greek-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+/* --------------------------------------------------------------------------
+   Tokens — every colour in the site is defined here and nowhere else.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Client palette, used exactly as supplied. */
+  --wood: #813a18;
+  --black: #181414;
+  --stone: #625e60;
+  --light-stone: #a09a91;
+
+  /* PROPOSED light neutral — the supplied palette has no background tone.
+     Drawn from the concrete surfaces the photos were shot on. Change these two
+     values to restyle every light section at once. */
+  --sand: #f4f0ea;
+  --sand-deep: #e9e3d9;
+
+  /* Derived. --wood-light is the accent for dark sections: --wood on --black is
+     only 2.3:1, which fails AA, so it is never used for text there. */
+  --wood-light: #c97a4e;
+  --paper: #fffdfa;
+
+  --text: var(--black);
+  --text-muted: var(--stone);
+  --bg: var(--sand);
+  --rule: color-mix(in srgb, var(--light-stone) 45%, transparent);
+
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'EB Garamond', 'Palatino Linotype', Georgia, serif;
+
+  /* Fluid type scale, 360px → 1440px viewport. */
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.92rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.13rem);
+  --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.34rem + 0.8vw, 2.1rem);
+  --step-3: clamp(1.9rem, 1.6rem + 1.5vw, 3rem);
+  --step-4: clamp(2.4rem, 1.85rem + 2.7vw, 4.4rem);
+
+  --gutter: clamp(1.25rem, 0.9rem + 1.7vw, 3rem);
+  --section-y: clamp(4rem, 3rem + 5vw, 8rem);
+  --measure: 62ch;
+  --radius: 2px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Reset / base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Sticky nav must not cover the heading of an anchored section. */
+  scroll-padding-top: 5.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* <picture> exists only to group its <source> elements. Letting it generate a
+   box breaks percentage heights on the <img> inside — the img resolves `height:
+   100%` against the picture, which is inline and has no definite height, so it
+   silently falls back to its intrinsic size and overflows the container. */
+picture {
+  display: contents;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.12;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--wood);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+.section-dark :focus-visible {
+  outline-color: var(--wood-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Layout primitives
+   -------------------------------------------------------------------------- */
+.wrap {
+  width: min(100% - var(--gutter) * 2, 78rem);
+  margin-inline: auto;
+}
+
+.wrap--narrow {
+  width: min(100% - var(--gutter) * 2, 52rem);
+}
+
+.section {
+  padding-block: var(--section-y);
+  scroll-margin-top: 4.5rem;
+}
+
+.section-dark {
+  background: var(--black);
+  color: var(--sand);
+  --text-muted: var(--light-stone);
+  --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% -120%;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--black);
+  color: var(--sand);
+  text-decoration: none;
+  transition: translate 0.2s var(--ease);
+}
+.skip-link:focus {
+  translate: -50% 0;
+}
+
+/* Section heading: small letterspaced eyebrow above a display heading. */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--wood);
+  margin-bottom: 0.9rem;
+}
+.section-dark .eyebrow {
+  color: var(--wood-light);
+}
+
+.section-head {
+  margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+}
+.section-head h2 {
+  font-size: var(--step-3);
+}
+.section-head p {
+  margin-top: 0.9rem;
+  max-width: var(--measure);
+  color: var(--text-muted);
+  font-size: var(--step-1);
+}
+
+/* Buttons ------------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.6rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition:
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+
+.btn--primary {
+  background: var(--wood);
+  color: var(--paper);
+}
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--wood) 84%, black);
+}
+
+.btn--ghost {
+  border-color: currentColor;
+  color: inherit;
+}
+.btn--ghost:hover {
+  background: currentColor;
+  color: var(--black);
+}
+.section-dark .btn--ghost:hover,
+.hero .btn--ghost:hover {
+  color: var(--black);
+}
+
+/* --------------------------------------------------------------------------
+   Navigation
+   -------------------------------------------------------------------------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--sand) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 4.5rem;
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-inline-end: auto;
+}
+.nav__brand img {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 0.4rem + 1.1vw, 1.9rem);
+}
+.nav__links a {
+  font-size: var(--step--1);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  padding-block: 0.4rem;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+  white-space: nowrap;
+}
+.nav__links a:hover {
+  color: var(--wood);
+  border-bottom-color: var(--wood);
+}
+
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lang {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.lang button {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition:
+    background-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+.lang button[aria-pressed='true'] {
+  background: var(--wood);
+  color: var(--paper);
+}
+
+.nav__toggle {
+  display: none;
+  padding: 0.5rem;
+}
+.nav__toggle svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+@media (max-width: 60rem) {
+  .nav__toggle {
+    display: block;
+  }
+  .nav__links {
+    position: fixed;
+    inset: 4.5rem 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 1rem var(--gutter) 2rem;
+    background: var(--sand);
+    border-bottom: 1px solid var(--rule);
+    max-height: calc(100dvh - 4.5rem);
+    overflow-y: auto;
+    /* Hidden by default on small screens; the toggle sets [data-open]. */
+    display: none;
+  }
+  .nav__links[data-open='true'] {
+    display: flex;
+  }
+  .nav__links a {
+    padding-block: 0.9rem;
+    font-size: var(--step-0);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav__cta {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Hero — split layout. The client's photos are portrait 3:2 vertical, so the
+   image column keeps its own aspect rather than being cropped to a wide band.
+   -------------------------------------------------------------------------- */
+.hero {
+  background: var(--black);
+  color: var(--sand);
+  --text-muted: var(--light-stone);
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+@media (min-width: 60rem) {
+  .hero__grid {
+    grid-template-columns: 1fr 1fr;
+    min-height: min(88vh, 52rem);
+  }
+}
+
+.hero__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: clamp(3rem, 2rem + 6vw, 6rem) var(--gutter);
+}
+@media (min-width: 60rem) {
+  .hero__copy {
+    padding-inline: clamp(2rem, 1rem + 4vw, 5rem);
+    max-width: 34rem;
+    margin-inline-start: auto;
+  }
+}
+
+.hero__logo {
+  width: clamp(5rem, 4rem + 4vw, 7.5rem);
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+}
+
+.hero__title {
+  font-size: var(--step-4);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.hero__tagline {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--wood-light);
+  margin-top: 0.6rem;
+}
+
+.hero__intro {
+  font-size: var(--step-1);
+  color: var(--light-stone);
+  max-width: 30ch;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Image column: all slides stacked; only the current one is opaque. */
+.hero__media {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--black) 80%, var(--stone));
+  aspect-ratio: 4 / 5;
+}
+@media (min-width: 60rem) {
+  .hero__media {
+    aspect-ratio: auto;
+  }
+}
+
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.1s var(--ease);
+}
+.hero__slide[data-active='true'] {
+  opacity: 1;
+}
+/* Before JS runs (and if it never does) the first slide is the visible one. */
+.hero__slide:first-child {
+  opacity: 1;
+}
+.hero__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__dots {
+  position: absolute;
+  z-index: 2;
+  bottom: 1.25rem;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  gap: 0.6rem;
+}
+.hero__dots button {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+}
+.hero__dots button::after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  background: color-mix(in srgb, var(--sand) 45%, transparent);
+  transition: background-color 0.25s var(--ease);
+}
+.hero__dots button[aria-current='true']::after {
+  background: var(--sand);
+}
+
+/* --------------------------------------------------------------------------
+   Our Goal
+   -------------------------------------------------------------------------- */
+.goal__lead {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1.25;
+  max-width: 24ch;
+  margin-bottom: 1.75rem;
+}
+
+.goal__grid {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+@media (min-width: 48rem) {
+  .goal__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.goal__grid p {
+  color: var(--text-muted);
+  max-width: var(--measure);
+}
+
+/* --------------------------------------------------------------------------
+   Menu
+   -------------------------------------------------------------------------- */
+
+/* Food / Drinks switch. Radio inputs drive it through CSS sibling selectors, so
+   it works with JavaScript disabled and is keyboard-operable by default. */
+.menu__switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu__tablist {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  margin-bottom: 2.5rem;
+}
+
+.menu__tab {
+  padding: 0.6rem 1.6rem;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+.menu__tab:hover {
+  color: var(--wood);
+}
+
+#menu-view-food:checked ~ .menu__tablist .menu__tab[for='menu-view-food'],
+#menu-view-drinks:checked ~ .menu__tablist .menu__tab[for='menu-view-drinks'] {
+  background: var(--wood);
+  color: var(--paper);
+}
+
+#menu-view-food:focus-visible ~ .menu__tablist .menu__tab[for='menu-view-food'],
+#menu-view-drinks:focus-visible ~ .menu__tablist .menu__tab[for='menu-view-drinks'] {
+  outline: 2px solid var(--wood);
+  outline-offset: 3px;
+}
+
+.menu__panel {
+  display: none;
+}
+#menu-view-food:checked ~ .menu__panel--food,
+#menu-view-drinks:checked ~ .menu__panel--drinks {
+  display: block;
+}
+
+/* Jump-to-category chips. */
+.menu__jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+.menu__jump a {
+  font-size: var(--step--1);
+  text-decoration: none;
+  color: var(--text-muted);
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  transition:
+    color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+.menu__jump a:hover {
+  color: var(--wood);
+  border-color: var(--wood);
+}
+
+/* Two columns on desktop. `columns` balances the categories automatically;
+   break-inside keeps a category from being split across the gap. */
+.menu__categories {
+  columns: 1;
+  column-gap: clamp(2rem, 1rem + 4vw, 5rem);
+}
+@media (min-width: 60rem) {
+  .menu__categories {
+    columns: 2;
+  }
+}
+
+.menu__category {
+  break-inside: avoid;
+  margin-bottom: 3rem;
+  scroll-margin-top: 6rem;
+}
+
+.menu__category-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--wood);
+}
+.menu__category-head h3 {
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+.menu__category-unit {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.menu__subhead {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wood);
+  margin: 1.75rem 0 1rem;
+}
+.menu__subhead:first-child {
+  margin-top: 0;
+}
+
+.menu__item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 1rem;
+  padding-block: 0.7rem;
+}
+.menu__item + .menu__item {
+  border-top: 1px solid color-mix(in srgb, var(--light-stone) 25%, transparent);
+}
+
+.menu__item-name {
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.menu__item-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+}
+.menu__item-price--none {
+  color: var(--light-stone);
+  font-weight: 400;
+}
+
+.menu__item-desc,
+.menu__item-variants,
+.menu__item-wine,
+.menu__item-meta {
+  grid-column: 1 / -1;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.2rem;
+}
+
+.menu__item-wine {
+  font-style: italic;
+}
+
+.menu__item-meta {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--light-stone);
+}
+
+.menu__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  grid-column: 1 / -1;
+  margin-top: 0.45rem;
+}
+.menu__tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--text-muted);
+}
+
+/* Legally required notices. Smaller type, but always present and never
+   collapsed — this block is not optional under Greek regulation. */
+.menu__legal {
+  margin-top: 1rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--rule);
+}
+.menu__legal h3 {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.menu__legal li {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  line-height: 1.55;
+  max-width: 80ch;
+}
+.menu__legal li + li {
+  margin-top: 0.5rem;
+}
+.menu__legal a {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   Team — alternating photo / text rows. Reads correctly at 4 members and at 6.
+   -------------------------------------------------------------------------- */
+.team__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 2rem + 4vw, 6rem);
+}
+
+.team__member {
+  display: grid;
+  gap: clamp(1.25rem, 0.8rem + 2vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 48rem) {
+  .team__member {
+    /* The portrait is deliberately the narrower column: at 4:5 a wider one makes
+       each row tall enough to push the next member entirely off screen. */
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+  /* Reverse every second row. */
+  .team__member:nth-child(even) .team__photo {
+    order: 2;
+  }
+}
+
+.team__photo {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--sand-deep);
+}
+.team__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.team__name {
+  font-size: var(--step-2);
+}
+.team__role {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wood);
+  margin: 0.5rem 0 1rem;
+}
+.team__bio {
+  color: var(--text-muted);
+  max-width: var(--measure);
+}
+
+/* --------------------------------------------------------------------------
+   Gallery — column masonry, which suits a set that is almost entirely portrait.
+   -------------------------------------------------------------------------- */
+.gallery__grid {
+  columns: 2;
+  column-gap: clamp(0.5rem, 0.3rem + 0.8vw, 1rem);
+}
+@media (min-width: 48rem) {
+  .gallery__grid {
+    columns: 3;
+  }
+}
+@media (min-width: 75rem) {
+  .gallery__grid {
+    columns: 4;
+  }
+}
+
+.gallery__item {
+  break-inside: avoid;
+  margin-bottom: clamp(0.5rem, 0.3rem + 0.8vw, 1rem);
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--light-stone) 25%, transparent);
+}
+.gallery__item img {
+  width: 100%;
+  height: auto;
+  transition: scale 0.5s var(--ease);
+}
+.gallery__item:hover img {
+  scale: 1.03;
+}
+
+/* --------------------------------------------------------------------------
+   Contact — takeaway and reservations share one phone number for now, but are
+   already two separate blocks so splitting them later is a content change.
+   -------------------------------------------------------------------------- */
+.contact__grid {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  align-items: start;
+}
+@media (min-width: 48rem) {
+  .contact__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.contact__card {
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.contact__card h3 {
+  font-size: var(--step-1);
+  margin-bottom: 0.75rem;
+}
+.contact__card p {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.contact__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  text-decoration: none;
+  color: var(--wood-light);
+  letter-spacing: 0.01em;
+}
+.contact__phone:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* --------------------------------------------------------------------------
+   Where to find us
+   -------------------------------------------------------------------------- */
+.find__grid {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 3vw, 4rem);
+}
+@media (min-width: 55rem) {
+  .find__grid {
+    grid-template-columns: 1fr 1.15fr;
+  }
+}
+
+.find__block + .find__block {
+  margin-top: 2rem;
+}
+.find__label {
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--wood);
+  margin-bottom: 0.6rem;
+}
+.find__address {
+  font-style: normal;
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+
+.find__hours {
+  font-variant-numeric: tabular-nums;
+}
+.find__hours li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 0.4rem;
+  max-width: 22rem;
+  border-bottom: 1px solid var(--rule);
+}
+.find__hours span:last-child {
+  color: var(--text-muted);
+}
+
+.find__media {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--sand-deep);
+}
+.find__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4 / 5;
+}
+@media (min-width: 55rem) {
+  .find__media img {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+.find__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.footer {
+  background: var(--black);
+  color: var(--sand);
+  --text-muted: var(--light-stone);
+  padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
+}
+
+.footer__grid {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+@media (min-width: 48rem) {
+  .footer__grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+.footer__brand {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+}
+.footer__brand + p {
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  max-width: 30ch;
+}
+
+.footer h2 {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--light-stone);
+  margin-bottom: 0.9rem;
+}
+
+.footer a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.footer a:hover {
+  border-bottom-color: var(--wood-light);
+  color: var(--wood-light);
+}
+
+.footer li + li {
+  margin-top: 0.45rem;
+}
+
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}

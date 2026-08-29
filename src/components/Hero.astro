@@ -1,0 +1,121 @@
+---
+import { Image, Picture } from 'astro:assets';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { carouselPhotos, logo } from '../lib/photos';
+import site from '../data/site.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+---
+
+<section class="hero" id="top">
+  <div class="hero__grid">
+    <div class="hero__copy">
+      <Image
+        class="hero__logo"
+        src={logo}
+        alt={site.name}
+        width={160}
+        height={160}
+        loading="eager"
+      />
+
+      <div>
+        <h1 class="hero__title">{site.name}</h1>
+        <p class="hero__tagline" data-i18n="hero.tagline">{t(locale, 'hero.tagline')}</p>
+      </div>
+
+      <p class="hero__intro" data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#contact" data-i18n="hero.cta">{t(locale, 'hero.cta')}</a>
+        <a class="btn btn--ghost" href="#menu" data-i18n="hero.ctaSecondary">
+          {t(locale, 'hero.ctaSecondary')}
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__media" id="hero-media">
+      {
+        carouselPhotos.map((photo, index) => (
+          <div class="hero__slide" data-active={index === 0 ? 'true' : 'false'}>
+            <Picture
+              src={photo}
+              formats={['avif', 'webp']}
+              widths={[600, 900, 1200, 1600]}
+              sizes="(min-width: 60rem) 50vw, 100vw"
+              alt=""
+              loading={index === 0 ? 'eager' : 'lazy'}
+              decoding={index === 0 ? 'sync' : 'async'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  /**
+   * Hero crossfade.
+   *
+   * Everything below is enhancement: with no JS the first slide stays visible
+   * and the hero is a still image, which is also the fastest possible LCP.
+   * Nothing here runs when the visitor has asked for reduced motion.
+   */
+  const media = document.getElementById('hero-media');
+  const slides = media ? Array.from(media.querySelectorAll<HTMLElement>('.hero__slide')) : [];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (media && slides.length > 1 && !reduceMotion.matches) {
+    const INTERVAL = 6000;
+    let current = 0;
+    let timer: number | undefined;
+
+    const show = (next: number) => {
+      current = (next + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        slide.dataset.active = String(i === current);
+      });
+      dots.forEach((dot, i) => {
+        dot.setAttribute('aria-current', String(i === current));
+      });
+    };
+
+    const start = () => {
+      window.clearInterval(timer);
+      timer = window.setInterval(() => show(current + 1), INTERVAL);
+    };
+
+    // Dots are created here rather than in the markup so that a visitor without
+    // JS is never shown controls that cannot do anything.
+    const nav = document.createElement('div');
+    nav.className = 'hero__dots';
+
+    const dots = slides.map((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-current', String(i === 0));
+      dot.setAttribute('aria-label', `${i + 1} / ${slides.length}`);
+      dot.addEventListener('click', () => {
+        show(i);
+        start();
+      });
+      nav.append(dot);
+      return dot;
+    });
+
+    media.append(nav);
+    start();
+
+    // Pause while the tab is hidden, so a backgrounded page is not decoding
+    // images nobody is looking at.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) window.clearInterval(timer);
+      else start();
+    });
+  }
+</script>

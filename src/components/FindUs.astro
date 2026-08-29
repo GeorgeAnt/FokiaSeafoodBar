@@ -1,0 +1,122 @@
+---
+import { Picture } from 'astro:assets';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { galleryPhoto } from '../lib/photos';
+import site from '../data/site.json';
+import gallery from '../data/gallery.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+
+/* The exterior shot doubles as the "how you will recognise the place" image —
+   it is the frontage with the sign on it. */
+const exterior = gallery.images.find((image) => image.id === 'exterior-sign')!;
+
+const dayOrder = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+] as const;
+
+/** One row per day, so a visitor can find today without decoding a range. */
+const schedule = dayOrder.map((day) => {
+  const entry = site.hours.entries.find((e) => e.days.includes(day));
+  return { day, entry };
+});
+---
+
+<section class="section" id="find-us">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="eyebrow" data-i18n="nav.findUs">{t(locale, 'nav.findUs')}</p>
+      <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
+    </header>
+
+    <div class="find__grid">
+      <div>
+        <div class="find__block">
+          <p class="find__label" data-i18n="findUs.addressLabel">
+            {t(locale, 'findUs.addressLabel')}
+          </p>
+          <address class="find__address">
+            {site.address.street}<br />
+            {site.address.postalCode} {site.address.city}<br />
+            <span data-i18n="site.countryName">{site.address.countryName[locale]}</span>
+          </address>
+        </div>
+
+        <div class="find__block">
+          <p class="find__label" data-i18n="findUs.hoursLabel">{t(locale, 'findUs.hoursLabel')}</p>
+          <ul class="find__hours">
+            {
+              schedule.map(({ day, entry }) => (
+                <li>
+                  <span data-i18n={`hours.${day}`}>{t(locale, `hours.${day}`)}</span>
+                  {entry ? (
+                    <span>
+                      {entry.opens}
+                      <span data-i18n="hours.rangeSeparator">{t(locale, 'hours.rangeSeparator')}</span>
+                      {entry.closes}
+                    </span>
+                  ) : (
+                    <span data-i18n="findUs.closed">{t(locale, 'findUs.closed')}</span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="find__actions">
+          {
+            /* Rendered only once the client supplies the real links — an empty
+               href would look like a working button that goes nowhere. */
+            site.directionsUrl && (
+              <a
+                class="btn btn--primary"
+                href={site.directionsUrl}
+                target="_blank"
+                rel="noopener"
+                data-i18n="findUs.directions"
+              >
+                {t(locale, 'findUs.directions')}
+              </a>
+            )
+          }
+          {
+            site.mapUrl && (
+              <a
+                class="btn btn--ghost"
+                href={site.mapUrl}
+                target="_blank"
+                rel="noopener"
+                data-i18n="findUs.viewOnMap"
+              >
+                {t(locale, 'findUs.viewOnMap')}
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      <div class="find__media">
+        <Picture
+          src={galleryPhoto(exterior.file)}
+          formats={['avif', 'webp']}
+          widths={[500, 800, 1100]}
+          sizes="(min-width: 55rem) 50vw, 100vw"
+          alt={t(locale, `gallery.${exterior.id}.alt`)}
+          data-i18n-alt={`gallery.${exterior.id}.alt`}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,368 @@
+{
+  "$comment": "Greek-only menu content. Never translated. See README for editing rules. price:null = not yet priced by the client; it renders as an em dash.",
+  "categories": [
+    {
+      "id": "salates",
+      "name": "Σαλάτες",
+      "items": [
+        {
+          "id": "salata-surimi",
+          "name": "Σαλάτα surimi",
+          "description": "Λάχανο, καρότο, τηγανητό surimi",
+          "price": 9
+        },
+        {
+          "id": "salata-wakame",
+          "name": "Σαλάτα wakame",
+          "description": "Φύκι wakame, λάχανο, καρότο, πιπεριές τουρσί, vermicelli noodles",
+          "price": 10
+        },
+        {
+          "id": "salata-domatinia-raspberry",
+          "name": "Σαλάτα με ντοματίνια & raspberry",
+          "description": "Ντοματίνια, raspberry, χαρούπι, βασιλικός, μαλακή φέτα",
+          "price": 12
+        }
+      ]
+    },
+    {
+      "id": "krya-orektika",
+      "name": "Κρύα Ορεκτικά",
+      "items": [
+        {
+          "id": "tuna-tacos",
+          "name": "Tuna tacos",
+          "description": "Ceviche τόνου & κινέζικο λάχανο",
+          "price": 12
+        },
+        {
+          "id": "crab-tacos",
+          "name": "Crab tacos",
+          "description": "Καβουροσαλάτα, tobiko & κινέζικο λάχανο",
+          "price": 10
+        },
+        {
+          "id": "carpaccio-lavraki",
+          "name": "Carpaccio λαβράκι",
+          "description": "Λαδολέμονο, σαφράν, φρέσκια ρίγανη, κρεμμύδι τουρσί, ψητό καλαμπόκι",
+          "price": 10
+        },
+        {
+          "id": "chips-ryziou-tartar-garidas",
+          "name": "Chips ρυζιού με tartar γαρίδας κοιλάδος",
+          "price": 9
+        }
+      ]
+    },
+    {
+      "id": "zesta-orektika",
+      "name": "Ζεστά Ορεκτικά",
+      "items": [
+        {
+          "id": "edamame",
+          "name": "Edamame",
+          "price": 5,
+          "variants": ["Ατμού", "σχάρας", "spicy"]
+        },
+        {
+          "id": "glykopatates-tiganites",
+          "name": "Γλυκοπατάτες τηγανητές με dressing κατσικίσιου τυριού",
+          "price": 8
+        },
+        {
+          "id": "arancini",
+          "name": "Arancini με chutney ντομάτας & sour cream",
+          "price": 10
+        },
+        {
+          "id": "dumplings-kavouri",
+          "name": "Χειροποίητα dumplings με καβούρι, ντοματίνια, φέτα & ούζο",
+          "price": 10
+        },
+        {
+          "id": "spring-rolls",
+          "name": "Χειροποίητα spring rolls με γλυκόξινη sauce",
+          "price": 8
+        },
+        {
+          "id": "spare-ribs",
+          "name": "Spare ribs με hoisin sauce",
+          "price": 12
+        },
+        {
+          "id": "kotopoulo-tonkatsu",
+          "name": "Τηγανητό κοτόπουλο tonkatsu μαριναρισμένο σε ξυνόγαλο",
+          "price": 12
+        },
+        {
+          "id": "garides-psites",
+          "name": "Γαρίδες ψητές με relish mango, κόλιανδρο, lime & chips tapioca",
+          "price": 13
+        },
+        {
+          "id": "bakaliaros",
+          "name": "Τραγανός μπακαλιάρος με ταραμά παντζαριού & αγιολί βασιλικού",
+          "price": 10
+        },
+        {
+          "id": "tuna-tataki-jalapeno",
+          "name": "Tuna tataki με jalapeño sauce & πιπεριά Φλωρίνης",
+          "price": 12
+        }
+      ]
+    },
+    {
+      "id": "bao-buns",
+      "name": "Bao buns",
+      "items": [
+        {
+          "id": "bao-shrimp",
+          "name": "Shrimp",
+          "description": "Γαρίδα tempura, ιαπωνικό ψωμάκι, λαχανικά τουρσί & sweet chili mayo",
+          "unit": "2 τεμάχια",
+          "price": 9
+        },
+        {
+          "id": "bao-chicken",
+          "name": "Chicken",
+          "description": "Κοτόπουλο, ιαπωνικό ψωμάκι, iceberg, καρότο & λαδολέμονο μουστάρδας",
+          "unit": "2 τεμάχια",
+          "price": 8
+        },
+        {
+          "id": "bao-surimi",
+          "name": "Surimi",
+          "description": "Τηγανητό surimi, ιαπωνικό ψωμάκι & coleslaw",
+          "unit": "2 τεμάχια",
+          "price": 8
+        }
+      ]
+    },
+    {
+      "id": "sushi",
+      "name": "Sushi",
+      "items": [
+        {
+          "id": "nigiri",
+          "name": "Nigiri",
+          "unit": "2 τεμάχια",
+          "price": 5,
+          "variants": ["Σολομός", "Τόνος", "Λαβράκι"]
+        },
+        {
+          "id": "sashimi",
+          "name": "Sashimi",
+          "unit": "2 τεμάχια",
+          "price": 5,
+          "variants": ["Σολομός", "Τόνος", "Λαβράκι"]
+        }
+      ]
+    },
+    {
+      "id": "maki-rolls",
+      "name": "Maki Rolls",
+      "unit": "6 τεμάχια | 6 pieces",
+      "items": [
+        {
+          "id": "maki-lavraki",
+          "name": "Λαβράκι μαριναρισμένο",
+          "price": 7
+        },
+        {
+          "id": "maki-solomos",
+          "name": "Σολομός",
+          "price": 7
+        },
+        {
+          "id": "maki-tonos",
+          "name": "Τόνος",
+          "price": 7
+        },
+        {
+          "id": "maki-triple-fish-futo",
+          "name": "Triple fish futo maki",
+          "price": null
+        },
+        {
+          "id": "maki-aggouri",
+          "name": "Αγγούρι",
+          "price": 4
+        },
+        {
+          "id": "maki-avokanto",
+          "name": "Αβοκάντο",
+          "price": 5
+        }
+      ]
+    },
+    {
+      "id": "inside-outs",
+      "name": "Inside-outs",
+      "unit": "8 τεμάχια | 8 pieces",
+      "items": [
+        {
+          "id": "io-lachanikon",
+          "name": "Λαχανικών",
+          "description": "Καρότο, αγγούρι, κρεμμυδάκι, mango",
+          "price": 6
+        },
+        {
+          "id": "io-shrimp-roll",
+          "name": "Shrimp roll",
+          "description": "Γαρίδα tempura, mayo, avocado",
+          "price": 8
+        },
+        {
+          "id": "io-salmon-roll",
+          "name": "Salmon roll",
+          "description": "Σολομός, αβοκάντο, philadelphia",
+          "price": 10
+        },
+        {
+          "id": "io-tuna-roll",
+          "name": "Tuna roll",
+          "description": "Τόνος, αγγούρι, κρεμμυδάκι, spicy mayo",
+          "price": 12
+        },
+        {
+          "id": "io-surimi-california",
+          "name": "Surimi California roll",
+          "description": "Surimi, τηγανητό κρεμμύδι, αβοκάντο, spicy mayo",
+          "price": 7
+        }
+      ]
+    },
+    {
+      "id": "premium-inside-out-rolls",
+      "name": "Premium inside-out rolls",
+      "unit": "8 τεμάχια | 8 pieces",
+      "items": [
+        {
+          "id": "premium-double-salmon",
+          "name": "Double salmon",
+          "description": "Σολομός, αβοκάντο, τυρί κρέμα, καψαλισμένος σολομός, teriyaki",
+          "price": 15
+        },
+        {
+          "id": "premium-tuna-tataki",
+          "name": "Tuna tataki",
+          "description": "Καψαλισμένος τόνος, μάνγκο, κρεμμυδάκι, αγγούρι, spicy mayo, ponzu",
+          "price": 15
+        },
+        {
+          "id": "premium-seabass",
+          "name": "Seabass",
+          "description": "Λαβράκι, μάνγκο, κρεμμυδάκι, αγγούρι, masago",
+          "price": 14
+        },
+        {
+          "id": "premium-spicy-tuna-tartar",
+          "name": "Spicy tuna tartar",
+          "description": "Τόνος, μάνγκο, κρεμμυδάκι, αγγούρι, καρότο, hot sauce",
+          "price": 15
+        },
+        {
+          "id": "premium-tuna-shrimp",
+          "name": "Tuna & shrimp",
+          "description": "Γαρίδα tempura, τόνος, μάνγκο, αγγούρι, αγγούρι-miso-jalapeño sauce",
+          "price": 16
+        },
+        {
+          "id": "premium-salmon-surimi",
+          "name": "Salmon & surimi",
+          "description": "Σολομός, surimi, αβοκάντο, κρεμμυδάκι, τυρί κρέμα",
+          "price": null
+        },
+        {
+          "id": "premium-king-crab-california",
+          "name": "King Crab California",
+          "description": "Βασιλικό καβούρι, αβοκάντο, τηγανητό κρεμμύδι, wasabi mayo",
+          "price": 18
+        }
+      ]
+    },
+    {
+      "id": "fried-rolls",
+      "name": "Fried Rolls",
+      "items": [
+        {
+          "id": "fried-vegie-futo-maki",
+          "name": "Fried vegie futo maki",
+          "description": "Καρότο, αγγούρι, λάχανο, πιπεριές, λάχανο τουρσί, red pepper sauce, teriyaki",
+          "unit": "6 τεμάχια",
+          "price": 8
+        },
+        {
+          "id": "fried-surimi",
+          "name": "Fried surimi",
+          "description": "Surimi, αβοκάντο, κρεμμυδάκι, τυρί κρέμα, hot sauce",
+          "unit": "8 τεμάχια",
+          "price": 10
+        }
+      ]
+    },
+    {
+      "id": "noodles",
+      "name": "Noodles",
+      "items": [
+        {
+          "id": "udon-noodles",
+          "name": "Udon noodles με κοτόπουλο, ανανά, γάλα καρύδας & κάρυ",
+          "price": 12
+        },
+        {
+          "id": "soba-noodles",
+          "name": "Soba noodles με λαχανικά, teriyaki & σησαμέλαιο",
+          "price": 9
+        },
+        {
+          "id": "egg-noodles",
+          "name": "Egg noodles με γαρίδες, ginger, λαχανικά, baby corn, σκόρδο, φύτρες μπαμπού & γάλα καρύδας",
+          "price": 14
+        }
+      ]
+    },
+    {
+      "id": "kyrios-piata",
+      "name": "Κυρίως πιάτα",
+      "items": [
+        {
+          "id": "solomos-poures-avokanto",
+          "name": "Σολομός με πουρέ αβοκάντο, ταμπουλέ με εσπεριδοειδή & teriyaki",
+          "price": 18
+        },
+        {
+          "id": "lavraki-choumous",
+          "name": "Λαβράκι με χούμους πορτοκάλι και κουρκουμά & σαλάτα ανάμεικτη με noodles",
+          "price": 17
+        },
+        {
+          "id": "kritharoto-garidas",
+          "name": "Κριθαρότο γαρίδας με bisque γαρίδας, ντοματίνια & φινόκιο",
+          "price": 17
+        }
+      ]
+    },
+    {
+      "id": "epidorpio",
+      "name": "Επιδόρπιο",
+      "items": [
+        {
+          "id": "tiramisu-mango",
+          "name": "Tiramisu mango",
+          "price": 8
+        },
+        {
+          "id": "namelaka-lefkis-sokolatas",
+          "name": "Namelaka λευκής σοκολάτας με φρούτα του δάσους, yuzu & φύλλα spring rolls",
+          "price": null
+        },
+        {
+          "id": "tiganito-pagoto",
+          "name": "Τηγανητό παγωτό με σοκολάτα bitter και κρέμα γιαουρτιού",
+          "price": null
+        }
+      ]
+    }
+  ]
+}

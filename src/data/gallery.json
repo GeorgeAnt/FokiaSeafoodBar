@@ -1,0 +1,189 @@
+{
+  "$comment": "Alt text is locale-keyed and describes what is actually visible — written from the photos, deliberately not asserting specific menu-dish names. `caption` is optional and omitted for now. Filenames map to src/assets/photos/gallery/. NOTE: dsc-9858-1.jpg is a near-duplicate frame of dsc-9858.jpg and is intentionally excluded; add an entry here to bring it back.",
+  "images": [
+    {
+      "id": "exterior-sign",
+      "file": "dsc-2916.jpg",
+      "alt": {
+        "el": "Η πινακίδα «fokia — seafood bar» από οξειδωμένο ατσάλι στην πρόσοψη του εστιατορίου, με ένα χέρι να κρατά ένα δροσιστικό κοκτέιλ.",
+        "en": "The corten steel “fokia — seafood bar” sign on the restaurant frontage, with a hand holding a chilled cocktail."
+      }
+    },
+    {
+      "id": "interior",
+      "file": "dsc-8248.jpg",
+      "alt": {
+        "el": "Ο εσωτερικός χώρος του εστιατορίου με ξύλινα τραπέζια, ψάθινες καρέκλες και κρεμαστά φωτιστικά.",
+        "en": "The dining room, with wooden tables, woven chairs and hanging pendant lights."
+      }
+    },
+    {
+      "id": "table-setting",
+      "file": "dsc-4367.jpg",
+      "alt": {
+        "el": "Στρωμένο τραπέζι με ποτήρια και πιάτα σε σκούρα πέτρινη επιφάνεια.",
+        "en": "A laid table with glassware and plates on a dark stone surface."
+      }
+    },
+    {
+      "id": "negroni-sunlight",
+      "file": "dsc-2833.jpg",
+      "alt": {
+        "el": "Κοκτέιλ σε ποτήρι coupe με φλούδα πορτοκαλιού και μεγάλο παγάκι, σε τσιμεντένιο τραπέζι στο έντονο φως του ήλιου.",
+        "en": "A cocktail in a coupe glass with an orange twist and a large ice cube, on a concrete table in hard sunlight."
+      }
+    },
+    {
+      "id": "negroni-closeup",
+      "file": "dsc-2835.jpg",
+      "alt": {
+        "el": "Κοντινό πλάνο κόκκινου κοκτέιλ με φλούδα πορτοκαλιού, με τη σκιά του ποτηριού στο τραπέζι.",
+        "en": "Close-up of a red cocktail with an orange twist, the glass casting a long shadow across the table."
+      }
+    },
+    {
+      "id": "shared-table",
+      "file": "dsc-2857.jpg",
+      "alt": {
+        "el": "Μοιρασμένο τραπέζι με σούσι σε ξύλινη πλατέλα, μπολ με noodles, κοκτέιλ και μπύρα.",
+        "en": "A shared table with sushi on a wooden board, a bowl of noodles, a cocktail and a beer."
+      }
+    },
+    {
+      "id": "roll-chopsticks-dark",
+      "file": "dsc-2880.jpg",
+      "alt": {
+        "el": "Ρολό sushi ανάμεσα σε ξύλινα chopsticks πάνω από κεραμικό πιατάκι, σε σκούρο φόντο.",
+        "en": "A sushi roll held between wooden chopsticks above a ceramic dish, against a dark background."
+      }
+    },
+    {
+      "id": "sushi-board-overhead",
+      "file": "dsc-2900.jpg",
+      "alt": {
+        "el": "Κάτοψη τραπεζιού με μακριά ξύλινη πλατέλα γεμάτη ρολά sushi, σαλάτες και μπύρα.",
+        "en": "Overhead view of a table with a long wooden board of sushi rolls, salads and a beer."
+      }
+    },
+    {
+      "id": "toast-outdoors",
+      "file": "dsc-2909.jpg",
+      "alt": {
+        "el": "Δύο χέρια τσουγκρίζουν κοκτέιλ σε τραπέζι έξω, με δέντρο και γαλάζιο ουρανό πίσω.",
+        "en": "Two hands clinking cocktails at an outdoor table, a tree and blue sky behind them."
+      }
+    },
+    {
+      "id": "maki-closeup",
+      "file": "dsc-2927.jpg",
+      "alt": {
+        "el": "Κοντινό πλάνο ρολού maki με σολομό και αβοκάντο, πιασμένο με chopsticks.",
+        "en": "Close-up of a maki roll with salmon and avocado, held with chopsticks."
+      }
+    },
+    {
+      "id": "tempura-and-rolls",
+      "file": "dsc-2929.jpg",
+      "alt": {
+        "el": "Κάτοψη με τηγανητά λαχανικά tempura σε μπολ και ρολά sushi με σάλτσα σε σκούρες πλατέλες.",
+        "en": "Overhead view of tempura-fried vegetables in a bowl and sauced sushi rolls on dark platters."
+      }
+    },
+    {
+      "id": "dark-bowl",
+      "file": "dsc-2933.jpg",
+      "alt": {
+        "el": "Πιάτο σε μαύρο μπολ σε χαμηλό φωτισμό, με κοκτέιλ στο βάθος.",
+        "en": "A dish in a black bowl under low light, a cocktail behind it."
+      }
+    },
+    {
+      "id": "reaching-for-maki",
+      "file": "dsc-2940.jpg",
+      "alt": {
+        "el": "Χέρι με chopsticks απλώνεται προς ρολά maki σε σκούρα πλατέλα, δίπλα σε κοκτέιλ.",
+        "en": "A hand with chopsticks reaching for maki rolls on a dark platter, beside a cocktail."
+      }
+    },
+    {
+      "id": "dessert-terracotta",
+      "file": "dsc-3832.jpg",
+      "alt": {
+        "el": "Επιδόρπιο σε κεραμικό μπολ με χρώμα τερακότα, με τραγανά φύλλα και σταγόνες κρέμας.",
+        "en": "A dessert in a terracotta-toned ceramic bowl, with crisp shards and dots of cream."
+      }
+    },
+    {
+      "id": "seared-fish-puree",
+      "file": "dsc-3875.jpg",
+      "alt": {
+        "el": "Ψητό φιλέτο ψαριού με τραγανή πέτσα πάνω σε κίτρινο πουρέ, με λεπτή σαλάτα και βρώσιμο άνθος.",
+        "en": "A seared fish fillet with crisp skin on a yellow purée, with a fine salad and an edible flower."
+      }
+    },
+    {
+      "id": "dumplings",
+      "file": "dsc-3878.jpg",
+      "alt": {
+        "el": "Χειροποίητα dumplings σε μπολ με σάλτσα ντομάτας και θρυμματισμένο τυρί.",
+        "en": "Handmade dumplings in a bowl with tomato sauce and crumbled cheese."
+      }
+    },
+    {
+      "id": "takeaway-box",
+      "file": "dsc-3936.jpg",
+      "alt": {
+        "el": "Χέρι κρατά κουτί takeaway με το λογότυπο fokia, με ένα ρολό sushi πιασμένο με chopsticks.",
+        "en": "A hand holding a fokia-branded takeaway box, a sushi roll lifted from it with chopsticks."
+      }
+    },
+    {
+      "id": "tacos",
+      "file": "dsc-5898.jpg",
+      "alt": {
+        "el": "Δύο tacos σε μαύρες βάσεις σερβιρίσματος πάνω σε ξύλινο τραπέζι στο ηλιακό φως.",
+        "en": "Two tacos in black serving stands on a wooden table in sunlight."
+      }
+    },
+    {
+      "id": "fried-starter",
+      "file": "dsc-5901.jpg",
+      "alt": {
+        "el": "Τηγανητό ορεκτικό σε φύλλο μπανάνας μέσα σε σκούρο μπολ, με μικρό μπολ σάλτσας δίπλα.",
+        "en": "A fried starter on a banana leaf in a dark bowl, with a small bowl of dipping sauce alongside."
+      }
+    },
+    {
+      "id": "ceviche-presented",
+      "file": "dsc-7275.jpg",
+      "alt": {
+        "el": "Δύο χέρια παρουσιάζουν μπολ με λεπτές φέτες ωμού ψαριού, κρεμμύδι τουρσί και καλαμπόκι.",
+        "en": "Two hands presenting a bowl of thinly sliced raw fish with pickled onion and corn."
+      }
+    },
+    {
+      "id": "croquettes-beetroot",
+      "file": "dsc-7387.jpg",
+      "alt": {
+        "el": "Τραγανές μπουκιές πάνω σε έντονο ροζ πουρέ παντζαριού, σε πιάτο με χείλος τερακότα.",
+        "en": "Crisp bites on a vivid pink beetroot purée, on a plate with a terracotta rim."
+      }
+    },
+    {
+      "id": "prawns-bisque",
+      "file": "dsc-9858.jpg",
+      "alt": {
+        "el": "Ψητές γαρίδες σε πορτοκαλί bisque με ρύζι, σε βαθύ πιάτο.",
+        "en": "Grilled prawns in an orange bisque with rice, in a deep bowl."
+      }
+    },
+    {
+      "id": "california-roll-closeup",
+      "file": "dsc-9891.jpg",
+      "alt": {
+        "el": "Κοντινό πλάνο ρολού California πιασμένου με chopsticks πάνω από το τραπέζι.",
+        "en": "Close-up of a California roll held with chopsticks above the table."
+      }
+    }
+  ]
+}

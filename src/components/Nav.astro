@@ -1,0 +1,96 @@
+---
+import { Image } from 'astro:assets';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { logo } from '../lib/photos';
+import site from '../data/site.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+
+const links = [
+  { href: '#goal', key: 'nav.goal' },
+  { href: '#menu', key: 'nav.menu' },
+  { href: '#team', key: 'nav.team' },
+  { href: '#gallery', key: 'nav.gallery' },
+  { href: '#contact', key: 'nav.contact' },
+  { href: '#find-us', key: 'nav.findUs' },
+];
+---
+
+<header class="nav">
+  <nav class="wrap nav__inner" aria-label="Main">
+    <a class="nav__brand" href="#top">
+      <Image src={logo} alt="" width={42} height={42} loading="eager" />
+      <span>{site.name}</span>
+    </a>
+
+    <ul class="nav__links" id="nav-links">
+      {
+        links.map((link) => (
+          <li>
+            <a href={link.href} data-i18n={link.key}>
+              {t(locale, link.key)}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="nav__actions">
+      <div class="lang" role="group" aria-label={t(locale, 'a11y.languageSwitcher')} data-i18n-label="a11y.languageSwitcher">
+        <button type="button" data-lang-btn="el" aria-pressed="true">ΕΛ</button>
+        <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+      </div>
+
+      <a class="btn btn--primary nav__cta" href="#contact" data-i18n="nav.reserve">
+        {t(locale, 'nav.reserve')}
+      </a>
+
+      <button
+        type="button"
+        class="nav__toggle"
+        id="nav-toggle"
+        aria-expanded="false"
+        aria-controls="nav-links"
+        aria-label={t(locale, 'a11y.openMenu')}
+        data-i18n-label="a11y.openMenu"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // Mobile navigation. Progressive enhancement: with no JS the links are simply
+  // always visible in the stacked layout.
+  const toggle = document.getElementById('nav-toggle');
+  const links = document.getElementById('nav-links');
+
+  if (toggle && links) {
+    const setOpen = (open: boolean) => {
+      links.dataset.open = String(open);
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(links.dataset.open !== 'true');
+    });
+
+    // Tapping a link should close the panel, not leave it covering the target.
+    links.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && links.dataset.open === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

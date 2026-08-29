@@ -1,0 +1,61 @@
+{
+  "$comment": "Order in this file is the display order. `name` is a flat string (never translated); `role` and `bio` are locale-keyed. Bios are PLACEHOLDER text at realistic length so the layout is tested at true content length — replace before launch. Layout holds from 4 to 6 members.",
+  "members": [
+    {
+      "id": "chef-john",
+      "name": "Chef John",
+      "photo": "chef-john.jpg",
+      "placeholder": true,
+      "role": {
+        "el": "Εκτελεστικός Σεφ",
+        "en": "Executive Chef"
+      },
+      "bio": {
+        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Ο σεφ μας συνδυάζει την ελληνική παράδοση του ψαριού με τεχνικές της ιαπωνικής κουζίνας. Ξεκίνησε από τις ταβέρνες του Αιγαίου και συνέχισε σε κουζίνες της Ευρώπης, φέρνοντας πίσω μια ματιά που σέβεται την πρώτη ύλη πάνω από όλα. Στη fokia σχεδιάζει ένα μενού που αλλάζει με τη θάλασσα.",
+        "en": "PLACEHOLDER — Our chef brings together the Greek tradition of fish cookery and the techniques of the Japanese kitchen. He started in the tavernas of the Aegean and went on to kitchens across Europe, returning with an approach that puts the raw ingredient above everything else. At fokia he builds a menu that changes with the sea."
+      }
+    },
+    {
+      "id": "sous-chef",
+      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
+      "photo": "female1.jpg",
+      "placeholder": true,
+      "role": {
+        "el": "Υπεύθυνη Sushi",
+        "en": "Head of Sushi"
+      },
+      "bio": {
+        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Δουλεύει το ψάρι με την ακρίβεια που ζητάει το sushi και την υπομονή που ζητάει η μαθητεία. Κάθε ρολό που βγαίνει από τον πάγκο της περνάει από τα χέρια της δύο φορές, μία για τη γεύση και μία για την εικόνα. Πιστεύει ότι το καλό ψάρι δεν χρειάζεται να κρυφτεί πίσω από σάλτσες.",
+        "en": "PLACEHOLDER — She works fish with the precision sushi demands and the patience an apprenticeship demands. Every roll that leaves her counter passes through her hands twice, once for the taste and once for the look. She believes good fish never needs to hide behind a sauce."
+      }
+    },
+    {
+      "id": "bar-manager",
+      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
+      "photo": "male1.jpg",
+      "placeholder": true,
+      "role": {
+        "el": "Υπεύθυνος Bar",
+        "en": "Bar Manager"
+      },
+      "bio": {
+        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Στήνει τη λίστα των cocktail γύρω από ελληνικά αποστάγματα, δουλεύοντας το τσίπουρο και το ούζο όπως άλλοι δουλεύουν το whisky. Το Twisted Greek Negroni ξεκίνησε ως πείραμα ενός βράδυ και έμεινε στον κατάλογο. Θεωρεί ότι το ποτό πρέπει να συνομιλεί με το πιάτο, όχι να το σκεπάζει.",
+        "en": "PLACEHOLDER — He builds the cocktail list around Greek spirits, working with tsipouro and ouzo the way others work with whisky. The Twisted Greek Negroni began as one evening's experiment and never left the list. He holds that a drink should talk to the plate, not cover it."
+      }
+    },
+    {
+      "id": "service-lead",
+      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
+      "photo": "male2.jpg",
+      "placeholder": true,
+      "role": {
+        "el": "Υπεύθυνος Αίθουσας",
+        "en": "Front of House"
+      },
+      "bio": {
+        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Θυμάται τι παρήγγειλε ο κάθε πελάτης την προηγούμενη φορά και ποιο κρασί του άρεσε. Φροντίζει ώστε το τραπέζι να έχει τον ρυθμό του, χωρίς βιασύνη και χωρίς κενά. Λέει ότι η δουλειά της αίθουσας φαίνεται μόνο όταν δεν τη χρειάζεσαι.",
+        "en": "PLACEHOLDER — He remembers what each guest ordered last time and which wine they liked. He keeps a table moving at its own pace, never rushed and never left waiting. He says front-of-house work only shows when you do not need it."
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+---
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import site from '../data/site.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+
+const year = new Date().getFullYear();
+const socials = site.social.filter((link) => link.url);
+---
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <p class="footer__brand">{site.name}</p>
+        <!-- Same name, address and phone as the structured data and the Find Us
+             section — consistent NAP matters for local search. -->
+        <p data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>
+      </div>
+
+      <div>
+        <h2 data-i18n="findUs.addressLabel">{t(locale, 'findUs.addressLabel')}</h2>
+        <address class="find__address" style="font-size: var(--step-0)">
+          {site.address.street}<br />
+          {site.address.postalCode} {site.address.city}<br />
+          <a href={`tel:${site.phone.href}`}>{site.phone.display}</a>
+        </address>
+      </div>
+
+      {
+        socials.length > 0 && (
+          <div>
+            <h2 data-i18n="footer.followUs">{t(locale, 'footer.followUs')}</h2>
+            <ul>
+              {socials.map((link) => (
+                <li>
+                  <a href={link.url} target="_blank" rel="noopener me">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="footer__bottom">
+      <p>
+        © {year} {site.name}. <span data-i18n="footer.rights">{t(locale, 'footer.rights')}</span>
+      </p>
+      <p><a href="#top" data-i18n="footer.backToTop">{t(locale, 'footer.backToTop')}</a></p>
+    </div>
+  </div>
+</footer>

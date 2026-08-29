@@ -1,0 +1,41 @@
+{
+  "$comment": "Greek regulation requires this block on the menu. Always rendered, never truncated, never collapsed behind a toggle. Unlike the menu itself this IS locale-keyed — the client supplied both EL and EN.",
+  "notices": [
+    {
+      "id": "allergies",
+      "el": "Ενημερώστε μας για τυχόν αλλεργίες ή δυσανεξίες.",
+      "en": "Please let us know if you have any food allergies or intolerances."
+    },
+    {
+      "id": "frozen",
+      "el": "Τα φύκια wakame, τα raspberry, τα edamame, οι γλυκοπατάτες, το surimi, το βασιλικό καβούρι, οι γαρίδες, το ιαπωνικό ψωμάκι, το tobiko και το masago είναι κατεψυγμένα.",
+      "en": "Wakame seaweed, raspberries, edamame, sweet potatoes, surimi, king crab, shrimp, Japanese milk bread, tobiko, and masago are stored frozen."
+    },
+    {
+      "id": "fish-freezing-protocol",
+      "el": "Τα ψάρια μας προμηθεύονται φρέσκα και, σύμφωνα με το προβλεπόμενο πρωτόκολλο υγειονομικής ασφάλειας, υποβάλλονται σε 24ωρη κατάψυξη για την εξάλειψη πιθανών μικροοργανισμών και την απόλυτη διασφάλιση της ποιότητας και της ασφάλειας των προϊόντων μας.",
+      "en": "Our fish are supplied fresh and, in accordance with the prescribed health and safety regulations, undergo a 24-hour freezing process to eliminate potential microorganisms and ensure the absolute quality and safety of our products."
+    },
+    {
+      "id": "right-to-information",
+      "el": "Οι καταναλωτές έχουν το δικαίωμα να ζητήσουν πληροφορίες για τα συστατικά και τις μεθόδους παρασκευής των πιάτων.",
+      "en": "Consumers have the right to request information on the ingredients and methods of preparation of the dishes."
+    },
+    {
+      "id": "receipt",
+      "el": "Ο καταναλωτής δεν υποχρεούται να πληρώσει εάν δεν παραλάβει το νόμιμο παραστατικό (απόδειξη ή τιμολόγιο).",
+      "en": "Consumers are not obliged to pay unless they have received a receipt or invoice."
+    },
+    {
+      "id": "taxes",
+      "el": "Οι τιμές συμπεριλαμβάνουν όλους τους νόμιμους φόρους.",
+      "en": "Prices include all applicable taxes."
+    }
+  ],
+  "commercialManager": {
+    "el": { "label": "Αγορανομικός υπεύθυνος", "name": "Καντάρης Θεόδωρος-Ιωάννης" },
+    "en": { "label": "Commercial Manager", "name": "Kantaris Theodoros-Ioannis" },
+    "phone": "213 099 1571",
+    "phoneHref": "+302130991571"
+  }
+}

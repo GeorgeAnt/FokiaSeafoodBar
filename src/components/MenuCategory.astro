@@ -1,0 +1,43 @@
+---
+import MenuItem from './MenuItem.astro';
+import type { MenuGroup } from '../lib/menu';
+import { defaultLocale, type Locale } from '../lib/i18n';
+
+interface Props {
+  category: MenuGroup;
+  locale?: Locale;
+}
+const { category, locale = defaultLocale } = Astro.props;
+---
+
+<section class="menu__category" id={`cat-${category.id}`}>
+  <header class="menu__category-head">
+    <h3>{category.name}</h3>
+    {category.unit && <span class="menu__category-unit">{category.unit}</span>}
+  </header>
+
+  {
+    category.items?.length && (
+      <ul>
+        {category.items.map((item) => (
+          <MenuItem item={item} locale={locale} />
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    /* Κρασί splits into Ποτήρι and Φιάλη. Nothing else uses subcategories, but
+       the renderer handles them generically so the client can add more. */
+    category.subcategories?.map((sub) => (
+      <>
+        <h4 class="menu__subhead">{sub.name}</h4>
+        <ul>
+          {(sub.items ?? []).map((item) => (
+            <MenuItem item={item} locale={locale} />
+          ))}
+        </ul>
+      </>
+    ))
+  }
+</section>
