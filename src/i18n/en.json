@@ -4,6 +4,9 @@
   "meta.title": "fokia — seafood bar | Fish, sushi and cocktails",
   "meta.description": "fokia is a seafood bar pairing fresh Greek fish with Japanese technique. Sushi, raw plates, hot dishes and cocktails built on Greek spirits.",
 
+  "meta.menuTitle": "The Menu | fokia — seafood bar",
+  "meta.menuDescription": "The full fokia menu: salads, raw and hot starters, sushi, maki, noodles, main courses, wines and cocktails. Served in Greek.",
+
   "a11y.skipToContent": "Skip to content",
   "a11y.openMenu": "Open navigation menu",
   "a11y.closeMenu": "Close navigation menu",
@@ -19,7 +22,6 @@
   "nav.gallery": "Gallery",
   "nav.contact": "Delivery & Reservations",
   "nav.findUs": "Where to Find Us",
-  "nav.reserve": "Reserve",
 
   "hero.tagline": "seafood bar",
   "hero.intro": "Fresh fish, Japanese technique, a Greek table.",
@@ -53,6 +55,7 @@
   "contact.reserveBody": "Call us to book a table. For larger groups, please let us know in advance.",
   "contact.callUs": "Call us",
   "contact.phoneLabel": "Phone",
+  "contact.emailLabel": "Email",
 
   "findUs.heading": "Where to Find Us",
   "findUs.addressLabel": "Address",

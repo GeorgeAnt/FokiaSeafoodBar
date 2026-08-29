@@ -4,6 +4,9 @@
   "meta.title": "fokia — seafood bar | Ψάρι, sushi και κοκτέιλ",
   "meta.description": "Το fokia είναι ένα seafood bar που συνδυάζει το φρέσκο ελληνικό ψάρι με ιαπωνική τεχνική. Sushi, ωμά, ζεστά πιάτα και κοκτέιλ με ελληνικά αποστάγματα.",
 
+  "meta.menuTitle": "Το Μενού | fokia — seafood bar",
+  "meta.menuDescription": "Ο πλήρης κατάλογος του fokia: σαλάτες, ωμά και ζεστά ορεκτικά, sushi, maki, noodles, κυρίως πιάτα, κρασιά και cocktails.",
+
   "a11y.skipToContent": "Μετάβαση στο περιεχόμενο",
   "a11y.openMenu": "Άνοιγμα μενού πλοήγησης",
   "a11y.closeMenu": "Κλείσιμο μενού πλοήγησης",
@@ -19,7 +22,6 @@
   "nav.gallery": "Gallery",
   "nav.contact": "Delivery & Κρατήσεις",
   "nav.findUs": "Πού θα μας βρείτε",
-  "nav.reserve": "Κράτηση",
 
   "hero.tagline": "seafood bar",
   "hero.intro": "Φρέσκο ψάρι, ιαπωνική τεχνική, ελληνικό τραπέζι.",
@@ -53,6 +55,7 @@
   "contact.reserveBody": "Καλέστε μας για να κρατήσετε τραπέζι. Για μεγάλες παρέες, ενημερώστε μας από πριν.",
   "contact.callUs": "Καλέστε μας",
   "contact.phoneLabel": "Τηλέφωνο",
+  "contact.emailLabel": "Email",
 
   "findUs.heading": "Πού θα μας βρείτε",
   "findUs.addressLabel": "Διεύθυνση",

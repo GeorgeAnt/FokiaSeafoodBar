@@ -1,5 +1,6 @@
 ---
 import { t, defaultLocale, type Locale } from '../lib/i18n';
+import SocialLinks from './SocialLinks.astro';
 import site from '../data/site.json';
 
 interface Props {
@@ -24,9 +25,10 @@ const socials = site.social.filter((link) => link.url);
       <div>
         <h2 data-i18n="findUs.addressLabel">{t(locale, 'findUs.addressLabel')}</h2>
         <address class="find__address" style="font-size: var(--step-0)">
-          {site.address.street}<br />
-          {site.address.postalCode} {site.address.city}<br />
-          <a href={`tel:${site.phone.href}`}>{site.phone.display}</a>
+          <span data-i18n="site.street">{t(locale, 'site.street')}</span><br />
+          {site.address.postalCode} <span data-i18n="site.city">{t(locale, 'site.city')}</span><br />
+          <a href={`tel:${site.phone.href}`}>{site.phone.display}</a><br />
+          <a href={`mailto:${site.email}`}>{site.email}</a>
         </address>
       </div>
 
@@ -34,15 +36,7 @@ const socials = site.social.filter((link) => link.url);
         socials.length > 0 && (
           <div>
             <h2 data-i18n="footer.followUs">{t(locale, 'footer.followUs')}</h2>
-            <ul>
-              {socials.map((link) => (
-                <li>
-                  <a href={link.url} target="_blank" rel="noopener me">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <SocialLinks />
           </div>
         )
       }

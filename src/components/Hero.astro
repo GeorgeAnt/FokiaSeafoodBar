@@ -29,8 +29,8 @@ const { locale = defaultLocale } = Astro.props;
       <p class="hero__intro" data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>
 
       <div class="hero__actions">
-        <a class="btn btn--primary" href="#contact" data-i18n="hero.cta">{t(locale, 'hero.cta')}</a>
-        <a class="btn btn--ghost" href="#menu" data-i18n="hero.ctaSecondary">
+        <a class="btn btn--primary" href="/#contact" data-i18n="hero.cta">{t(locale, 'hero.cta')}</a>
+        <a class="btn btn--ghost" href="/menu" data-i18n="hero.ctaSecondary">
           {t(locale, 'hero.ctaSecondary')}
         </a>
       </div>

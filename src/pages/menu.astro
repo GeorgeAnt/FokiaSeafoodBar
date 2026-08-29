@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Menu from '../components/Menu.astro';
+import Footer from '../components/Footer.astro';
+import { defaultLocale } from '../lib/i18n';
+
+/*
+  The menu has its own page rather than an anchor on the homepage.
+
+  It is 98 items across 19 sections — over half of the site's DOM — and, more to
+  the point, a restaurant needs a URL that *is* the menu: for the QR code on the
+  table, the link in the Instagram bio, and the Google Business Profile menu
+  field. An anchor cannot carry its own title and description, or rank on its
+  own for "fokia menu".
+
+  Structured data follows the split: the Restaurant graph stays on the homepage
+  with `hasMenu` pointing here, and the Menu/MenuSection/MenuItem graph is
+  emitted on this page via `menuSchema`.
+*/
+const locale = defaultLocale;
+---
+
+<Base
+  locale={locale}
+  titleKey="meta.menuTitle"
+  descriptionKey="meta.menuDescription"
+  menuSchema
+>
+  <Nav locale={locale} />
+
+  {/*
+    id="main" is what the skip link targets. The footer's "back to top" uses
+    href="#top", which needs no element — HTML treats the fragment "top" as the
+    top of the document when nothing carries that id.
+  */}
+  <main id="main">
+    <Menu locale={locale} />
+  </main>
+
+  <Footer locale={locale} />
+</Base>

@@ -6,10 +6,28 @@ import site from '../data/site.json';
 
 interface Props {
   locale?: Locale;
+  /** i18n keys for this page's title and description. */
+  titleKey?: string;
+  descriptionKey?: string;
+  /**
+   * Emits the Menu / MenuSection / MenuItem graph. Only the menu page sets this
+   * — the graph is ~14 KB, and it belongs on the page that actually shows it.
+   */
+  menuSchema?: boolean;
 }
-const { locale = defaultLocale } = Astro.props;
+const {
+  locale = defaultLocale,
+  titleKey = 'meta.title',
+  descriptionKey = 'meta.description',
+  menuSchema = false,
+} = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.com').toString();
+const origin = Astro.site ?? new URL('https://example.com');
+const canonical = new URL(Astro.url.pathname, origin).toString();
+const menuUrl = new URL('/menu', origin).toString();
+
+const title = t(locale, titleKey);
+const description = t(locale, descriptionKey);
 
 /* ---------------------------------------------------------------------------
    Structured data.
@@ -60,13 +78,21 @@ const restaurantSchema = {
   description: t(locale, 'meta.description'),
   url: canonical,
   telephone: site.phone.href,
+  email: site.email,
   servesCuisine: site.seo.servesCuisine,
   priceRange: site.seo.priceRange,
   acceptsReservations: site.seo.acceptsReservations,
+  // Links the site to the restaurant's official profiles, so search engines
+  // treat them as the same entity.
+  sameAs: site.social.filter((link) => link.url).map((link) => link.url),
+  hasMap: site.mapUrl || undefined,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: site.address.street,
-    addressLocality: site.address.city,
+    // Structured data carries one form of the address; the Greek one, since
+    // that is the address as it is written locally.
+    streetAddress: site.address.street.el,
+    addressLocality: site.address.city.el,
+    addressRegion: site.address.region.el,
     postalCode: site.address.postalCode,
     addressCountry: site.address.country,
   },
@@ -82,13 +108,23 @@ const restaurantSchema = {
       }
     : {}),
   openingHoursSpecification: openingHours,
-  hasMenu: {
-    '@type': 'Menu',
-    name: t(locale, 'menu.heading'),
-    inLanguage: 'el',
-    hasMenuSection: menuSections,
-  },
+  // A URL rather than an inline graph: schema.org expects hasMenu to point at
+  // the menu, and it keeps 14 KB of structured data off every other page.
+  hasMenu: menuUrl,
 };
+
+/** Emitted only on /menu, where the items actually are. */
+const menuGraph = {
+  '@context': 'https://schema.org',
+  '@type': 'Menu',
+  '@id': menuUrl,
+  name: t(locale, 'menu.heading'),
+  url: menuUrl,
+  inLanguage: 'el',
+  hasMenuSection: menuSections,
+};
+
+const schemas = menuSchema ? [restaurantSchema, menuGraph] : [restaurantSchema];
 
 /* Both dictionaries ship inline. Together they are a few kilobytes — smaller
    than the round trip a fetch would cost, and it means switching language never
@@ -101,8 +137,10 @@ const dictJson = JSON.stringify(dictionaries);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    {/* Generated from the client's logo by `npm run favicons`. */}
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="generator" content={Astro.generator} />
 
     {/*
@@ -118,8 +156,8 @@ const dictJson = JSON.stringify(dictionaries);
     <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-greek-wght-normal.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-latin-wght-normal.woff2" crossorigin />
 
-    <title data-i18n="meta.title">{t(locale, 'meta.title')}</title>
-    <meta name="description" content={t(locale, 'meta.description')} data-i18n-content="meta.description" />
+    <title data-i18n={titleKey}>{title}</title>
+    <meta name="description" content={description} data-i18n-content={descriptionKey} />
 
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="el" href={canonical} />
@@ -128,12 +166,8 @@ const dictJson = JSON.stringify(dictionaries);
 
     <meta property="og:type" content="restaurant.restaurant" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={t(locale, 'meta.title')} data-i18n-content="meta.title" />
-    <meta
-      property="og:description"
-      content={t(locale, 'meta.description')}
-      data-i18n-content="meta.description"
-    />
+    <meta property="og:title" content={title} data-i18n-content={titleKey} />
+    <meta property="og:description" content={description} data-i18n-content={descriptionKey} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="el_GR" />
     <meta property="og:locale:alternate" content="en_GB" />
@@ -141,7 +175,9 @@ const dictJson = JSON.stringify(dictionaries);
 
     <meta name="theme-color" content="#181414" />
 
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(restaurantSchema)} />
+    {schemas.map((schema) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
   </head>
 
   <body>

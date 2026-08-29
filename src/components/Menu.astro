@@ -23,7 +23,8 @@ const views = [
   <div class="wrap">
     <header class="section-head" lang={locale}>
       <p class="eyebrow" data-i18n="nav.menu">{t(locale, 'nav.menu')}</p>
-      <h2 data-i18n="menu.heading">{t(locale, 'menu.heading')}</h2>
+      {/* The menu has a page to itself, so this is the page's h1. */}
+      <h1 data-i18n="menu.heading">{t(locale, 'menu.heading')}</h1>
       <p data-i18n="menu.intro">{t(locale, 'menu.intro')}</p>
     </header>
 
@@ -79,7 +80,7 @@ const views = [
       bilingual — the client supplied both versions.
     -->
     <aside class="menu__legal" lang={locale}>
-      <h3 data-i18n="menu.legalHeading">{t(locale, 'menu.legalHeading')}</h3>
+      <h2 data-i18n="menu.legalHeading">{t(locale, 'menu.legalHeading')}</h2>
       <ul>
         {
           legal.notices.map((notice) => (

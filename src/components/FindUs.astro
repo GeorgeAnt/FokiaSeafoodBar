@@ -49,10 +49,25 @@ const schedule = dayOrder.map((day) => {
             {t(locale, 'findUs.addressLabel')}
           </p>
           <address class="find__address">
-            {site.address.street}<br />
-            {site.address.postalCode} {site.address.city}<br />
-            <span data-i18n="site.countryName">{site.address.countryName[locale]}</span>
+            <span data-i18n="site.street">{t(locale, 'site.street')}</span><br />
+            {site.address.postalCode} <span data-i18n="site.city">{t(locale, 'site.city')}</span><br />
+            <span data-i18n="site.countryName">{t(locale, 'site.countryName')}</span>
           </address>
+        </div>
+
+        <div class="find__block">
+          <p class="find__label" data-i18n="contact.phoneLabel">
+            {t(locale, 'contact.phoneLabel')}
+          </p>
+          <p class="find__contact">
+            <a href={`tel:${site.phone.href}`}>{site.phone.display}</a>
+          </p>
+          <p class="find__label find__label--tight" data-i18n="contact.emailLabel">
+            {t(locale, 'contact.emailLabel')}
+          </p>
+          <p class="find__contact">
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
         </div>
 
         <div class="find__block">

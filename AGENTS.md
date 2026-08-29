@@ -1,6 +1,7 @@
 # fokia — seafood bar
 
-Single-page Astro marketing site for a Greek seafood restaurant. See `README.md`
+Astro marketing site for a Greek seafood restaurant: a scrolling homepage plus
+a dedicated `/menu` page. See `README.md`
 for how to run it and how a non-developer edits the content.
 
 ## Rules that are easy to break
@@ -21,6 +22,12 @@ under the menu, never collapsed, never shortened.
 
 **Content changes go in JSON, not components.** `src/data/` and `src/i18n/` only.
 
+**Two pages.** `/` is the scrolling homepage; `/menu` is the menu and its legal
+block. Nav links to homepage sections must stay rooted (`/#team`) so they work
+from `/menu`. The `Restaurant` JSON-LD lives on `/` with `hasMenu` pointing at
+`/menu`; the `Menu` graph is emitted only on `/menu` via Base's `menuSchema`
+prop. Each page needs exactly one `h1`.
+
 ## Commands
 
 ```
@@ -29,6 +36,7 @@ npm run build    # production build into dist/
 npm run check    # content validation + what is still missing from the client
 npx astro check  # type check (should stay at 0 errors)
 npm run photos   # re-run the one-time photo downsample (only for new originals)
+npm run favicons # regenerate favicons from the logo (only if the logo changes)
 ```
 
 Node is installed but **not on the shell PATH**; prepend it first:
@@ -49,6 +57,14 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - Colours on a section come from tokens the surface tier sets (`--accent`,
   `--text-muted`, `--ghost-hover-*`). Don't reference `--wood` directly for
   text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
+- The nav logo is centred with `position: absolute`, so the two flanking groups
+  must stay near-equal in width or they slide under it. The language switcher
+  and social icons sit on the *left* purely to balance the right-hand group;
+  re-measure before moving anything between them. Measured clearance runs down
+  to 990px, which is why the bar collapses at 64rem — adding anything to either
+  group means re-checking that breakpoint.
+- Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
+  nav links need `display: block` or the tap targets collapse to ~26px.
 - When screenshotting to verify, disable Chrome's HTTP cache, force
   `scroll-behavior: auto` before scrolling to trigger lazy images, and clear
   `localStorage['fokia:lang']` before testing the default locale.

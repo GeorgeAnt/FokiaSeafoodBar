@@ -12,7 +12,7 @@ const { category, locale = defaultLocale } = Astro.props;
 
 <section class="menu__category" id={`cat-${category.id}`}>
   <header class="menu__category-head">
-    <h3>{category.name}</h3>
+    <h2>{category.name}</h2>
     {category.unit && <span class="menu__category-unit">{category.unit}</span>}
   </header>
 
@@ -31,7 +31,7 @@ const { category, locale = defaultLocale } = Astro.props;
        the renderer handles them generically so the client can add more. */
     category.subcategories?.map((sub) => (
       <>
-        <h4 class="menu__subhead">{sub.name}</h4>
+        <h3 class="menu__subhead">{sub.name}</h3>
         <ul>
           {(sub.items ?? []).map((item) => (
             <MenuItem item={item} locale={locale} />

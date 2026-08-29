@@ -54,6 +54,9 @@ function contentKeys(locale: Locale): Dict {
 
   for (const img of galleryData.images) out[`gallery.${img.id}.alt`] = img.alt[locale];
 
+  out['site.street'] = siteData.address.street[locale];
+  out['site.city'] = siteData.address.city[locale];
+  out['site.region'] = siteData.address.region[locale];
   out['site.countryName'] = siteData.address.countryName[locale];
 
   return out;

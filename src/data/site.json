@@ -1,45 +1,54 @@
 {
-  "$comment": "Restaurant identity and contact details. Fields marked PLACEHOLDER need confirming with the client before launch — see README.",
+  "$comment": "Restaurant identity and contact details. Fields marked PLACEHOLDER still need confirming with the client — see README.",
   "name": "fokia",
   "tagline": "seafood bar",
   "phone": {
-    "display": "213 099 1571",
-    "href": "+302130991571",
-    "$comment": "PLACEHOLDER — taken from the menu's commercial-manager line. Confirm this is the reservations/takeaway number."
+    "display": "21 3099 1571",
+    "href": "+302130991571"
   },
+  "email": "fokiaseafoodbar@gmail.com",
   "address": {
-    "street": "PLACEHOLDER — οδός και αριθμός",
-    "city": "Αθήνα",
-    "postalCode": "PLACEHOLDER",
+    "$comment": "Confirmed by the client. `street` and `city` are locale-keyed so the Greek page is not left reading a Latin transliteration of a Greek street name. VERIFY the Greek spellings before launch.",
+    "street": { "el": "Λάσκου 3", "en": "Laskou 3" },
+    "city": { "el": "Ελευσίνα", "en": "Elefsina" },
+    "region": { "el": "Αττική", "en": "Attica" },
+    "postalCode": "19200",
     "country": "GR",
-    "countryName": { "el": "Ελλάδα", "en": "Greece" },
-    "$comment": "PLACEHOLDER — real address needed."
+    "countryName": { "el": "Ελλάδα", "en": "Greece" }
   },
   "geo": {
     "latitude": null,
     "longitude": null,
-    "$comment": "PLACEHOLDER — needed for JSON-LD and the map. Omitted from structured data while null."
+    "$comment": "PLACEHOLDER — needed for the `geo` block in the JSON-LD, which is omitted entirely while these are null. Read them off Google Maps at the pin for Laskou 3."
   },
-  "mapUrl": "",
-  "directionsUrl": "",
+  "mapUrl": "https://www.google.com/maps/search/?api=1&query=Laskou%203%2C%20Elefsina%2019200%2C%20Greece",
+  "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=Laskou%203%2C%20Elefsina%2019200%2C%20Greece",
   "hours": {
-    "$comment": "PLACEHOLDER — real opening hours needed. `days` uses schema.org day names for JSON-LD.",
+    "$comment": "Confirmed by the client. `days` uses schema.org day names for the JSON-LD. A `closes` earlier than `opens` means the following day, so 00:00 reads as midnight. Any day not listed in `entries` renders as closed.",
     "entries": [
-      { "days": ["Tuesday", "Wednesday", "Thursday"], "opens": "18:00", "closes": "00:00" },
-      { "days": ["Friday", "Saturday"], "opens": "13:00", "closes": "01:00" },
-      { "days": ["Sunday"], "opens": "13:00", "closes": "23:00" }
+      {
+        "days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "16:00",
+        "closes": "00:00"
+      },
+      { "days": ["Saturday", "Sunday"], "opens": "14:00", "closes": "00:00" }
     ],
     "closed": ["Monday"]
   },
+  "$socialComment": "Order here is the order shown in the nav and the footer. `id` selects the icon in components/SocialLinks.astro — an id with no matching icon is skipped, so add the icon before adding the network.",
   "social": [
-    { "id": "instagram", "label": "Instagram", "url": "" },
-    { "id": "facebook", "label": "Facebook", "url": "" }
+    {
+      "id": "instagram",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/fokia_seafood_bar/"
+    },
+    { "id": "facebook", "label": "Facebook", "url": "https://www.facebook.com/fokiaseafoodbar" }
   ],
   "seo": {
     "url": "https://example.com",
     "priceRange": "€€",
     "servesCuisine": ["Seafood", "Greek", "Japanese", "Sushi"],
     "acceptsReservations": true,
-    "$comment": "PLACEHOLDER — `url` must be the real production domain before launch (canonical, OG, sitemap all derive from it)."
+    "$comment": "PLACEHOLDER — `url` must be the real production domain before launch (canonical, OG, sitemap and robots.txt all derive from it)."
   }
 }

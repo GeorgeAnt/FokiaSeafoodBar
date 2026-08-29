@@ -1,6 +1,7 @@
 # fokia — seafood bar
 
-A single-page marketing site for the restaurant. Built with [Astro](https://astro.build),
+A marketing site for the restaurant — a single scrolling homepage plus a
+dedicated menu page at `/menu`. Built with [Astro](https://astro.build),
 which ships **zero JavaScript frameworks** — the whole page loads about 29 KB of
 HTML/CSS (gzipped) plus images.
 
@@ -19,10 +20,28 @@ npm run dev       # http://localhost:4321 — live reload
 npm run build     # production build into dist/
 npm run preview   # serve the built dist/ locally
 npm run check     # validate the content files (see below)
+npm run favicons  # regenerate the favicons from the logo (only if it changes)
 ```
 
 Deploy by uploading `dist/` to any static host — Netlify, Vercel, Cloudflare
 Pages, GitHub Pages, or plain nginx. There is no server and no database.
+
+### Pages
+
+| URL | What's on it |
+|---|---|
+| `/` | Hero, Our Goal, the Team, Gallery, Delivery & Reservations, Where to Find Us |
+| `/menu` | The full menu and the legally required notices |
+
+The menu has a page of its own rather than being a section on the homepage. It
+is 98 items across 19 sections — over half the site's DOM — but the real reason
+is that a restaurant needs a URL that **is** the menu: the QR code on the table,
+the Instagram bio link, the Google Business Profile menu field. An anchor cannot
+carry its own title and description, or rank on its own for "fokia menu".
+
+Nav links to homepage sections are written rooted (`/#team`, not `#team`) so
+they work from `/menu` too. From the homepage a rooted fragment is still a
+same-document jump, so nothing reloads.
 
 ---
 
@@ -127,9 +146,17 @@ To add new photos, drop the originals into the source folder and run
 
 ### Restaurant details — `src/data/site.json`
 
-Name, phone, address, opening hours, social links, and the production domain.
-Fields still marked `PLACEHOLDER` must be replaced before launch — see
-[Before launch](#before-launch).
+Name, phone, email, address, opening hours, social links, map links and the
+production domain. Fields still marked `PLACEHOLDER` must be replaced before
+launch — see [Before launch](#before-launch).
+
+`street` and `city` are locale-keyed so the Greek page shows `Λάσκου 3,
+Ελευσίνα` rather than a Latin transliteration.
+
+**Adding a social network:** add an entry to `social` with an `id`, `label` and
+`url`. The `id` picks the icon out of `src/components/SocialLinks.astro` — add
+the SVG path there first, or the entry is skipped rather than rendered blank.
+Order in the file is the order shown in the nav and the footer.
 
 ### The legal block — `src/data/legal.json`
 
@@ -196,6 +223,26 @@ fallback from those masters, at the widths each section actually needs. Every
 image carries explicit dimensions, so nothing shifts as the page loads. Only the
 first hero image loads eagerly; everything else is lazy.
 
+### Favicons
+
+`npm run favicons` regenerates them from `src/assets/photos/logo.png` into
+`public/`. Run it only if the logo changes.
+
+It produces two different pieces of artwork on purpose. **Tab icons use the
+wave-in-the-o monogram**, cropped out of the badge — the full logo is an
+illegible grey smudge at 16px, because the wordmark and "SEAFOOD BAR" collapse
+into a few pixels. **The Apple touch icon uses the whole badge**, since iOS
+renders it large on the home screen where the wordmark reads.
+
+| File | Size | Artwork |
+|---|---|---|
+| `favicon.ico` | 16, 32, 48 | monogram |
+| `favicon-96x96.png` | 96 | monogram |
+| `apple-touch-icon.png` | 180 | full badge |
+
+If the client supplies a transparent or vector logo, replace `logo.png` and
+re-run — and reconsider the crop box (`MONOGRAM` at the top of the script).
+
 ---
 
 ## Performance
@@ -242,13 +289,17 @@ Two things are load-bearing for those numbers; changing them will cost score:
 
 **Blocking — the site is wrong without these:**
 
-- **Real address and postcode** — `site.json` currently says `PLACEHOLDER`. It
-  appears in the Find Us section, the footer, and the structured data.
 - **Production domain** — `site.seo.url`. Canonical URLs, Open Graph tags,
   `sitemap.xml` and `robots.txt` all derive from it.
-- **Confirm the phone number.** `213 099 1571` was taken from the commercial-manager
-  line of the menu. It may not be the reservations number.
-- **Confirm the opening hours** — the current ones are invented placeholders.
+- **Check the Greek spelling of the address.** The client supplied it in Latin
+  script (`Laskou 3, Elefsína`); `site.json` renders `Λάσκου 3, Ελευσίνα` on the
+  Greek page, which needs a native-speaker check.
+
+**Confirmed and in place:** address (Laskou 3, Elefsina 19200), phone
+(21 3099 1571), email (fokiaseafoodbar@gmail.com), opening hours (Tue–Fri
+16:00–00:00, Sat–Sun 14:00–00:00, closed Monday), Instagram and Facebook.
+The map and directions links are built from the address, so they work now;
+swap them for a Google Maps place link if you want the exact pin.
 
 **Content still outstanding:**
 
@@ -283,10 +334,11 @@ src/
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script
   lib/                i18n lookup, menu formatting, photo resolution
-  pages/index.astro   the single page
+  pages/index.astro   homepage — hero, goal, team, gallery, contact, find us
+  pages/menu.astro    the menu, at /menu
   styles/global.css   design tokens and all styling
-public/               fonts, favicon, robots.txt
-scripts/              prepare-photos.mjs, check-content.mjs
+public/               fonts, favicons, robots.txt
+scripts/              prepare-photos.mjs, prepare-favicons.mjs, check-content.mjs
 ```
 
 Colours, type scale and spacing are CSS custom properties at the top of

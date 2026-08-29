@@ -110,7 +110,7 @@
 html {
   scroll-behavior: smooth;
   /* Sticky nav must not cover the heading of an anchored section. */
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: 6.25rem;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -219,7 +219,7 @@ button {
 
 .section {
   padding-block: var(--section-y);
-  scroll-margin-top: 4.5rem;
+  scroll-margin-top: 5rem;
 }
 
 .section-dark {
@@ -302,6 +302,7 @@ button {
 .section-head {
   margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.5rem);
 }
+.section-head h1,
 .section-head h2 {
   font-size: var(--step-3);
 }
@@ -370,27 +371,48 @@ button {
   border-bottom: 1px solid var(--rule);
 }
 
+/*
+  Centred logo with the links split either side.
+
+  Only two groups are in normal flow — the left list and .nav__end — pushed to
+  opposite edges, which leaves a clear gap in the middle. The logo is taken out
+  of flow and centred on the bar itself, so it lands on the true centre of the
+  viewport rather than the midpoint between two unequal groups.
+*/
 .nav__inner {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1.5rem;
-  min-height: 4.5rem;
+  min-height: 5rem;
+}
+
+.nav__start,
+.nav__end {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 0.4rem + 1.1vw, 1.9rem);
+}
+
+.nav__utils {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .nav__brand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
   text-decoration: none;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-inline-end: auto;
 }
 .nav__brand img {
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 3.4rem;
+  height: 3.4rem;
   border-radius: 50%;
 }
 
@@ -416,10 +438,49 @@ button {
   border-bottom-color: var(--accent);
 }
 
-.nav__actions {
+/* The menu is a page of its own now, so the nav can show where you are. */
+.nav__links a[aria-current='page'] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* Social icons ------------------------------------------------------------- */
+.social {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.25rem;
+}
+.social a {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  transition:
+    color 0.18s var(--ease),
+    background-color 0.18s var(--ease);
+}
+.social a:hover {
+  color: var(--accent);
+}
+.social svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* In the footer they sit under a heading and can afford to be a touch larger. */
+.footer .social {
+  gap: 0.35rem;
+  margin-top: -0.35rem;
+  margin-inline-start: -0.55rem;
+}
+.footer .social a {
+  color: var(--sand);
+}
+.footer .social a:hover {
+  color: var(--accent);
+  border-bottom-color: transparent;
 }
 
 .lang {
@@ -452,34 +513,76 @@ button {
   height: 1.5rem;
 }
 
-@media (max-width: 60rem) {
+/*
+  Below this width the split layout runs out of room and the two link groups
+  slide under the centred logo. Measured: the groups stay clear down to 990px
+  and collide at 961px, so 64rem (1024px) leaves a margin without giving up the
+  full nav on landscape tablets.
+*/
+@media (max-width: 64rem) {
   .nav__toggle {
     display: block;
   }
+
+  .nav__inner {
+    flex-wrap: wrap;
+    /* No row gap: the two link groups have to read as one continuous list once
+       they stack, not as two separate menus. */
+    row-gap: 0;
+    column-gap: 1rem;
+  }
+  .nav__inner[data-open='true'] {
+    max-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  /* Dissolving these wrappers lets the links, the utilities and the actions be
+     ordered independently of one another once the bar stacks. */
+  .nav__start,
+  .nav__end {
+    display: contents;
+  }
+
+  .nav__brand {
+    position: static;
+    translate: none;
+    order: 1;
+    margin-inline-end: auto;
+  }
+  .nav__utils {
+    order: 2;
+  }
+  .nav__toggle {
+    order: 3;
+  }
+
   .nav__links {
-    position: fixed;
-    inset: 4.5rem 0 auto;
+    order: 4;
+    width: 100%;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: 1rem var(--gutter) 2rem;
-    background: var(--sand);
-    border-bottom: 1px solid var(--rule);
-    max-height: calc(100dvh - 4.5rem);
-    overflow-y: auto;
-    /* Hidden by default on small screens; the toggle sets [data-open]. */
+    /* Hidden until the toggle sets [data-open] on the bar. */
     display: none;
   }
-  .nav__links[data-open='true'] {
+  .nav__links--right {
+    order: 5;
+    padding-bottom: 1rem;
+  }
+  .nav__inner[data-open='true'] .nav__links {
     display: flex;
   }
+  .nav__links--left {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--rule);
+  }
   .nav__links a {
+    /* Must be block: vertical padding on an inline link does not grow its row,
+       which left the tap targets around 26px tall — well under the 44px minimum. */
+    display: block;
     padding-block: 0.9rem;
     font-size: var(--step-0);
     border-bottom: 1px solid var(--rule);
-  }
-  .nav__cta {
-    display: none;
   }
 }
 
@@ -757,7 +860,7 @@ button {
 .menu__category {
   break-inside: avoid;
   margin-bottom: 3rem;
-  scroll-margin-top: 6rem;
+  scroll-margin-top: 6.75rem;
 }
 
 .menu__category-head {
@@ -769,7 +872,7 @@ button {
   margin-bottom: 1.25rem;
   border-bottom: 1px solid var(--accent);
 }
-.menu__category-head h3 {
+.menu__category-head h2 {
   font-size: var(--step-2);
   font-weight: 600;
 }
@@ -1029,6 +1132,20 @@ button {
   text-underline-offset: 0.2em;
 }
 
+.contact__email {
+  margin-top: 0.6rem;
+  font-size: var(--step--1);
+}
+.contact__email a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+.contact__email a:hover {
+  color: var(--sand);
+  border-bottom-color: currentColor;
+}
+
 /* --------------------------------------------------------------------------
    Where to find us
    -------------------------------------------------------------------------- */
@@ -1052,6 +1169,22 @@ button {
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 0.6rem;
+}
+.find__label--tight {
+  margin-top: 1.1rem;
+}
+
+.find__contact {
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+.find__contact a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  transition: border-color 0.18s var(--ease);
+}
+.find__contact a:hover {
+  border-bottom-color: currentColor;
 }
 .find__address {
   font-style: normal;

@@ -119,15 +119,39 @@ walk(drinks.categories, []);
 console.log(`  ${itemCount} items across ${categoryCount} sections, all ids unique`);
 
 /* --- Placeholders still to be replaced ----------------------------------- */
-const site = readFileSync(join(root, 'src/data/site.json'), 'utf8');
-const placeholderCount = (site.match(/PLACEHOLDER/g) ?? []).length;
+const site = read('src/data/site.json');
+
+/** Walks site.json and names the fields that are still unset or placeholder. */
+function outstandingSiteFields(node, trail = []) {
+  const found = [];
+  for (const [key, value] of Object.entries(node)) {
+    if (key.startsWith('$')) continue;
+    const path = [...trail, key].join('.');
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      found.push(...outstandingSiteFields(value, [...trail, key]));
+    } else if (typeof value === 'string' && value.includes('PLACEHOLDER')) {
+      found.push(`${path} — still says PLACEHOLDER`);
+    } else if (value === null) {
+      found.push(`${path} — not set`);
+    } else if (path === 'seo.url' && value.includes('example.com')) {
+      found.push(`${path} — still the example domain`);
+    }
+  }
+  return found;
+}
+
+const outstanding = outstandingSiteFields(site);
 const placeholderTeam = team.members.filter((m) => m.placeholder).length;
 
 console.log('\n--- still needed from the client ---');
 console.log(`\nUnpriced items (${unpriced.length}):`);
 for (const u of unpriced) console.log(`  · ${u}`);
-console.log(`\nPlaceholders in site.json: ${placeholderCount} (address, hours, phone, domain, socials)`);
-console.log(`Team entries still marked placeholder: ${placeholderTeam}/${team.members.length}`);
+
+console.log(`\nsite.json (${outstanding.length} outstanding):`);
+if (outstanding.length === 0) console.log('  · nothing outstanding');
+for (const o of outstanding) console.log(`  · ${o}`);
+
+console.log(`\nTeam entries still marked placeholder: ${placeholderTeam}/${team.members.length}`);
 
 console.log(`\n${errors === 0 ? 'OK — no errors' : `${errors} error(s)`}`);
 process.exit(errors === 0 ? 0 : 1);

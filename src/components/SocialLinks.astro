@@ -1,0 +1,57 @@
+---
+/**
+ * Social icons, driven by `social` in src/data/site.json.
+ *
+ * Both marks are drawn as the same rounded square so they read as a pair rather
+ * than as two borrowed logos. A network whose `id` has no icon here is skipped
+ * rather than rendered blank — add the path below before adding it to the JSON.
+ */
+import site from '../data/site.json';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const icons: Record<string, string> = {
+  instagram: `<rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="4.2" />
+              <circle cx="17.1" cy="6.9" r="1.15" fill="currentColor" stroke="none" />`,
+  /*
+    The stem stops at 18.2, not at the container's own edge — running it to 21
+    made the "f" merge into the bottom border. The crossbar is its own subpath
+    so it stays a bar rather than closing into a lump.
+  */
+  facebook: `<rect x="3" y="3" width="18" height="18" rx="5" />
+             <path d="M14.7 7.8h-0.4a2.1 2.1 0 0 0-2.1 2.1V18.2" stroke-linecap="round" />
+             <path d="M9.7 12.9h5" stroke-linecap="round" />`,
+};
+
+const links = site.social.filter((link) => link.url && icons[link.id]);
+---
+
+{
+  links.length > 0 && (
+    <ul class:list={['social', className]}>
+      {links.map((link) => (
+        <li>
+          {/*
+            The label is the accessible name rather than visible text, and
+            `rel="me"` states that this profile belongs to the same entity.
+          */}
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener me"
+            aria-label={link.label}
+            title={link.label}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <Fragment set:html={icons[link.id]} />
+            </svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
