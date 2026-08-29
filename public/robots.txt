@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Update the host once the production domain is confirmed (src/data/site.json).
+Sitemap: https://example.com/sitemap-index.xml

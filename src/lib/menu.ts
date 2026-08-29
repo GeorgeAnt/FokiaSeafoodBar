@@ -42,13 +42,12 @@ export const drinkCategories = drinksData.categories as MenuGroup[];
 
 /**
  * Greek price convention: comma as the decimal separator, euro sign after the
- * number. Whole numbers stay whole (9 €, not 9,00 €) — that is how the client's
- * own menu is written.
+ * number. Matches how the client's own menu is written — whole numbers stay
+ * whole (9 €, not 9,00 €), and anything with cents keeps both digits
+ * (2,50 € and 3,90 €, never 2,5 € or 3,9 €).
  */
 export function formatPrice(price: number): string {
-  const text = Number.isInteger(price)
-    ? String(price)
-    : price.toFixed(2).replace('.', ',').replace(/,?0+$/, '');
+  const text = Number.isInteger(price) ? String(price) : price.toFixed(2).replace('.', ',');
   return `${text} €`;
 }
 

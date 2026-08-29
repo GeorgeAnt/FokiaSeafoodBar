@@ -147,6 +147,17 @@ p {
   text-wrap: pretty;
 }
 
+/* <figure> carries a default `margin: 1em 40px`, which silently narrows every
+   gallery image inside its column. */
+figure,
+blockquote {
+  margin: 0;
+}
+
+address {
+  font-style: normal;
+}
+
 a {
   color: inherit;
 }
@@ -747,7 +758,9 @@ button {
   text-align: right;
 }
 .menu__item-price--none {
-  color: var(--light-stone);
+  /* --light-stone would only reach 2.5:1 here. The dash is the visible stand-in
+     for a real price, so it has to meet AA like any other text. */
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -767,10 +780,11 @@ button {
 }
 
 .menu__item-meta {
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--light-stone);
+  /* Not uppercased: these are the client's own unit strings ("1 lt", "250 ml",
+     "2 τεμάχια") and should read exactly as written on the menu. */
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
 }
 
 .menu__tags {
@@ -840,7 +854,13 @@ button {
        each row tall enough to push the next member entirely off screen. */
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
   }
-  /* Reverse every second row. */
+
+  /* Reverse every second row. The track sizes have to be swapped along with the
+     items — reordering alone would drop the portrait into the wide track and
+     double that row's height. */
+  .team__member:nth-child(even) {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  }
   .team__member:nth-child(even) .team__photo {
     order: 2;
   }

@@ -1,7 +1,7 @@
 ---
-import { Image, Picture } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
-import { carouselPhotos, logo } from '../lib/photos';
+import { carouselPhotos } from '../lib/photos';
 import site from '../data/site.json';
 
 interface Props {
@@ -13,15 +13,14 @@ const { locale = defaultLocale } = Astro.props;
 <section class="hero" id="top">
   <div class="hero__grid">
     <div class="hero__copy">
-      <Image
-        class="hero__logo"
-        src={logo}
-        alt={site.name}
-        width={160}
-        height={160}
-        loading="eager"
-      />
-
+      {/*
+        The supplied logo is a 1080x1080 Instagram badge with its concrete
+        background baked in, and it already reads "fokia / SEAFOOD BAR" — so on
+        the hero it both duplicates the wordmark below it and sits on the black
+        as a grey disc. It stays in the nav, where it works as a small mark.
+        Once the client supplies a transparent or vector version, drop it back in
+        here and remove the typeset lockup.
+      */}
       <div>
         <h1 class="hero__title">{site.name}</h1>
         <p class="hero__tagline" data-i18n="hero.tagline">{t(locale, 'hero.tagline')}</p>
