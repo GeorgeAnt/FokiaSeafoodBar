@@ -1,7 +1,7 @@
 ---
-import { Picture } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
-import { carouselPhotos } from '../lib/photos';
+import { carouselPhotos, logoClean } from '../lib/photos';
 import site from '../data/site.json';
 
 interface Props {
@@ -14,25 +14,38 @@ const { locale = defaultLocale } = Astro.props;
   <div class="hero__grid">
     <div class="hero__copy">
       {/*
-        The supplied logo is a 1080x1080 Instagram badge with its concrete
-        background baked in, and it already reads "fokia / SEAFOOD BAR" — so on
-        the hero it both duplicates the wordmark below it and sits on the black
-        as a grey disc. It stays in the nav, where it works as a small mark.
-        Once the client supplies a transparent or vector version, drop it back in
-        here and remove the typeset lockup.
+        The logo itself, replacing the typeset "fokia / SEAFOOD BAR" lockup.
+
+        logo-clean.png has a transparent surround so it can sit on the black,
+        but the concrete texture is still inside the badge — it reads as a pale
+        disc rather than a wordmark floating on the ground. That is the supplied
+        artwork. A tightly cropped or vector version would sit better here.
+
+        It stays wrapped in the h1 because this is the homepage's only one, and
+        the alt text is what gives that heading its accessible name. The alt is
+        composed rather than a single key and needs no data-i18n-alt: the brand
+        name is not translated and `hero.tagline` is "seafood bar" in both
+        locales, so the string is identical either way.
       */}
-      <div>
-        <h1 class="hero__title">{site.name}</h1>
-        <p class="hero__tagline" data-i18n="hero.tagline">{t(locale, 'hero.tagline')}</p>
-      </div>
+      <h1 class="hero__logo">
+        <Image
+          src={logoClean}
+          alt={`${site.name} — ${t(locale, 'hero.tagline')}`}
+          widths={[400, 800]}
+          sizes="(min-width: 60rem) 24rem, 16rem"
+          loading="eager"
+        />
+      </h1>
 
       <p class="hero__intro" data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>
 
+      {/*
+        One call to action. Reservations are a phone call, and the number is
+        rendered once in Take away & Reservations — a hero button could only
+        scroll to it, so the menu is the thing worth sending people to.
+      */}
       <div class="hero__actions">
-        <a class="btn btn--primary" href="/#contact" data-i18n="hero.cta">{t(locale, 'hero.cta')}</a>
-        <a class="btn btn--ghost" href="/menu" data-i18n="hero.ctaSecondary">
-          {t(locale, 'hero.ctaSecondary')}
-        </a>
+        <a class="btn btn--primary" href="/menu" data-i18n="hero.cta">{t(locale, 'hero.cta')}</a>
       </div>
     </div>
 
@@ -58,6 +71,49 @@ const { locale = defaultLocale } = Astro.props;
           </div>
         ))
       }
+      {/*
+        Controls live in a <template> rather than in the DOM so a visitor
+        without JavaScript is never shown a button that cannot do anything —
+        but their labels are still rendered by Astro, in the right locale, and
+        carry data-i18n-label so the language switch keeps translating them
+        after the script has cloned them.
+      */}
+      <template id="hero-controls-template">
+        <div class="hero__controls">
+          <button
+            type="button"
+            class="hero__arrow"
+            data-hero-prev
+            aria-label={t(locale, 'a11y.heroPrevious')}
+            data-i18n-label="a11y.heroPrevious"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14.25 5.5 7.75 12l6.5 6.5" />
+            </svg>
+          </button>
+          <div class="hero__dots"></div>
+          <button
+            type="button"
+            class="hero__arrow"
+            data-hero-next
+            aria-label={t(locale, 'a11y.heroNext')}
+            data-i18n-label="a11y.heroNext"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9.75 5.5 16.25 12l-6.5 6.5" />
+            </svg>
+          </button>
+        </div>
+      </template>
+
+      {/*
+        `a11y.heroGoTo` carries an {n} placeholder. The number is per-dot, so the
+        base string travels on the template and the index is substituted below;
+        data-i18n-n lets the language switch redo the same substitution.
+      */}
+      <template id="hero-dot-template">
+        <button type="button" data-i18n-label="a11y.heroGoTo" data-label-template={t(locale, 'a11y.heroGoTo')}></button>
+      </template>
     </div>
   </div>
 </section>
@@ -73,11 +129,14 @@ const { locale = defaultLocale } = Astro.props;
   const media = document.getElementById('hero-media');
   const slides = media ? Array.from(media.querySelectorAll<HTMLElement>('.hero__slide')) : [];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const controlsTemplate = document.querySelector<HTMLTemplateElement>('#hero-controls-template');
+  const dotTemplate = document.querySelector<HTMLTemplateElement>('#hero-dot-template');
 
-  if (media && slides.length > 1 && !reduceMotion.matches) {
+  if (media && controlsTemplate && dotTemplate && slides.length > 1 && !reduceMotion.matches) {
     const INTERVAL = 6000;
     let current = 0;
     let timer: number | undefined;
+    let paused = false;
 
     // Reveals slides 2..n, which until now were display:none so they would not
     // download during the initial load. Deferred to the load event so they never
@@ -86,8 +145,30 @@ const { locale = defaultLocale } = Astro.props;
     if (document.readyState === 'complete') reveal();
     else window.addEventListener('load', reveal, { once: true });
 
-    const show = (next: number) => {
-      current = (next + slides.length) % slides.length;
+    // Controls come from templates so they exist only once JS is running, but
+    // still arrive with Astro-rendered labels in the current locale.
+    const controls = controlsTemplate.content.firstElementChild!.cloneNode(true) as HTMLElement;
+    const dotList = controls.querySelector<HTMLElement>('.hero__dots')!;
+    const prev = controls.querySelector<HTMLButtonElement>('[data-hero-prev]')!;
+    const next = controls.querySelector<HTMLButtonElement>('[data-hero-next]')!;
+
+    const dots = slides.map((_, i) => {
+      const dot = dotTemplate.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
+      const label = dot.getAttribute('data-label-template') || '{n}';
+      dot.removeAttribute('data-label-template');
+      dot.setAttribute('data-i18n-n', String(i + 1));
+      dot.setAttribute('aria-label', label.replace('{n}', String(i + 1)));
+      dot.setAttribute('aria-current', String(i === 0));
+      dot.addEventListener('click', () => {
+        show(i);
+        start();
+      });
+      dotList.append(dot);
+      return dot;
+    });
+
+    const show = (next_: number) => {
+      current = (next_ + slides.length) % slides.length;
       slides.forEach((slide, i) => {
         slide.dataset.active = String(i === current);
       });
@@ -98,29 +179,33 @@ const { locale = defaultLocale } = Astro.props;
 
     const start = () => {
       window.clearInterval(timer);
+      if (paused) return;
       timer = window.setInterval(() => show(current + 1), INTERVAL);
     };
 
-    // Dots are created here rather than in the markup so that a visitor without
-    // JS is never shown controls that cannot do anything.
-    const nav = document.createElement('div');
-    nav.className = 'hero__dots';
-
-    const dots = slides.map((_, i) => {
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.setAttribute('aria-current', String(i === 0));
-      dot.setAttribute('aria-label', `${i + 1} / ${slides.length}`);
-      dot.addEventListener('click', () => {
-        show(i);
-        start();
-      });
-      nav.append(dot);
-      return dot;
+    prev.addEventListener('click', () => {
+      show(current - 1);
+      start();
+    });
+    next.addEventListener('click', () => {
+      show(current + 1);
+      start();
     });
 
-    media.append(nav);
+    media.append(controls);
     start();
+
+    // WCAG 2.2.2: auto-advancing content needs a way to stop it. Hovering or
+    // tabbing into the hero holds the current photo, so nobody loses the frame
+    // they were looking at — or the button they were reaching for.
+    const setPaused = (value: boolean) => {
+      paused = value;
+      start();
+    };
+    media.addEventListener('pointerenter', () => setPaused(true));
+    media.addEventListener('pointerleave', () => setPaused(false));
+    media.addEventListener('focusin', () => setPaused(true));
+    media.addEventListener('focusout', () => setPaused(false));
 
     // Pause while the tab is hidden, so a backgrounded page is not decoding
     // images nobody is looking at.

@@ -7,6 +7,8 @@
   "meta.menuTitle": "The Menu | fokia — seafood bar",
   "meta.menuDescription": "The full fokia menu: salads, raw and hot starters, sushi, maki, noodles, main courses, wines and cocktails. Served in Greek.",
 
+  "meta.galleryTitle": "Gallery | fokia — seafood bar",
+  "meta.galleryDescription": "Photographs from fokia: the room, the plates, the cocktails and the team.",
   "a11y.skipToContent": "Skip to content",
   "a11y.openMenu": "Open navigation menu",
   "a11y.closeMenu": "Close navigation menu",
@@ -14,19 +16,22 @@
   "a11y.heroPrevious": "Previous photo",
   "a11y.heroNext": "Next photo",
   "a11y.heroGoTo": "Go to photo {n}",
+  "a11y.galleryDialog": "Photo viewer",
+  "a11y.galleryClose": "Close",
+  "a11y.galleryPrevious": "Previous photo",
+  "a11y.galleryNext": "Next photo",
   "a11y.priceOnRequest": "Price not yet set",
 
   "nav.goal": "Our Goal",
   "nav.menu": "The Menu",
   "nav.team": "The Team",
   "nav.gallery": "Gallery",
-  "nav.contact": "Delivery & Reservations",
+  "nav.contact": "Reserve your spot • Take away",
   "nav.findUs": "Where to Find Us",
 
   "hero.tagline": "seafood bar",
-  "hero.intro": "Fresh fish, Japanese technique, a Greek table.",
-  "hero.cta": "Make a reservation",
-  "hero.ctaSecondary": "See the menu",
+  "hero.intro": "A refined expression of the sea • crafted moments, timeless taste.",
+  "hero.cta": "See the menu",
 
   "goal.heading": "Our Goal",
   "goal.lead": "To serve fish with the respect it deserves.",
@@ -47,12 +52,7 @@
   "gallery.heading": "Gallery",
   "gallery.intro": "Moments from our table.",
 
-  "contact.heading": "Delivery & Reservations",
-  "contact.intro": "One number for everything — book a table or order to take away.",
-  "contact.takeawayTitle": "Delivery & Take away",
-  "contact.takeawayBody": "Order by phone and collect from the restaurant.",
-  "contact.reserveTitle": "Reservations",
-  "contact.reserveBody": "Call us to book a table. For larger groups, please let us know in advance.",
+  "contact.heading": "Reserve your spot • Take away",
   "contact.callUs": "Call us",
   "contact.phoneLabel": "Phone",
   "contact.emailLabel": "Email",
@@ -60,7 +60,6 @@
   "findUs.heading": "Where to Find Us",
   "findUs.addressLabel": "Address",
   "findUs.hoursLabel": "Opening hours",
-  "findUs.directions": "Get directions",
   "findUs.viewOnMap": "View on map",
   "findUs.closed": "Closed",
 
@@ -71,9 +70,14 @@
   "hours.Friday": "Friday",
   "hours.Saturday": "Saturday",
   "hours.Sunday": "Sunday",
+  "hours.short.Monday": "Mon",
+  "hours.short.Tuesday": "Tue",
+  "hours.short.Wednesday": "Wed",
+  "hours.short.Thursday": "Thu",
+  "hours.short.Friday": "Fri",
+  "hours.short.Saturday": "Sat",
+  "hours.short.Sunday": "Sun",
   "hours.rangeSeparator": "–",
 
-  "footer.followUs": "Follow us",
-  "footer.rights": "All rights reserved.",
-  "footer.backToTop": "Back to top"
+  "footer.rights": "All rights reserved."
 }

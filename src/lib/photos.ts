@@ -45,4 +45,9 @@ export const carouselPhotos: ImageMetadata[] = Object.keys(carousel)
   .sort()
   .map((k) => carousel[k]!.default);
 
-export { default as logo } from '../assets/photos/logo.png';
+/**
+ * The badge, transparent outside the circle. The only logo file: it carries the
+ * hero and the footer, and scripts/prepare-favicons.mjs generates the icons from
+ * it. The old opaque 512px square went with the nav logo it existed for.
+ */
+export { default as logoClean } from '../assets/photos/logo-clean.png';

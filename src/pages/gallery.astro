@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Gallery from '../components/Gallery.astro';
+import Footer from '../components/Footer.astro';
+import { defaultLocale } from '../lib/i18n';
+
+/*
+  The gallery has its own page for the same reason the menu does: 23 full-width
+  photographs are a large share of the homepage's weight and its DOM, and the
+  photos are the thing people are sent to look at — a link in the Instagram bio
+  or a message wants a URL that *is* the gallery, with its own title and
+  description, rather than an anchor partway down the homepage.
+
+  No extra structured data: the Restaurant graph stays on the homepage, and a
+  page of photographs adds nothing schema.org describes that the photos on the
+  homepage did not already.
+*/
+const locale = defaultLocale;
+---
+
+<Base locale={locale} titleKey="meta.galleryTitle" descriptionKey="meta.galleryDescription">
+  <Nav locale={locale} />
+
+  {/*
+    id="main" is what the skip link targets. The footer's "back to top" uses
+    href="#top", which needs no element — HTML treats the fragment "top" as the
+    top of the document when nothing carries that id.
+  */}
+  <main id="main">
+    <Gallery locale={locale} />
+  </main>
+
+  <Footer locale={locale} />
+</Base>

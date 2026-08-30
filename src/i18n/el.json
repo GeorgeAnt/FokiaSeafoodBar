@@ -1,5 +1,5 @@
 {
-  "$comment": "Greek UI strings — the default locale. Every key here must also exist in en.json. Menu dish names live in menu-*.json and are NEVER translated.",
+  "$comment": "Greek UI strings — the default locale. Every key here must also exist in en.json. Menu dish names live in menu-*.json and are NEVER translated. `footer.rights` is English here ON PURPOSE — the client asked for a single copyright line in both locales; it is not the untranslated-string bug it resembles.",
 
   "meta.title": "fokia — seafood bar | Ψάρι, sushi και κοκτέιλ",
   "meta.description": "Το fokia είναι ένα seafood bar που συνδυάζει το φρέσκο ελληνικό ψάρι με ιαπωνική τεχνική. Sushi, ωμά, ζεστά πιάτα και κοκτέιλ με ελληνικά αποστάγματα.",
@@ -7,6 +7,8 @@
   "meta.menuTitle": "Το Μενού | fokia — seafood bar",
   "meta.menuDescription": "Ο πλήρης κατάλογος του fokia: σαλάτες, ωμά και ζεστά ορεκτικά, sushi, maki, noodles, κυρίως πιάτα, κρασιά και cocktails.",
 
+  "meta.galleryTitle": "Gallery | fokia — seafood bar",
+  "meta.galleryDescription": "Φωτογραφίες από το fokia: ο χώρος, τα πιάτα, τα κοκτέιλ και η ομάδα.",
   "a11y.skipToContent": "Μετάβαση στο περιεχόμενο",
   "a11y.openMenu": "Άνοιγμα μενού πλοήγησης",
   "a11y.closeMenu": "Κλείσιμο μενού πλοήγησης",
@@ -14,19 +16,22 @@
   "a11y.heroPrevious": "Προηγούμενη φωτογραφία",
   "a11y.heroNext": "Επόμενη φωτογραφία",
   "a11y.heroGoTo": "Μετάβαση στη φωτογραφία {n}",
+  "a11y.galleryDialog": "Προβολή φωτογραφίας",
+  "a11y.galleryClose": "Κλείσιμο",
+  "a11y.galleryPrevious": "Προηγούμενη φωτογραφία",
+  "a11y.galleryNext": "Επόμενη φωτογραφία",
   "a11y.priceOnRequest": "Η τιμή δεν έχει οριστεί ακόμη",
 
   "nav.goal": "Ο Στόχος μας",
   "nav.menu": "Το Μενού",
   "nav.team": "Η Ομάδα",
   "nav.gallery": "Gallery",
-  "nav.contact": "Delivery & Κρατήσεις",
+  "nav.contact": "Κλείστε τη θέση σας • Take away",
   "nav.findUs": "Πού θα μας βρείτε",
 
   "hero.tagline": "seafood bar",
-  "hero.intro": "Φρέσκο ψάρι, ιαπωνική τεχνική, ελληνικό τραπέζι.",
-  "hero.cta": "Κάντε κράτηση",
-  "hero.ctaSecondary": "Δείτε το μενού",
+  "hero.intro": "Μια εκλεπτυσμένη έκφραση της θάλασσας • προσεγμένες στιγμές, διαχρονική γεύση.",
+  "hero.cta": "Δείτε το μενού",
 
   "goal.heading": "Ο Στόχος μας",
   "goal.lead": "Να σερβίρουμε το ψάρι με τον σεβασμό που του αξίζει.",
@@ -47,12 +52,7 @@
   "gallery.heading": "Gallery",
   "gallery.intro": "Στιγμές από το τραπέζι μας.",
 
-  "contact.heading": "Delivery & Κρατήσεις",
-  "contact.intro": "Ένα τηλέφωνο για όλα — κράτηση τραπεζιού ή παραγγελία για το σπίτι.",
-  "contact.takeawayTitle": "Delivery & Take away",
-  "contact.takeawayBody": "Παραγγείλτε τηλεφωνικά και παραλάβετε από το κατάστημα.",
-  "contact.reserveTitle": "Κρατήσεις",
-  "contact.reserveBody": "Καλέστε μας για να κρατήσετε τραπέζι. Για μεγάλες παρέες, ενημερώστε μας από πριν.",
+  "contact.heading": "Κλείστε τη θέση σας • Take away",
   "contact.callUs": "Καλέστε μας",
   "contact.phoneLabel": "Τηλέφωνο",
   "contact.emailLabel": "Email",
@@ -60,7 +60,6 @@
   "findUs.heading": "Πού θα μας βρείτε",
   "findUs.addressLabel": "Διεύθυνση",
   "findUs.hoursLabel": "Ώρες λειτουργίας",
-  "findUs.directions": "Οδηγίες πρόσβασης",
   "findUs.viewOnMap": "Δείτε στον χάρτη",
   "findUs.closed": "Κλειστά",
 
@@ -71,9 +70,14 @@
   "hours.Friday": "Παρασκευή",
   "hours.Saturday": "Σάββατο",
   "hours.Sunday": "Κυριακή",
+  "hours.short.Monday": "Δευ",
+  "hours.short.Tuesday": "Τρί",
+  "hours.short.Wednesday": "Τετ",
+  "hours.short.Thursday": "Πέμ",
+  "hours.short.Friday": "Παρ",
+  "hours.short.Saturday": "Σάβ",
+  "hours.short.Sunday": "Κυρ",
   "hours.rangeSeparator": "–",
 
-  "footer.followUs": "Ακολουθήστε μας",
-  "footer.rights": "Με επιφύλαξη παντός δικαιώματος.",
-  "footer.backToTop": "Επιστροφή στην κορυφή"
+  "footer.rights": "All rights reserved."
 }

@@ -1,9 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import SocialLinks from './SocialLinks.astro';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
-import { logo } from '../lib/photos';
-import site from '../data/site.json';
 
 interface Props {
   locale?: Locale;
@@ -11,20 +8,23 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 /*
-  Split either side of the centred logo. Keep these balanced when adding a
-  section — the logo is optically centred in the bar, so a lopsided split shows.
+  One list, in reading order, with the utilities after it.
+
+  There is no centred logo any more, so the links no longer have to be split
+  into two balanced groups to leave a gap in the middle of the bar — they are a
+  single run, and the social icons and the language switch sit at the end
+  because that is where you go looking for them rather than because something
+  needed counterweighting.
 
   Section links are rooted ("/#team", not "#team") because the nav also renders
-  on /menu, where those sections do not exist. From the homepage a rooted
-  fragment is still a same-document jump, so nothing reloads.
+  on /menu and /gallery, where those sections do not exist. From the homepage a
+  rooted fragment is still a same-document jump, so nothing reloads.
 */
-const leftLinks = [
+const links = [
   { href: '/#goal', key: 'nav.goal' },
   { href: '/menu', key: 'nav.menu' },
   { href: '/#team', key: 'nav.team' },
-];
-const rightLinks = [
-  { href: '/#gallery', key: 'nav.gallery' },
+  { href: '/gallery', key: 'nav.gallery' },
   { href: '/#contact', key: 'nav.contact' },
   { href: '/#find-us', key: 'nav.findUs' },
 ];
@@ -36,85 +36,55 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
 
 <header class="nav">
   <nav class="wrap nav__inner" id="nav-inner" aria-label="Main">
-    <!--
-      The switcher and the social icons live on the left so the two flanking
-      groups are close enough in width to leave a clear gap for the centred
-      logo. With everything piled on the right, the right-hand group reached
-      past the middle of the bar and sat underneath the logo.
-    -->
-    <div class="nav__start">
-      <div class="nav__utils">
-        <div
-          class="lang"
-          role="group"
-          aria-label={t(locale, 'a11y.languageSwitcher')}
-          data-i18n-label="a11y.languageSwitcher"
-        >
-          <button type="button" data-lang-btn="el" aria-pressed="true">ΕΛ</button>
-          <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
-        </div>
+    <ul class="nav__links" id="nav-links">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              data-i18n={link.key}
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+            >
+              {t(locale, link.key)}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
 
-        <SocialLinks class="nav__social" />
-      </div>
+    <div class="nav__utils">
+      <SocialLinks class="nav__social" />
 
-      <ul class="nav__links nav__links--left" id="nav-links-left">
-        {
-          leftLinks.map((link) => (
-            <li>
-              <a href={link.href} data-i18n={link.key} aria-current={isCurrent(link.href) ? 'page' : undefined}>
-                {t(locale, link.key)}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-
-    <!--
-      The logo stands alone, as on the reference site — it already reads
-      "fokia / SEAFOOD BAR", so a wordmark beside it only repeated itself. Its
-      alt text is what gives this link its accessible name.
-    -->
-    <a class="nav__brand" href="/#top">
-      <Image src={logo} alt={site.name} width={128} height={128} loading="eager" />
-    </a>
-
-    <!-- Right links and the actions travel together so that the flex row has
-         exactly two in-flow groups, one at each edge, leaving a clear centre
-         for the absolutely positioned logo to sit in. -->
-    <div class="nav__end">
-      <ul class="nav__links nav__links--right" id="nav-links-right">
-        {
-          rightLinks.map((link) => (
-            <li>
-              <a href={link.href} data-i18n={link.key} aria-current={isCurrent(link.href) ? 'page' : undefined}>
-                {t(locale, link.key)}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-
-      <button
-        type="button"
-        class="nav__toggle"
-        id="nav-toggle"
-        aria-expanded="false"
-        aria-controls="nav-links-left nav-links-right"
-        aria-label={t(locale, 'a11y.openMenu')}
-        data-i18n-label="a11y.openMenu"
+      <div
+        class="lang"
+        role="group"
+        aria-label={t(locale, 'a11y.languageSwitcher')}
+        data-i18n-label="a11y.languageSwitcher"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
-        </svg>
-      </button>
+        <button type="button" data-lang-btn="el" aria-pressed="true">ΕΛ</button>
+        <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+      </div>
     </div>
+
+    <button
+      type="button"
+      class="nav__toggle"
+      id="nav-toggle"
+      aria-expanded="false"
+      aria-controls="nav-links"
+      aria-label={t(locale, 'a11y.openMenu')}
+      data-i18n-label="a11y.openMenu"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+      </svg>
+    </button>
   </nav>
 </header>
 
 <script>
-  // Mobile navigation. Both link lists are revealed together, so the open state
-  // lives on their shared parent rather than on either list.
+  // Mobile navigation. The open state lives on the bar rather than on the list,
+  // because the stacked panel is laid out by the bar's own wrap.
   const toggle = document.getElementById('nav-toggle');
   const inner = document.getElementById('nav-inner');
 

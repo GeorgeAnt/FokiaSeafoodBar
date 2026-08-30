@@ -7,7 +7,12 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 ---
 
-<section class="section section-dark" id="goal">
+{/*
+  The mid tier, not dark. The hero is already --black, so a dark Goal ran
+  straight into it with no boundary and made the top of the page one mass. Stone
+  suits a text-only section: there are no photographs here to sit against it.
+*/}
+<section class="section section-stone" id="goal">
   <div class="wrap">
     <p class="eyebrow" data-i18n="nav.goal">{t(locale, 'nav.goal')}</p>
     <h2 class="goal__lead" data-i18n="goal.lead">{t(locale, 'goal.lead')}</h2>

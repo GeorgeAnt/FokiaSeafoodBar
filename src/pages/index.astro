@@ -4,15 +4,14 @@ import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import Goal from '../components/Goal.astro';
 import Team from '../components/Team.astro';
-import Gallery from '../components/Gallery.astro';
 import Contact from '../components/Contact.astro';
 import FindUs from '../components/FindUs.astro';
 import Footer from '../components/Footer.astro';
 import { defaultLocale } from '../lib/i18n';
 
 /* Greek is what the server renders; the switcher swaps chrome to English on the
-   client. Every section here is an anchor target; the menu is its own page at
-   /menu — see the note in src/pages/menu.astro. */
+   client. Every section here is an anchor target; the menu and the gallery are
+   their own pages — see the notes in src/pages/menu.astro and gallery.astro. */
 const locale = defaultLocale;
 ---
 
@@ -23,7 +22,6 @@ const locale = defaultLocale;
     <Hero locale={locale} />
     <Goal locale={locale} />
     <Team locale={locale} />
-    <Gallery locale={locale} />
     <Contact locale={locale} />
     <FindUs locale={locale} />
   </main>

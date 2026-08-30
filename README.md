@@ -1,7 +1,7 @@
 # fokia — seafood bar
 
 A marketing site for the restaurant — a single scrolling homepage plus a
-dedicated menu page at `/menu`. Built with [Astro](https://astro.build),
+dedicated menu page at `/menu` and a gallery at `/gallery`. Built with [Astro](https://astro.build),
 which ships **zero JavaScript frameworks** — the whole page loads about 29 KB of
 HTML/CSS (gzipped) plus images.
 
@@ -30,8 +30,9 @@ Pages, GitHub Pages, or plain nginx. There is no server and no database.
 
 | URL | What's on it |
 |---|---|
-| `/` | Hero, Our Goal, the Team, Gallery, Delivery & Reservations, Where to Find Us |
+| `/` | Hero, Our Goal, the Team, Take away & Reservations, Where to Find Us |
 | `/menu` | The full menu and the legally required notices |
+| `/gallery` | The photographs, each opening in a lightbox |
 
 The menu has a page of its own rather than being a section on the homepage. It
 is 98 items across 19 sections — over half the site's DOM — but the real reason
@@ -39,8 +40,12 @@ is that a restaurant needs a URL that **is** the menu: the QR code on the table,
 the Instagram bio link, the Google Business Profile menu field. An anchor cannot
 carry its own title and description, or rank on its own for "fokia menu".
 
+The gallery is split out for the same reasons: 23 full-width photographs are a
+large share of the homepage's weight, and a link sent to someone should land on
+the photos rather than partway down the homepage.
+
 Nav links to homepage sections are written rooted (`/#team`, not `#team`) so
-they work from `/menu` too. From the homepage a rooted fragment is still a
+they work from `/menu` and `/gallery` too. From the homepage a rooted fragment is still a
 same-document jump, so nothing reloads.
 
 ---
@@ -225,8 +230,10 @@ first hero image loads eagerly; everything else is lazy.
 
 ### Favicons
 
-`npm run favicons` regenerates them from `src/assets/photos/logo.png` into
-`public/`. Run it only if the logo changes.
+`npm run favicons` regenerates them from `src/assets/photos/logo-clean.png`
+into `public/`. Run it only if the logo changes. The badge is centred in a wide
+transparent field there, so the script trims to the badge and normalises it to
+512×512 first; every crop in it is expressed against that square.
 
 It produces two different pieces of artwork on purpose. **Tab icons use the
 wave-in-the-o monogram**, cropped out of the badge — the full logo is an
@@ -240,8 +247,9 @@ renders it large on the home screen where the wordmark reads.
 | `favicon-96x96.png` | 96 | monogram |
 | `apple-touch-icon.png` | 180 | full badge |
 
-If the client supplies a transparent or vector logo, replace `logo.png` and
-re-run — and reconsider the crop box (`MONOGRAM` at the top of the script).
+If the client supplies a tighter or vector logo, replace `logo-clean.png` and
+re-run — and reconsider the crop box (`MONOGRAM` in the script), which is
+measured against the normalised 512×512 badge, not the file's own pixels.
 
 ---
 
@@ -311,15 +319,24 @@ swap them for a Google Maps place link if you want the exact pin.
   buttons are hidden while these are empty rather than linking nowhere.
 - **Social links** — hidden while empty.
 - **Latitude and longitude** — omitted from the structured data while unset.
-- **A transparent or vector logo.** The supplied file is a 1080×1080 Instagram
-  badge with its background baked in. It works in the navigation bar; on the dark
-  hero it reads as a grey disc, so the hero uses a typeset wordmark instead. See
-  the comment in `src/components/Hero.astro`.
+- **A cropped or vector logo.** `logo-clean.png` has a transparent surround, so
+  it now carries the hero and the footer, and the typeset wordmark it replaced is
+  gone. Two things would still improve it: the concrete texture is baked *inside*
+  the badge, so on the black hero it reads as a pale disc rather than a mark on
+  the ground; and the file is 1672×940 with the badge centred in a wide empty
+  field, about 44% of the width, which the layout has to size around. A tight
+  crop or a vector would fix both. It is now the only logo file: the opaque
+  512px square was deleted with the nav logo it existed for, and the favicons
+  are generated from this one.
 
 **One decision to confirm:** the client palette has no light background tone, so
-this site proposes a warm off-white, `--sand: #F4F0EA`, drawn from the concrete
-surfaces in the photographs. It and `--sand-deep` are defined at the top of
-`src/styles/global.css`; changing those two values restyles every light section.
+this site proposes one, `--salt: #E2E8EB` — a cool off-white drawn from the
+concrete and stone the photographs were actually shot on. Those surfaces are
+cold, and matching them sets the food photography into the page rather than on
+top of it; a warm cream also pulls the client's brick red toward terracotta,
+which the rusted-metal shopfront sign in the team photographs is not. It and
+`--salt-deep` are defined at the top of `src/styles/global.css`; changing those
+two values restyles every light section.
 
 ---
 
@@ -334,8 +351,9 @@ src/
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script
   lib/                i18n lookup, menu formatting, photo resolution
-  pages/index.astro   homepage — hero, goal, team, gallery, contact, find us
+  pages/index.astro   homepage — hero, goal, team, contact, find us
   pages/menu.astro    the menu, at /menu
+  pages/gallery.astro the photographs, at /gallery
   styles/global.css   design tokens and all styling
 public/               fonts, favicons, robots.txt
 scripts/              prepare-photos.mjs, prepare-favicons.mjs, check-content.mjs
@@ -359,7 +377,7 @@ only tinting text:
 
 | Class | Background | Sections |
 |---|---|---|
-| *(default)* | `--sand` | Menu, Team, Gallery |
+| *(default)* | `--salt` | Menu, Team, Gallery |
 | `.section-stone` | `--stone` | Where to Find Us |
 | `.section-dark` | `--black` | Hero, Our Goal, Delivery & Reservations, footer |
 
@@ -371,9 +389,12 @@ single `--accent` token, and no rule references `--wood` directly for text:
 
 | Tier | `--accent` | Contrast |
 |---|---|---|
-| sand | `--wood` `#813A18` | 7.3:1 |
-| stone | `--wood-pale` `#F0DCCB` | 4.8:1 |
-| dark | `--wood-light` `#C97A4E` | 5.7:1 |
+| salt | `--wood` `#813A18` | 6.6:1 |
+| stone | `--wood-pale` `#F0E0D8` | 5.0:1 |
+| dark | `--wood-light` `#C98A76` | 6.4:1 |
+
+Both tints lighten Wood along the oxidation path — weathered rust, dusty and
+pink — rather than toward orange, which lands on terracotta.
 
 Eyebrows, field labels, team roles, menu subheadings and focus rings all read
 `--accent`, so adding a section to any tier tints them correctly with no extra

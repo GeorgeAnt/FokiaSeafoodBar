@@ -225,7 +225,12 @@ const dictJson = JSON.stringify(dictionaries);
 
           document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
             var value = strings[el.getAttribute('data-i18n-label')];
-            if (value != null) el.setAttribute('aria-label', value);
+            if (value == null) return;
+            // Labels that count something (the carousel dots) carry their number
+            // separately, so the translated string keeps its {n} placeholder.
+            var n = el.getAttribute('data-i18n-n');
+            if (n != null) value = value.replace('{n}', n);
+            el.setAttribute('aria-label', value);
           });
 
           document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {

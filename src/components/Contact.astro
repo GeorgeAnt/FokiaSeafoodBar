@@ -7,52 +7,36 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-/* One number covers both for now. Each block already owns its own copy and its
-   own call-to-action, so splitting them into two sections later is a content
-   change rather than a rewrite. */
-const blocks = [
-  { id: 'takeaway', title: 'contact.takeawayTitle', body: 'contact.takeawayBody' },
-  { id: 'reservations', title: 'contact.reserveTitle', body: 'contact.reserveBody' },
-];
+/* Reservations and take away are the same phone call, and the heading now names
+   both, so the section is the heading and the number — the two description cards
+   that used to sit under it only restated the heading at length. */
 ---
 
-<section class="section section-dark" id="contact">
+<section class="section section--tight section-dark" id="contact">
   <div class="wrap">
     <header class="section-head">
-      <p class="eyebrow" data-i18n="nav.contact">{t(locale, 'nav.contact')}</p>
       <h2 data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
-      <p data-i18n="contact.intro">{t(locale, 'contact.intro')}</p>
     </header>
 
-    <div class="contact__grid">
-      {
-        blocks.map((block) => (
-          <article class="contact__card">
-            <h3 data-i18n={block.title}>{t(locale, block.title)}</h3>
-            <p data-i18n={block.body}>{t(locale, block.body)}</p>
-            <a class="contact__phone" href={`tel:${site.phone.href}`}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                width="20"
-                height="20"
-                aria-hidden="true"
-              >
-                <path
-                  d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              {site.phone.display}
-            </a>
-            <p class="contact__email">
-              <a href={`mailto:${site.email}`}>{site.email}</a>
-            </p>
-          </article>
-        ))
-      }
-    </div>
+    <p class="contact__call">
+      <span class="contact__call-label" data-i18n="contact.callUs">{t(locale, 'contact.callUs')}</span>
+      <a class="contact__phone" href={`tel:${site.phone.href}`}>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          width="22"
+          height="22"
+          aria-hidden="true"
+        >
+          <path
+            d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"
+            stroke-linejoin="round"
+          />
+        </svg>
+        {site.phone.display}
+      </a>
+    </p>
   </div>
 </section>

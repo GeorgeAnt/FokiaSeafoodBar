@@ -28,14 +28,6 @@ const FOLDERS = {
 const MAX_EDGE = 2560;
 const QUALITY = 88;
 
-/**
- * The logo is a 1080x1080 Instagram profile picture: a circular badge with the
- * concrete texture baked into the artwork, so there is no transparency to
- * preserve. We keep it square and let CSS do the circular mask.
- * TODO: replace with a vector/transparent original when the client supplies one.
- */
-const LOGO = { from: 'instagram profile picture.png', to: 'logo.png', size: 512 };
-
 /** `Chef John.jpeg` -> `chef-john`, `DSC_9858(1).jpeg` -> `dsc_9858-1` */
 function slugify(filename) {
   return basename(filename, extname(filename))
@@ -76,24 +68,6 @@ for (const [srcFolder, destFolder] of Object.entries(FOLDERS)) {
         `${(inSize / 1e6).toFixed(1)}MB -> ${(info.size / 1e6).toFixed(2)}MB  (-${pct}%)`
     );
   }
-}
-
-// Logo, kept lossless — it is flat artwork, and PNG handles it better than JPEG.
-{
-  const from = join(SOURCE, LOGO.from);
-  const to = join(DEST, LOGO.to);
-  const { size: inSize } = await stat(from);
-  const info = await sharp(from)
-    .resize(LOGO.size, LOGO.size, { fit: 'inside' })
-    .png({ compressionLevel: 9, palette: true })
-    .toFile(to);
-
-  totalIn += inSize;
-  totalOut += info.size;
-  console.log(
-    `\nlogo\n  ${LOGO.from} -> ${LOGO.to}  ${info.width}x${info.height}  ` +
-      `${(inSize / 1e3).toFixed(0)}KB -> ${(info.size / 1e3).toFixed(0)}KB`
-  );
 }
 
 console.log(

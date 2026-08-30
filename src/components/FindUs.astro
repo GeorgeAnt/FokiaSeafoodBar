@@ -10,9 +10,17 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-/* The exterior shot doubles as the "how you will recognise the place" image —
-   it is the frontage with the sign on it. */
-const exterior = gallery.images.find((image) => image.id === 'exterior-sign')!;
+/* Looked up by filename because that is how this one was chosen. The id is
+   still what drives the alt text, so the caption follows the photo without
+   anything here having to restate it. */
+const FIND_US_PHOTO = 'dsc-8248.jpg';
+const photo = gallery.images.find((image) => image.file === FIND_US_PHOTO);
+if (!photo) {
+  throw new Error(
+    `Where to Find Us wants ${FIND_US_PHOTO}, which has no entry in data/gallery.json. ` +
+      `Add one (with alt text in both locales) before pointing the section at it.`
+  );
+}
 
 const dayOrder = [
   'Monday',
@@ -24,11 +32,44 @@ const dayOrder = [
   'Sunday',
 ] as const;
 
-/** One row per day, so a visitor can find today without decoding a range. */
-const schedule = dayOrder.map((day) => {
-  const entry = site.hours.entries.find((e) => e.days.includes(day));
-  return { day, entry };
-});
+/**
+ * Collapses each entry's days into *contiguous* runs, so the block reads
+ * "Τρί – Παρ" on one row instead of four separate rows.
+ *
+ * The runs are computed rather than taken as each entry's first and last day: an
+ * entry listing Tuesday and Thursday would otherwise render as "Τρί – Πέμ" and
+ * claim the restaurant is open on a Wednesday it is closed. Non-contiguous days
+ * simply become separate rows.
+ */
+function runsOf(days: readonly string[]) {
+  const indices = days
+    .map((day) => dayOrder.indexOf(day as (typeof dayOrder)[number]))
+    .filter((i) => i >= 0)
+    .sort((a, b) => a - b);
+
+  const runs: { from: string; to: string }[] = [];
+  let start = -1;
+  let previous = -Infinity;
+  for (const i of indices) {
+    if (i !== previous + 1) {
+      if (start >= 0) runs.push({ from: dayOrder[start], to: dayOrder[previous] });
+      start = i;
+    }
+    previous = i;
+  }
+  if (start >= 0) runs.push({ from: dayOrder[start], to: dayOrder[previous] });
+  return runs;
+}
+
+/* Open ranges in the order the client listed them, then the closed days. A day
+   the restaurant is shut is not a working hour, but dropping it entirely leaves
+   a visitor guessing about Monday. */
+const schedule = [
+  ...site.hours.entries.flatMap((entry) =>
+    runsOf(entry.days).map((run) => ({ run, opens: entry.opens, closes: entry.closes }))
+  ),
+  ...runsOf(site.hours.closed).map((run) => ({ run, opens: null, closes: null })),
+];
 ---
 
 <!--
@@ -37,23 +78,93 @@ const schedule = dayOrder.map((day) => {
 -->
 <section class="section section-stone" id="find-us">
   <div class="wrap">
-    <header class="section-head">
-      <p class="eyebrow" data-i18n="nav.findUs">{t(locale, 'nav.findUs')}</p>
-      <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
-    </header>
-
+    {/*
+      The heading sits inside the grid's first column rather than above the
+      grid, so that the photo starts on the same line as it. Above the grid it
+      pushed the whole row down and the image top sat a heading's height lower
+      than the words it belongs to.
+    */}
     <div class="find__grid">
       <div>
+        <header class="section-head section-head--inline">
+          <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
+        </header>
         <div class="find__block">
           <p class="find__label" data-i18n="findUs.addressLabel">
             {t(locale, 'findUs.addressLabel')}
           </p>
+          {/*
+            Street and city only. The postcode and the country are still in the
+            Restaurant JSON-LD, which is what local search reads; on the page
+            they were three lines telling a visitor what one line tells them.
+          */}
           <address class="find__address">
-            <span data-i18n="site.street">{t(locale, 'site.street')}</span><br />
-            {site.address.postalCode} <span data-i18n="site.city">{t(locale, 'site.city')}</span><br />
-            <span data-i18n="site.countryName">{t(locale, 'site.countryName')}</span>
+            <span data-i18n="site.street">{t(locale, 'site.street')}</span>{' '}
+            <span data-i18n="site.city">{t(locale, 'site.city')}</span>
           </address>
+
+          {
+            /* Rendered only once the client supplies the real link — an empty
+               href would look like a working button that goes nowhere. */
+            site.mapUrl && (
+              <p class="find__actions">
+                <a
+                  class="btn btn--ghost"
+                  href={site.mapUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-i18n="findUs.viewOnMap"
+                >
+                  {t(locale, 'findUs.viewOnMap')}
+                </a>
+              </p>
+            )
+          }
         </div>
+
+
+        <div class="find__block">
+          <p class="find__label" data-i18n="findUs.hoursLabel">{t(locale, 'findUs.hoursLabel')}</p>
+          <ul class="find__hours">
+            {
+              schedule.map(({ run, opens, closes }) => (
+                <li>
+                  {/*
+                    The key goes on the inner spans, never the wrapper: the
+                    language switch assigns textContent, so a data-i18n parent
+                    would wipe the day names nested inside it.
+                  */}
+                  <span>
+                    <span data-i18n={`hours.short.${run.from}`}>
+                      {t(locale, `hours.short.${run.from}`)}
+                    </span>
+                    {run.to !== run.from && (
+                      <Fragment>
+                        {' '}
+                        <span data-i18n="hours.rangeSeparator">
+                          {t(locale, 'hours.rangeSeparator')}
+                        </span>{' '}
+                        <span data-i18n={`hours.short.${run.to}`}>
+                          {t(locale, `hours.short.${run.to}`)}
+                        </span>
+                      </Fragment>
+                    )}
+                  </span>
+                  {opens ? (
+                    <span>
+                      {opens}
+                      <span data-i18n="hours.rangeSeparator">{t(locale, 'hours.rangeSeparator')}</span>
+                      {closes}
+                    </span>
+                  ) : (
+                    <span data-i18n="findUs.closed">{t(locale, 'findUs.closed')}</span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
 
         <div class="find__block">
           <p class="find__label" data-i18n="contact.phoneLabel">
@@ -69,69 +180,16 @@ const schedule = dayOrder.map((day) => {
             <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
         </div>
-
-        <div class="find__block">
-          <p class="find__label" data-i18n="findUs.hoursLabel">{t(locale, 'findUs.hoursLabel')}</p>
-          <ul class="find__hours">
-            {
-              schedule.map(({ day, entry }) => (
-                <li>
-                  <span data-i18n={`hours.${day}`}>{t(locale, `hours.${day}`)}</span>
-                  {entry ? (
-                    <span>
-                      {entry.opens}
-                      <span data-i18n="hours.rangeSeparator">{t(locale, 'hours.rangeSeparator')}</span>
-                      {entry.closes}
-                    </span>
-                  ) : (
-                    <span data-i18n="findUs.closed">{t(locale, 'findUs.closed')}</span>
-                  )}
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-
-        <div class="find__actions">
-          {
-            /* Rendered only once the client supplies the real links — an empty
-               href would look like a working button that goes nowhere. */
-            site.directionsUrl && (
-              <a
-                class="btn btn--primary"
-                href={site.directionsUrl}
-                target="_blank"
-                rel="noopener"
-                data-i18n="findUs.directions"
-              >
-                {t(locale, 'findUs.directions')}
-              </a>
-            )
-          }
-          {
-            site.mapUrl && (
-              <a
-                class="btn btn--ghost"
-                href={site.mapUrl}
-                target="_blank"
-                rel="noopener"
-                data-i18n="findUs.viewOnMap"
-              >
-                {t(locale, 'findUs.viewOnMap')}
-              </a>
-            )
-          }
-        </div>
       </div>
 
       <div class="find__media">
         <Picture
-          src={galleryPhoto(exterior.file)}
+          src={galleryPhoto(photo.file)}
           formats={['avif', 'webp']}
           widths={[500, 800, 1100]}
           sizes="(min-width: 55rem) 50vw, 100vw"
-          alt={t(locale, `gallery.${exterior.id}.alt`)}
-          data-i18n-alt={`gallery.${exterior.id}.alt`}
+          alt={t(locale, `gallery.${photo.id}.alt`)}
+          data-i18n-alt={`gallery.${photo.id}.alt`}
           loading="lazy"
           decoding="async"
         />

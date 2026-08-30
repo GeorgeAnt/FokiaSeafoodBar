@@ -1,6 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
-import SocialLinks from './SocialLinks.astro';
+import { logoClean } from '../lib/photos';
 import site from '../data/site.json';
 
 interface Props {
@@ -9,44 +10,39 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 const year = new Date().getFullYear();
-const socials = site.social.filter((link) => link.url);
 ---
 
+{/*
+  The mark and the copyright, and nothing else.
+
+  The address, phone, email and social links that used to sit here are all
+  already on the page above — Where to Find Us carries the address and hours,
+  Take away & Reservations carries the phone, and the social icons live in the
+  nav on every page. Repeating them in the footer added length, not information.
+
+  Search is unaffected: the name/address/phone that matters for local results is
+  in the Restaurant JSON-LD on the homepage, which is untouched, and still in the
+  Find Us section.
+*/}
 <footer class="footer">
-  <div class="wrap">
-    <div class="footer__grid">
-      <div>
-        <p class="footer__brand">{site.name}</p>
-        <!-- Same name, address and phone as the structured data and the Find Us
-             section — consistent NAP matters for local search. -->
-        <p data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>
-      </div>
+  <div class="wrap footer__inner">
+    {/*
+      Sized by height, not width. The file is 1672x940 with the badge centred in
+      a wide transparent field, so constraining the width would shrink the mark
+      itself to about half the box.
+    */}
+    <Image
+      class="footer__logo"
+      src={logoClean}
+      alt={site.name}
+      widths={[240, 480]}
+      sizes="240px"
+      loading="lazy"
+      decoding="async"
+    />
 
-      <div>
-        <h2 data-i18n="findUs.addressLabel">{t(locale, 'findUs.addressLabel')}</h2>
-        <address class="find__address" style="font-size: var(--step-0)">
-          <span data-i18n="site.street">{t(locale, 'site.street')}</span><br />
-          {site.address.postalCode} <span data-i18n="site.city">{t(locale, 'site.city')}</span><br />
-          <a href={`tel:${site.phone.href}`}>{site.phone.display}</a><br />
-          <a href={`mailto:${site.email}`}>{site.email}</a>
-        </address>
-      </div>
-
-      {
-        socials.length > 0 && (
-          <div>
-            <h2 data-i18n="footer.followUs">{t(locale, 'footer.followUs')}</h2>
-            <SocialLinks />
-          </div>
-        )
-      }
-    </div>
-
-    <div class="footer__bottom">
-      <p>
-        © {year} {site.name}. <span data-i18n="footer.rights">{t(locale, 'footer.rights')}</span>
-      </p>
-      <p><a href="#top" data-i18n="footer.backToTop">{t(locale, 'footer.backToTop')}</a></p>
-    </div>
+    <p class="footer__rights">
+      © {year} {site.name}. <span data-i18n="footer.rights">{t(locale, 'footer.rights')}</span>
+    </p>
   </div>
 </footer>

@@ -1,5 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
+import { Picture, getImage } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 import { galleryPhoto } from '../lib/photos';
 import gallery from '../data/gallery.json';
@@ -8,35 +8,187 @@ interface Props {
   locale?: Locale;
 }
 const { locale = defaultLocale } = Astro.props;
+
+/*
+  One large variant per photo, built once at build time.
+
+  It does double duty: it is what the lightbox loads, and it is the href the
+  grid link points at. That is what keeps the grid honest without JavaScript —
+  the link still goes somewhere real (the photo itself) rather than being a
+  control that does nothing, so the tiles need no <template> treatment. Only the
+  lightbox does.
+
+  The masters are 1707x2560, so 1400 never upscales.
+*/
+const items = await Promise.all(
+  gallery.images.map(async (image) => {
+    const src = galleryPhoto(image.file);
+    const full = await getImage({ src, format: 'webp', width: 1400 });
+    return { ...image, src, full: full.src, altKey: `gallery.${image.id}.alt` };
+  })
+);
 ---
 
 <section class="section" id="gallery">
   <div class="wrap">
     <header class="section-head">
-      <p class="eyebrow" data-i18n="nav.gallery">{t(locale, 'nav.gallery')}</p>
-      <h2 data-i18n="gallery.heading">{t(locale, 'gallery.heading')}</h2>
+      <h1 data-i18n="gallery.heading">{t(locale, 'gallery.heading')}</h1>
       <p data-i18n="gallery.intro">{t(locale, 'gallery.intro')}</p>
     </header>
 
     <!-- Column masonry: the set is almost entirely portrait, so a fixed grid
          would either crop the frames or leave gaps. -->
-    <div class="gallery__grid">
+    <div class="gallery__grid" id="gallery-grid">
       {
-        gallery.images.map((image) => (
+        items.map((image) => (
           <figure class="gallery__item">
-            <Picture
-              src={galleryPhoto(image.file)}
-              formats={['avif', 'webp']}
-              widths={[300, 500, 700]}
-              sizes="(min-width: 75rem) 22vw, (min-width: 48rem) 30vw, 45vw"
-              alt={t(locale, `gallery.${image.id}.alt`)}
-              data-i18n-alt={`gallery.${image.id}.alt`}
-              loading="lazy"
-              decoding="async"
-            />
+            <a class="gallery__link" href={image.full} data-alt-key={image.altKey}>
+              <Picture
+                src={image.src}
+                formats={['avif', 'webp']}
+                widths={[300, 500, 700]}
+                sizes="(min-width: 75rem) 22vw, (min-width: 48rem) 30vw, 45vw"
+                alt={t(locale, image.altKey)}
+                data-i18n-alt={image.altKey}
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
           </figure>
         ))
       }
     </div>
+
+    {/*
+      The lightbox is useless without JavaScript, so it is cloned from here at
+      runtime rather than sitting in the DOM. Its labels are still rendered by
+      Astro in the current locale and keep data-i18n-label, so the language
+      switch reaches them after cloning.
+
+      The counter needs no data-i18n-n: unlike the hero dots it is digits only
+      ("3 / 23"), with no translatable word around the number.
+    */}
+    <template id="lightbox-template">
+      <dialog
+        class="lightbox"
+        aria-label={t(locale, 'a11y.galleryDialog')}
+        data-i18n-label="a11y.galleryDialog"
+      >
+        <img class="lightbox__img" alt="" />
+
+        {/* Both arrows are intentionally empty: the arrowhead and the dark
+            backing behind it are border triangles drawn in global.css. */}
+        <button
+          type="button"
+          class="lightbox__arrow lightbox__arrow--prev"
+          data-lb-prev
+          aria-label={t(locale, 'a11y.galleryPrevious')}
+          data-i18n-label="a11y.galleryPrevious"
+        ></button>
+
+        <button
+          type="button"
+          class="lightbox__arrow lightbox__arrow--next"
+          data-lb-next
+          aria-label={t(locale, 'a11y.galleryNext')}
+          data-i18n-label="a11y.galleryNext"
+        ></button>
+
+        <button
+          type="button"
+          class="lightbox__close"
+          data-lb-close
+          aria-label={t(locale, 'a11y.galleryClose')}
+          data-i18n-label="a11y.galleryClose"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+
+        <p class="lightbox__counter" data-lb-counter></p>
+      </dialog>
+    </template>
   </div>
 </section>
+
+<script>
+  /*
+    Click a tile to open it large, then move through the rest.
+
+    Built on <dialog>.showModal(), which gives the focus trap, the Escape
+    handler and the inert background for free — all of which a hand-rolled
+    overlay has to reimplement and usually gets wrong.
+  */
+  const grid = document.getElementById('gallery-grid');
+  const template = document.querySelector<HTMLTemplateElement>('#lightbox-template');
+  const links = grid ? Array.from(grid.querySelectorAll<HTMLAnchorElement>('.gallery__link')) : [];
+  const supportsDialog = typeof HTMLDialogElement === 'function';
+
+  if (grid && template && links.length > 0 && supportsDialog) {
+    const dialog = template.content.firstElementChild!.cloneNode(true) as HTMLDialogElement;
+    // Appended to the body, not left in the section: a modal must not be
+    // clipped by an ancestor's overflow or trapped in its stacking context.
+    document.body.append(dialog);
+
+    const image = dialog.querySelector<HTMLImageElement>('.lightbox__img')!;
+    const counter = dialog.querySelector<HTMLElement>('[data-lb-counter]')!;
+    let current = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (next: number) => {
+      current = (next + links.length) % links.length;
+      const link = links[current]!;
+      const thumb = link.querySelector('img');
+
+      image.src = link.href;
+      // Carry the thumbnail's alt across, and its key with it, so the language
+      // switch keeps translating the photo description while the box is open.
+      image.alt = thumb?.getAttribute('alt') ?? '';
+      const key = link.dataset.altKey;
+      if (key) image.setAttribute('data-i18n-alt', key);
+
+      counter.textContent = `${current + 1} / ${links.length}`;
+    };
+
+    links.forEach((link, index) => {
+      link.addEventListener('click', (event) => {
+        // Let ctrl/cmd/middle-click keep doing what the href promises.
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+        event.preventDefault();
+        opener = link;
+        show(index);
+        dialog.showModal();
+        document.documentElement.classList.add('has-lightbox');
+      });
+    });
+
+    dialog.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(current - 1));
+    dialog.querySelector('[data-lb-next]')!.addEventListener('click', () => show(current + 1));
+    dialog.querySelector('[data-lb-close]')!.addEventListener('click', () => dialog.close());
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        show(current - 1);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        show(current + 1);
+      }
+    });
+
+    // The dialog fills the viewport, so a click that lands on it rather than on
+    // the photo or a control is a click on the backdrop.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // Covers the close button, the backdrop and Escape in one place. Focus goes
+    // back to the tile that opened it, so keyboard position is not lost.
+    dialog.addEventListener('close', () => {
+      document.documentElement.classList.remove('has-lightbox');
+      opener?.focus();
+      opener = null;
+    });
+  }
+</script>

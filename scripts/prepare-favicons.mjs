@@ -1,5 +1,5 @@
 /**
- * Generates the favicons from the client's logo.
+ * Generates the favicons from the client's logo (logo-clean.png).
  *
  *   node scripts/prepare-favicons.mjs
  *
@@ -22,17 +22,35 @@ import { dirname, join } from 'node:path';
 import sharp from 'sharp';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SOURCE = join(root, 'src/assets/photos/logo.png');
+const SOURCE = join(root, 'src/assets/photos/logo-clean.png');
 const DEST = join(root, 'public');
 
 /**
- * The monogram, cropped out of the 512x512 badge. Slightly wider than the mark
- * itself so the waves are not flush against the edge at small sizes.
+ * logo-clean.png is a badge centred in a wide transparent field, so it is
+ * trimmed to the badge and normalised to 512x512 first. Every crop below is
+ * expressed against that square, which is the geometry the monogram box was
+ * originally measured on.
  */
-const MONOGRAM = { left: 92, top: 217, width: 136, height: 136 };
+const badge = () =>
+  sharp(SOURCE)
+    .trim({ threshold: 1 })
+    .resize(512, 512, { fit: 'fill' })
+    // The badge carries its own concrete ground; flattening drops the alpha so
+    // the .ico payloads and the iOS tile are opaque.
+    .flatten({ background: '#f5f9fa' })
+    .png()
+    .toBuffer();
 
-const monogram = (size) =>
-  sharp(SOURCE).extract(MONOGRAM).resize(size, size, { fit: 'cover' }).png();
+/**
+ * The monogram, cropped out of the normalised 512x512 badge. Slightly wider
+ * than the mark itself so the waves are not flush against the edge at small
+ * sizes — the slivers of the f and the k at either edge read as part of the
+ * waves once the icon is 32px.
+ */
+const MONOGRAM = { left: 75, top: 197, width: 170, height: 170 };
+
+const monogram = async (size) =>
+  sharp(await badge()).extract(MONOGRAM).resize(size, size, { fit: 'cover' }).png();
 
 /** Packs already-encoded PNGs into an ICO container. */
 function buildIco(images) {
@@ -64,17 +82,17 @@ await mkdir(DEST, { recursive: true });
 const icoSizes = [16, 32, 48];
 const icoImages = [];
 for (const size of icoSizes) {
-  icoImages.push({ size, data: await monogram(size).toBuffer() });
+  icoImages.push({ size, data: await (await monogram(size)).toBuffer() });
 }
 await writeFile(join(DEST, 'favicon.ico'), buildIco(icoImages));
 console.log(`favicon.ico            ${icoSizes.join(', ')}px  (monogram)`);
 
-await monogram(96).toFile(join(DEST, 'favicon-96x96.png'));
+await (await monogram(96)).toFile(join(DEST, 'favicon-96x96.png'));
 console.log('favicon-96x96.png      96px  (monogram)');
 
 // iOS puts this on a white or coloured tile, so the badge keeps its own
 // background rather than being made transparent.
-await sharp(SOURCE).resize(180, 180, { fit: 'cover' }).png().toFile(join(DEST, 'apple-touch-icon.png'));
+await sharp(await badge()).resize(180, 180, { fit: 'cover' }).png().toFile(join(DEST, 'apple-touch-icon.png'));
 console.log('apple-touch-icon.png   180px (full badge)');
 
 // Astro's starter favicon is not ours.

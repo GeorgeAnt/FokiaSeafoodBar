@@ -54,30 +54,42 @@
   --stone: #625e60;
   --light-stone: #a09a91;
 
-  /* PROPOSED light neutral — the supplied palette has no background tone.
-     Drawn from the concrete surfaces the photos were shot on. Change these two
-     values to restyle every light section at once. */
-  --sand: #f4f0ea;
-  --sand-deep: #e9e3d9;
+  /* PROPOSED light neutral — the supplied palette has no background tone, so
+     this one is ours. It is drawn from the concrete and stone the photos were
+     actually shot on, which are cool: a warm cream sits the food photography on
+     top of the page instead of into it, and turns the client's brick red into
+     terracotta. Salt is the same value range, read cold.
+       --salt        14.8:1 with Deep Black, 6.6:1 with Wood, 5.2:1 with Stone
+       --salt-deep   4.7:1 on Stone, where it is the muted text
+     Change these two values to restyle every light section at once. */
+  --salt: #e2e8eb;
+  --salt-deep: #d5dee2;
 
   /* Derived accents. Wood is only legible on light ground: it is 2.3:1 on Deep
      Black and 1.3:1 on Stone, so each surface tier gets its own tint of it.
-       --wood-light  5.7:1 on Deep Black
-       --wood-pale   4.8:1 on Stone
+     Both tints follow the oxidation path — rust weathered in salt air, dusty
+     and pink — rather than lightening Wood toward orange, which lands on
+     terracotta and reads as a different brand.
+       --wood-light  6.4:1 on Deep Black
+       --wood-pale   5.0:1 on Stone
      Sections set --accent; nothing should reference --wood directly. */
-  --wood-light: #c97a4e;
-  --wood-pale: #f0dccb;
-  --paper: #fffdfa;
+  --wood-light: #c98a76;
+  --wood-pale: #f0e0d8;
+  --paper: #f5f9fa;
 
   --text: var(--black);
   --text-muted: var(--stone);
   --accent: var(--wood);
-  --bg: var(--sand);
+  --bg: var(--salt);
 
   /* Ghost-button hover fill: inverts against whichever surface it sits on. */
   --ghost-hover-bg: var(--black);
-  --ghost-hover-fg: var(--sand);
-  --rule: color-mix(in srgb, var(--light-stone) 45%, transparent);
+  --ghost-hover-fg: var(--salt);
+  /* Light-tier rules are tinted with Wood, not grey. It is the one tier Wood is
+     legible on (see above), and a warm hairline across a cold ground is what
+     ties the brick red to the salt. Dark and Stone override this with a neutral
+     tint, because Wood at this opacity would disappear on both. */
+  --rule: color-mix(in srgb, var(--wood) 24%, transparent);
 
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'EB Garamond', 'Palatino Linotype', Georgia, serif;
@@ -222,33 +234,51 @@ button {
   scroll-margin-top: 5rem;
 }
 
+/* For a band whose content is a heading and one line. The full --section-y is
+   sized for sections with a grid or a photo set under the heading; on a short
+   one it reads as a gap rather than as breathing room. */
+.section--tight {
+  padding-block: clamp(2.5rem, 1.9rem + 2.4vw, 4.5rem);
+}
+.section--tight .section-head {
+  margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem);
+}
+.section--tight .section-head h2 {
+  font-size: var(--step-2);
+}
+
 .section-dark {
   background: var(--black);
-  color: var(--sand);
+  color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--sand);
+  --ghost-hover-bg: var(--salt);
   --ghost-hover-fg: var(--black);
   --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
 }
 
 /*
   The third surface tier. Stone otherwise only ever appears as secondary text,
-  so the page steps straight from sand to black; this gives it one band of its
+  so the page would step straight from salt to black; this gives it bands of its
   own and a rhythm of light / mid / dark.
+
+  It carries Our Goal and Where to Find Us — the two text-only sections, which
+  is what suits a mid grey: there are no photographs on either to sit against
+  it. Both also sit next to a black band (the hero above one, the footer below
+  the other), which is the point. No two bands in a row share a background.
 
   Everything on it has to be re-tinted: Light Stone drops to 2.3:1 here and Wood
   to 1.3:1, so the muted tone lightens and the accent becomes --wood-pale.
 */
 .section-stone {
   background: var(--stone);
-  color: var(--sand);
-  --text: var(--sand);
-  --text-muted: var(--sand-deep);
+  color: var(--salt);
+  --text: var(--salt);
+  --text-muted: var(--salt-deep);
   --accent: var(--wood-pale);
-  --ghost-hover-bg: var(--sand);
+  --ghost-hover-bg: var(--salt);
   --ghost-hover-fg: var(--black);
-  --rule: color-mix(in srgb, var(--sand) 32%, transparent);
+  --rule: color-mix(in srgb, var(--salt) 32%, transparent);
 }
 
 /* Wood as a button fill would nearly vanish into Stone (1.3:1). A light fill
@@ -258,7 +288,7 @@ button {
   color: var(--black);
 }
 .section-stone .btn--primary:hover {
-  background: var(--sand-deep);
+  background: var(--salt-deep);
 }
 
 .sr-only {
@@ -281,7 +311,7 @@ button {
   z-index: 100;
   padding: 0.75rem 1.25rem;
   background: var(--black);
-  color: var(--sand);
+  color: var(--salt);
   text-decoration: none;
   transition: translate 0.2s var(--ease);
 }
@@ -306,7 +336,11 @@ button {
 .section-head h2 {
   font-size: var(--step-3);
 }
-.section-head p {
+/* :not(.eyebrow) is load-bearing. `.section-head p` is (0,1,1) and `.eyebrow`
+   is (0,1,0), so without it this rule wins and an eyebrow inside a section head
+   silently renders at heading size in the muted tone instead of small in the
+   accent — which is what made five sections look like they had two titles. */
+.section-head p:not(.eyebrow) {
   margin-top: 0.9rem;
   max-width: var(--measure);
   color: var(--text-muted);
@@ -366,21 +400,18 @@ button {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--sand) 88%, transparent);
+  background: color-mix(in srgb, var(--salt) 88%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--rule);
 }
 
 /*
-  Centred logo with the links split either side.
-
-  Only two groups are in normal flow — the left list and .nav__end — pushed to
-  opposite edges, which leaves a clear gap in the middle. The logo is taken out
-  of flow and centred on the bar itself, so it lands on the true centre of the
-  viewport rather than the midpoint between two unequal groups.
+  Links at one end, utilities at the other. Nothing is out of flow: the bar used
+  to centre a logo absolutely, which is why the links were split into two
+  balanced groups. With the logo gone there is no gap to protect, so they are a
+  single list and the row is just two items pushed apart.
 */
 .nav__inner {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -388,32 +419,10 @@ button {
   min-height: 5rem;
 }
 
-.nav__start,
-.nav__end {
-  display: flex;
-  align-items: center;
-  gap: clamp(1rem, 0.4rem + 1.1vw, 1.9rem);
-}
-
 .nav__utils {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.nav__brand {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-.nav__brand img {
-  width: 3.4rem;
-  height: 3.4rem;
-  border-radius: 50%;
+  gap: 0.75rem;
 }
 
 .nav__links {
@@ -470,18 +479,6 @@ button {
 }
 
 /* In the footer they sit under a heading and can afford to be a touch larger. */
-.footer .social {
-  gap: 0.35rem;
-  margin-top: -0.35rem;
-  margin-inline-start: -0.55rem;
-}
-.footer .social a {
-  color: var(--sand);
-}
-.footer .social a:hover {
-  color: var(--accent);
-  border-bottom-color: transparent;
-}
 
 .lang {
   display: inline-flex;
@@ -536,45 +533,30 @@ button {
     overflow-y: auto;
   }
 
-  /* Dissolving these wrappers lets the links, the utilities and the actions be
-     ordered independently of one another once the bar stacks. */
-  .nav__start,
-  .nav__end {
-    display: contents;
-  }
-
-  .nav__brand {
-    position: static;
-    translate: none;
+  /* The utilities stay visible in the collapsed bar and push the toggle to the
+     far edge; the links drop below as a full-width panel. */
+  .nav__utils {
     order: 1;
     margin-inline-end: auto;
   }
-  .nav__utils {
-    order: 2;
-  }
   .nav__toggle {
-    order: 3;
+    order: 2;
   }
 
   .nav__links {
-    order: 4;
+    order: 3;
     width: 100%;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
+    margin-top: 0.5rem;
+    padding-bottom: 1rem;
+    border-top: 1px solid var(--rule);
     /* Hidden until the toggle sets [data-open] on the bar. */
     display: none;
   }
-  .nav__links--right {
-    order: 5;
-    padding-bottom: 1rem;
-  }
   .nav__inner[data-open='true'] .nav__links {
     display: flex;
-  }
-  .nav__links--left {
-    margin-top: 0.5rem;
-    border-top: 1px solid var(--rule);
   }
   .nav__links a {
     /* Must be block: vertical padding on an inline link does not grow its row,
@@ -592,10 +574,10 @@ button {
    -------------------------------------------------------------------------- */
 .hero {
   background: var(--black);
-  color: var(--sand);
+  color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--sand);
+  --ghost-hover-bg: var(--salt);
   --ghost-hover-fg: var(--black);
 }
 
@@ -616,49 +598,52 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.5rem;
+  /* Centred, not left-aligned: the lockup is a wordmark over a tagline over a
+     sentence, which reads as a badge rather than as a column of copy. */
+  align-items: center;
+  text-align: center;
+  gap: 1.75rem;
   padding: clamp(3rem, 2rem + 6vw, 6rem) var(--gutter);
 }
 @media (min-width: 60rem) {
   .hero__copy {
     padding-inline: clamp(2rem, 1rem + 4vw, 5rem);
-    max-width: 34rem;
-    margin-inline-start: auto;
+    max-width: 36rem;
+    /* Both sides, so the block sits in the middle of its half. With
+       margin-inline-start alone it was pushed against the photo and left the
+       outer edge of the panel bare. */
+    margin-inline: auto;
+    gap: 2.25rem;
   }
 }
 
+/*
+  The h1 is the logo, so there is no text here to size — only the image.
+  No border-radius: the artwork already carries its own round badge inside a
+  wide transparent field, and clipping the box would cut the field, not the
+  badge.
+*/
 .hero__logo {
-  width: clamp(5rem, 4rem + 4vw, 7.5rem);
+  margin: 0;
+  width: clamp(15rem, 11rem + 15vw, 24rem);
+  max-width: 100%;
+}
+.hero__logo img {
+  width: 100%;
   height: auto;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
-}
-
-.hero__title {
-  font-size: var(--step-4);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-
-.hero__tagline {
-  font-family: var(--font-body);
-  font-size: var(--step--1);
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: var(--wood-light);
-  margin-top: 0.6rem;
 }
 
 .hero__intro {
-  font-size: var(--step-1);
+  font-size: clamp(1.3rem, 1.15rem + 0.7vw, 1.75rem);
   color: var(--light-stone);
+  /* Held to a readable measure even though the column is wider than this. */
   max-width: 30ch;
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
@@ -711,30 +696,77 @@ button {
   object-fit: cover;
 }
 
-.hero__dots {
+/*
+  Carousel controls.
+
+  Most of the photos are mid-grey across the bottom, so a hairline dash drawn
+  straight onto the image disappears on half of them. The controls therefore
+  carry their own scrim rather than relying on whatever is behind them, and the
+  arrows and dots share a single pill so there is one surface to keep legible
+  instead of three floating marks.
+*/
+.hero__controls {
   position: absolute;
   z-index: 2;
   bottom: 1.25rem;
   left: 50%;
   translate: -50% 0;
   display: flex;
-  gap: 0.6rem;
+  align-items: center;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--black) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--salt) 26%, transparent);
+  box-shadow: 0 2px 16px color-mix(in srgb, var(--black) 45%, transparent);
+  backdrop-filter: blur(10px) saturate(1.2);
+}
+
+.hero__arrow {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--salt);
+  transition:
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+.hero__arrow svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+/* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
+.hero__arrow:hover,
+.hero__arrow:focus-visible {
+  background: var(--salt);
+  color: var(--black);
+}
+
+.hero__dots {
+  display: flex;
+  gap: 0.35rem;
+  padding-inline: 0.5rem;
 }
 .hero__dots button {
-  width: 2rem;
-  height: 2rem;
+  width: 1.5rem;
+  height: 2.5rem;
   display: grid;
   place-items: center;
 }
 .hero__dots button::after {
   content: '';
   width: 100%;
-  height: 2px;
-  background: color-mix(in srgb, var(--sand) 45%, transparent);
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--salt) 42%, transparent);
   transition: background-color 0.25s var(--ease);
 }
+.hero__dots button:hover::after {
+  background: color-mix(in srgb, var(--salt) 72%, transparent);
+}
 .hero__dots button[aria-current='true']::after {
-  background: var(--sand);
+  background: var(--salt);
 }
 
 /* --------------------------------------------------------------------------
@@ -1029,7 +1061,7 @@ button {
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--radius);
-  background: var(--sand-deep);
+  background: var(--salt-deep);
 }
 .team__photo img {
   width: 100%;
@@ -1079,42 +1111,219 @@ button {
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--light-stone) 25%, transparent);
 }
+.gallery__link {
+  display: block;
+}
 .gallery__item img {
   width: 100%;
   height: auto;
   transition: scale 0.5s var(--ease);
 }
-.gallery__item:hover img {
+.gallery__item:hover img,
+.gallery__link:focus-visible img {
   scale: 1.03;
 }
 
 /* --------------------------------------------------------------------------
-   Contact — takeaway and reservations share one phone number for now, but are
-   already two separate blocks so splitting them later is a content change.
+   Lightbox — a <dialog> cloned out of #lightbox-template once JS is running.
+
+   The scrim sits on the dialog itself rather than only on ::backdrop: the
+   element is sized to the whole viewport, so its own background is what the
+   photo is actually read against, and ::backdrop is left matching it for the
+   sliver of cases where it shows.
    -------------------------------------------------------------------------- */
-.contact__grid {
-  display: grid;
-  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
-  align-items: start;
+.lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--black) 90%, transparent);
+  color: var(--salt);
 }
-@media (min-width: 48rem) {
-  .contact__grid {
-    grid-template-columns: repeat(2, 1fr);
+/*
+  `display` is set only while the dialog is open, and this is load-bearing.
+  The UA stylesheet hides a closed dialog with `dialog:not([open])
+  { display: none }`, but any author `display` beats it — so declaring
+  `display: grid` on `.lightbox` itself leaves a full-viewport dark block
+  sitting in the page after the footer, adding 100dvh to the document.
+*/
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+.lightbox::backdrop {
+  background: color-mix(in srgb, var(--black) 90%, transparent);
+}
+
+/* The page behind a modal still scrolls in most browsers; showModal() does not
+   stop it. */
+.has-lightbox {
+  overflow: hidden;
+}
+
+.lightbox__img {
+  max-width: min(92vw, 78rem);
+  /* Leaves the counter clear of the photo. The arrows deliberately overlap it,
+     as they do in the reference — that is what the backing triangle is for. */
+  max-height: 84dvh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/*
+  Arrows, built the way the reference gallery builds them: a solid triangle at
+  the very edge of the viewport rather than a button with a fill.
+
+  Two triangles, not one. `::after` is the light arrowhead and `::before` is a
+  larger dark one directly behind it, offset so it reads as a rim. That backing
+  is not decoration — it is what keeps the arrowhead above the 3:1 a control
+  needs when it lands on a pale part of a photograph, which is the job the pill
+  did before. Ours uses --black behind --salt rather than the reference's mid
+  grey, so the pairing is a little stronger than the original.
+
+  The triangles come from borders, so the button itself stays empty: no glyph,
+  no SVG, nothing for the language switch to translate.
+*/
+.lightbox__arrow {
+  position: absolute;
+  top: 50%;
+  width: 5.625rem;
+  height: 6.875rem;
+  margin-top: -3.4375rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  opacity: 0.65;
+  transition: opacity 0.2s var(--ease);
+}
+.lightbox__arrow:hover,
+.lightbox__arrow:focus-visible {
+  opacity: 1;
+}
+.lightbox__arrow::before,
+.lightbox__arrow::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  margin-top: 2.1875rem;
+  border: medium solid transparent;
+}
+.lightbox__arrow::before {
+  border-top-width: 1.3125rem;
+  border-bottom-width: 1.3125rem;
+  opacity: 0.7;
+}
+.lightbox__arrow::after {
+  top: 0.5rem;
+  border-top-width: 0.8125rem;
+  border-bottom-width: 0.8125rem;
+}
+
+.lightbox__arrow--prev {
+  left: 0;
+}
+.lightbox__arrow--prev::before {
+  margin-left: 1.5625rem;
+  border-right: 1.6875rem solid var(--black);
+}
+.lightbox__arrow--prev::after {
+  margin-left: 1.9375rem;
+  border-right: 1.0625rem solid var(--salt);
+}
+
+.lightbox__arrow--next {
+  right: 0;
+}
+.lightbox__arrow--next::before {
+  margin-left: 2.1875rem;
+  border-left: 1.6875rem solid var(--black);
+}
+.lightbox__arrow--next::after {
+  margin-left: 2.4375rem;
+  border-left: 1.0625rem solid var(--salt);
+}
+
+/* The close button keeps a scrim: it sits in the top corner, where there is no
+   backing triangle to read it against. */
+.lightbox__close {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  color: var(--salt);
+  background: color-mix(in srgb, var(--black) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--salt) 26%, transparent);
+  backdrop-filter: blur(10px) saturate(1.2);
+  transition:
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+  top: clamp(0.5rem, 0.2rem + 1.5vw, 2rem);
+  right: clamp(0.5rem, 0.2rem + 1.5vw, 2rem);
+}
+/* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
+.lightbox__close:hover,
+.lightbox__close:focus-visible {
+  background: var(--salt);
+  color: var(--black);
+}
+.lightbox__close svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.lightbox__counter {
+  position: absolute;
+  bottom: clamp(0.75rem, 0.4rem + 1.5vw, 2rem);
+  left: 50%;
+  translate: -50% 0;
+  margin: 0;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--salt);
+  background: color-mix(in srgb, var(--black) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--salt) 26%, transparent);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  backdrop-filter: blur(10px) saturate(1.2);
+}
+
+/* On a narrow screen the arrows cover a real share of the frame, so the photo
+   gives up a little height rather than being read through them. */
+@media (max-width: 30rem) {
+  .lightbox__img {
+    max-height: 70dvh;
   }
 }
 
-.contact__card {
-  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+/* --------------------------------------------------------------------------
+   Contact — take away and reservations are one phone call. The heading names
+   both and the number answers it; there is nothing else in the section.
+   -------------------------------------------------------------------------- */
+/* The number is the last thing in the section now, so it carries no trailing
+   margin of its own. */
+.contact__call {
+  margin: 0;
 }
-.contact__card h3 {
-  font-size: var(--step-1);
-  margin-bottom: 0.75rem;
-}
-.contact__card p {
+.contact__call-label {
+  display: block;
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .contact__phone {
@@ -1122,9 +1331,9 @@ button {
   align-items: center;
   gap: 0.6rem;
   font-family: var(--font-display);
-  font-size: var(--step-2);
+  font-size: var(--step-3);
   text-decoration: none;
-  color: var(--wood-light);
+  color: var(--accent);
   letter-spacing: 0.01em;
 }
 .contact__phone:hover {
@@ -1132,19 +1341,6 @@ button {
   text-underline-offset: 0.2em;
 }
 
-.contact__email {
-  margin-top: 0.6rem;
-  font-size: var(--step--1);
-}
-.contact__email a {
-  color: var(--text-muted);
-  text-decoration: none;
-  border-bottom: 1px solid var(--rule);
-}
-.contact__email a:hover {
-  color: var(--sand);
-  border-bottom-color: currentColor;
-}
 
 /* --------------------------------------------------------------------------
    Where to find us
@@ -1157,6 +1353,12 @@ button {
   .find__grid {
     grid-template-columns: 1fr 1.15fr;
   }
+}
+
+/* The heading is inside the column here, so its trailing space is the gap to
+   the first block rather than to a whole grid below it. */
+.section-head--inline {
+  margin-bottom: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
 }
 
 .find__block + .find__block {
@@ -1210,7 +1412,7 @@ button {
 .find__media {
   border-radius: var(--radius);
   overflow: hidden;
-  background: var(--sand-deep);
+  background: var(--salt-deep);
 }
 .find__media img {
   width: 100%;
@@ -1224,11 +1426,13 @@ button {
   }
 }
 
+/* Sits directly under the address it belongs to now, not at the end of the
+   column, so it needs the spacing of a related element rather than a break. */
 .find__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -1236,67 +1440,30 @@ button {
    -------------------------------------------------------------------------- */
 .footer {
   background: var(--black);
-  color: var(--sand);
+  color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--sand);
+  --ghost-hover-bg: var(--salt);
   --ghost-hover-fg: var(--black);
   padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
 }
 
-.footer__grid {
-  display: grid;
-  gap: 2rem;
-  align-items: start;
-}
-@media (min-width: 48rem) {
-  .footer__grid {
-    grid-template-columns: 2fr 1fr 1fr;
-  }
-}
-
-.footer__brand {
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-}
-.footer__brand + p {
-  color: var(--text-muted);
-  margin-top: 0.5rem;
-  max-width: 30ch;
-}
-
-.footer h2 {
-  font-family: var(--font-body);
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--light-stone);
-  margin-bottom: 0.9rem;
-}
-
-.footer a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-.footer a:hover {
-  border-bottom-color: var(--wood-light);
-  color: var(--wood-light);
-}
-
-.footer li + li {
-  margin-top: 0.45rem;
-}
-
-.footer__bottom {
+.footer__inner {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--rule);
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+/* Height, not width. The badge sits centred in a wide transparent field, so a
+   width constraint would size the empty margins rather than the mark. */
+.footer__logo {
+  width: auto;
+  height: clamp(4.5rem, 3.6rem + 3.5vw, 6.5rem);
+}
+
+.footer__rights {
   font-size: var(--step--1);
   color: var(--text-muted);
 }
