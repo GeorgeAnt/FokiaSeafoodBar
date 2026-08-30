@@ -13,8 +13,6 @@
   "a11y.openMenu": "Άνοιγμα μενού πλοήγησης",
   "a11y.closeMenu": "Κλείσιμο μενού πλοήγησης",
   "a11y.languageSwitcher": "Επιλογή γλώσσας",
-  "a11y.heroPrevious": "Προηγούμενη φωτογραφία",
-  "a11y.heroNext": "Επόμενη φωτογραφία",
   "a11y.heroGoTo": "Μετάβαση στη φωτογραφία {n}",
   "a11y.galleryDialog": "Προβολή φωτογραφίας",
   "a11y.galleryClose": "Κλείσιμο",

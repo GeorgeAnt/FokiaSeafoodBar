@@ -10,7 +10,7 @@
   "address": {
     "$comment": "Confirmed by the client. `street` and `city` are locale-keyed so the Greek page is not left reading a Latin transliteration of a Greek street name. VERIFY the Greek spellings before launch.",
     "street": { "el": "Λάσκου 3", "en": "Laskou 3" },
-    "city": { "el": "Ελευσίνα", "en": "Elefsina" },
+    "city": { "el": "Ελευσίνα", "en": "Elefsína" },
     "region": { "el": "Αττική", "en": "Attica" },
     "postalCode": "19200",
     "country": "GR",
@@ -24,14 +24,11 @@
   "mapUrl": "https://www.google.com/maps/search/?api=1&query=Laskou%203%2C%20Elefsina%2019200%2C%20Greece",
   "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=Laskou%203%2C%20Elefsina%2019200%2C%20Greece",
   "hours": {
-    "$comment": "Confirmed by the client. `days` uses schema.org day names for the JSON-LD. A `closes` earlier than `opens` means the following day, so 00:00 reads as midnight. Any day not listed in `entries` renders as closed.",
+    "$comment": "PLACEHOLDER — real opening hours still needed. `days` uses schema.org day names for the JSON-LD.",
     "entries": [
-      {
-        "days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
-        "opens": "16:00",
-        "closes": "00:00"
-      },
-      { "days": ["Saturday", "Sunday"], "opens": "14:00", "closes": "00:00" }
+      { "days": ["Tuesday", "Wednesday", "Thursday"], "opens": "18:00", "closes": "00:00" },
+      { "days": ["Friday", "Saturday"], "opens": "13:00", "closes": "01:00" },
+      { "days": ["Sunday"], "opens": "13:00", "closes": "23:00" }
     ],
     "closed": ["Monday"]
   },

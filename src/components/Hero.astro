@@ -72,38 +72,17 @@ const { locale = defaultLocale } = Astro.props;
         ))
       }
       {/*
-        Controls live in a <template> rather than in the DOM so a visitor
-        without JavaScript is never shown a button that cannot do anything —
-        but their labels are still rendered by Astro, in the right locale, and
+        The dot strip lives in a <template> rather than in the DOM so a visitor
+        without JavaScript is never shown a control that cannot do anything —
+        but the labels are still rendered by Astro, in the right locale, and
         carry data-i18n-label so the language switch keeps translating them
         after the script has cloned them.
+
+        Dashes only, as originally designed: no arrows and no scrim pill behind
+        them. See the note in global.css about what that costs.
       */}
       <template id="hero-controls-template">
-        <div class="hero__controls">
-          <button
-            type="button"
-            class="hero__arrow"
-            data-hero-prev
-            aria-label={t(locale, 'a11y.heroPrevious')}
-            data-i18n-label="a11y.heroPrevious"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M14.25 5.5 7.75 12l6.5 6.5" />
-            </svg>
-          </button>
-          <div class="hero__dots"></div>
-          <button
-            type="button"
-            class="hero__arrow"
-            data-hero-next
-            aria-label={t(locale, 'a11y.heroNext')}
-            data-i18n-label="a11y.heroNext"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M9.75 5.5 16.25 12l-6.5 6.5" />
-            </svg>
-          </button>
-        </div>
+        <div class="hero__dots"></div>
       </template>
 
       {/*
@@ -146,11 +125,9 @@ const { locale = defaultLocale } = Astro.props;
     else window.addEventListener('load', reveal, { once: true });
 
     // Controls come from templates so they exist only once JS is running, but
-    // still arrive with Astro-rendered labels in the current locale.
-    const controls = controlsTemplate.content.firstElementChild!.cloneNode(true) as HTMLElement;
-    const dotList = controls.querySelector<HTMLElement>('.hero__dots')!;
-    const prev = controls.querySelector<HTMLButtonElement>('[data-hero-prev]')!;
-    const next = controls.querySelector<HTMLButtonElement>('[data-hero-next]')!;
+    // still arrive with Astro-rendered labels in the current locale. The cloned
+    // element is the dot strip itself — there is no wrapper and no arrows.
+    const dotList = controlsTemplate.content.firstElementChild!.cloneNode(true) as HTMLElement;
 
     const dots = slides.map((_, i) => {
       const dot = dotTemplate.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
@@ -183,16 +160,7 @@ const { locale = defaultLocale } = Astro.props;
       timer = window.setInterval(() => show(current + 1), INTERVAL);
     };
 
-    prev.addEventListener('click', () => {
-      show(current - 1);
-      start();
-    });
-    next.addEventListener('click', () => {
-      show(current + 1);
-      start();
-    });
-
-    media.append(controls);
+    media.append(dotList);
     start();
 
     // WCAG 2.2.2: auto-advancing content needs a way to stop it. Hovering or

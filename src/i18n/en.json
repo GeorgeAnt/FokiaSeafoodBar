@@ -13,8 +13,6 @@
   "a11y.openMenu": "Open navigation menu",
   "a11y.closeMenu": "Close navigation menu",
   "a11y.languageSwitcher": "Choose language",
-  "a11y.heroPrevious": "Previous photo",
-  "a11y.heroNext": "Next photo",
   "a11y.heroGoTo": "Go to photo {n}",
   "a11y.galleryDialog": "Photo viewer",
   "a11y.galleryClose": "Close",

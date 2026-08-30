@@ -697,73 +697,36 @@ button {
 }
 
 /*
-  Carousel controls.
+  Carousel controls — bare dashes, as originally designed.
 
-  Most of the photos are mid-grey across the bottom, so a hairline dash drawn
-  straight onto the image disappears on half of them. The controls therefore
-  carry their own scrim rather than relying on whatever is behind them, and the
-  arrows and dots share a single pill so there is one surface to keep legible
-  instead of three floating marks.
+  KNOWN TRADE-OFF, chosen deliberately. The photos are mid-grey exactly where
+  these sit, so a hairline drawn straight onto the image measures 1.7-2.3:1
+  against them on every slide, under the 3:1 WCAG minimum for a control. A scrim
+  pill behind them fixed that and was reverted for the lighter look. If the
+  contrast is ever raised again, put the surface back rather than only darkening
+  the dash — the photo underneath changes on every slide.
 */
-.hero__controls {
+.hero__dots {
   position: absolute;
   z-index: 2;
   bottom: 1.25rem;
   left: 50%;
   translate: -50% 0;
   display: flex;
-  align-items: center;
-  padding: 0.2rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--black) 62%, transparent);
-  border: 1px solid color-mix(in srgb, var(--salt) 26%, transparent);
-  box-shadow: 0 2px 16px color-mix(in srgb, var(--black) 45%, transparent);
-  backdrop-filter: blur(10px) saturate(1.2);
-}
-
-.hero__arrow {
-  width: 2.5rem;
-  height: 2.5rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--salt);
-  transition:
-    background-color 0.2s var(--ease),
-    color 0.2s var(--ease);
-}
-.hero__arrow svg {
-  width: 1.3rem;
-  height: 1.3rem;
-}
-/* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
-.hero__arrow:hover,
-.hero__arrow:focus-visible {
-  background: var(--salt);
-  color: var(--black);
-}
-
-.hero__dots {
-  display: flex;
-  gap: 0.35rem;
-  padding-inline: 0.5rem;
+  gap: 0.6rem;
 }
 .hero__dots button {
-  width: 1.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   display: grid;
   place-items: center;
 }
 .hero__dots button::after {
   content: '';
   width: 100%;
-  height: 3px;
-  border-radius: 2px;
-  background: color-mix(in srgb, var(--salt) 42%, transparent);
+  height: 2px;
+  background: color-mix(in srgb, var(--salt) 45%, transparent);
   transition: background-color 0.25s var(--ease);
-}
-.hero__dots button:hover::after {
-  background: color-mix(in srgb, var(--salt) 72%, transparent);
 }
 .hero__dots button[aria-current='true']::after {
   background: var(--salt);
