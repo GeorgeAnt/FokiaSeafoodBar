@@ -2,7 +2,7 @@
 
 A marketing site for the restaurant — a single scrolling homepage plus a
 dedicated menu page at `/menu` and a gallery at `/gallery`. Built with [Astro](https://astro.build),
-which ships **zero JavaScript frameworks** — the whole page loads about 29 KB of
+which ships **zero JavaScript frameworks** — the homepage loads about 18 KB of
 HTML/CSS (gzipped) plus images.
 
 Greek is the default language. The site chrome switches to English; **the menu
@@ -30,7 +30,7 @@ Pages, GitHub Pages, or plain nginx. There is no server and no database.
 
 | URL | What's on it |
 |---|---|
-| `/` | Hero, Our Goal, the Team, Take away & Reservations, Where to Find Us |
+| `/` | Hero, Our Goal, the Team, Reserve your spot • Take away, Where to Find Us |
 | `/menu` | The full menu and the legally required notices |
 | `/gallery` | The photographs, each opening in a lightbox |
 
@@ -155,8 +155,10 @@ Name, phone, email, address, opening hours, social links, map links and the
 production domain. Fields still marked `PLACEHOLDER` must be replaced before
 launch — see [Before launch](#before-launch).
 
-`street` and `city` are locale-keyed so the Greek page shows `Λάσκου 3,
-Ελευσίνα` rather than a Latin transliteration.
+`street` and `city` are locale-keyed so the Greek page shows `Λάσκου 3
+Ελευσίνα` rather than a Latin transliteration. Where to Find Us shows the street
+and city only; the postcode and country stay in the structured data, which is
+what local search reads.
 
 **Adding a social network:** add an entry to `social` with an `id`, `label` and
 `url`. The `id` picks the icon out of `src/components/SocialLinks.astro` — add
@@ -226,7 +228,9 @@ script if the folder moves.
 **2. Build time.** Astro generates responsive AVIF and WebP variants with a JPEG
 fallback from those masters, at the widths each section actually needs. Every
 image carries explicit dimensions, so nothing shifts as the page loads. Only the
-first hero image loads eagerly; everything else is lazy.
+first hero photo and the hero logo load eagerly; everything else is lazy. The
+gallery additionally builds one 1400px variant per photo, which is both what the
+lightbox shows and the link a visitor without JavaScript follows.
 
 ### Favicons
 
@@ -255,7 +259,10 @@ measured against the normalised 512×512 badge, not the file's own pixels.
 
 ## Performance
 
-Lighthouse, mobile, on the production build:
+Lighthouse, mobile, on the production build. **These were measured before the
+gallery was split onto its own page and the hero, nav, footer and Take away
+sections were reworked — re-run before quoting them.** The page-weight figures
+below the table are current and measured against the build in `dist/`.
 
 | | |
 |---|---|
@@ -270,14 +277,17 @@ Lighthouse, mobile, on the production build:
 
 | | |
 |---|---|
-| HTML (inc. inlined CSS, structured data) | 129 KB raw, **29 KB gzipped** |
-| JavaScript requests | **0** — the ~2 KB of script is inlined |
+| `/` (inc. inlined CSS, structured data) | 69 KB raw, **18 KB gzipped** |
+| `/menu` | 92 KB raw, **22 KB gzipped** |
+| `/gallery` | 77 KB raw, **20 KB gzipped** |
+| JavaScript requests | **0** — every script is inlined |
 | Fonts | 4 files, 128 KB total (Greek + Latin, both families) |
-| Total `dist/` | 33 MB, almost all image variants the browser chooses between |
+| Total `dist/` | 40 MB across 390 files, almost all image variants the browser chooses between |
 
 The Food/Drinks switch, the menu, and the whole page work with JavaScript
 disabled — verified. JavaScript only adds the hero crossfade, the mobile menu
-panel, and the language switch.
+panel, the gallery lightbox and the language switch. With it off, a gallery tile
+is still a link straight to the full-size photo.
 
 Two things are load-bearing for those numbers; changing them will cost score:
 
@@ -306,8 +316,10 @@ Two things are load-bearing for those numbers; changing them will cost score:
 **Confirmed and in place:** address (Laskou 3, Elefsina 19200), phone
 (21 3099 1571), email (fokiaseafoodbar@gmail.com), opening hours (Tue–Fri
 16:00–00:00, Sat–Sun 14:00–00:00, closed Monday), Instagram and Facebook.
-The map and directions links are built from the address, so they work now;
-swap them for a Google Maps place link if you want the exact pin.
+The map link is built from the address, so it works now; swap it for a Google
+Maps place link if you want the exact pin. `directionsUrl` is still in
+`site.json` but nothing renders it — the "Get directions" button was removed, so
+delete the field or restore a button if it is wanted back.
 
 **Content still outstanding:**
 
@@ -315,8 +327,8 @@ swap them for a Google Maps place link if you want the exact pin.
   by name, label and grape.
 - **Team names and bios** for 3 of the 4 members (all 4 bios are placeholder text
   at realistic length, so the layout is already tested).
-- **Map and directions links** — `mapUrl` / `directionsUrl` in `site.json`. The
-  buttons are hidden while these are empty rather than linking nowhere.
+- **Map link** — `mapUrl` in `site.json`. The button is hidden while it is empty
+  rather than linking nowhere.
 - **Social links** — hidden while empty.
 - **Latitude and longitude** — omitted from the structured data while unset.
 - **A cropped or vector logo.** `logo-clean.png` has a transparent surround, so
@@ -344,7 +356,7 @@ two values restyles every light section.
 
 ```
 src/
-  assets/photos/      downsampled masters — carousel, gallery, team, logo
+  assets/photos/      downsampled masters — carousel, gallery, team, logo-clean
   components/         Nav, Hero, Goal, Menu, MenuCategory, MenuItem,
                       Team, Gallery, Contact, FindUs, Footer
   data/               ← content lives here (menu, team, gallery, site, legal)
@@ -378,8 +390,13 @@ only tinting text:
 | Class | Background | Sections |
 |---|---|---|
 | *(default)* | `--salt` | Menu, Team, Gallery |
-| `.section-stone` | `--stone` | Where to Find Us |
-| `.section-dark` | `--black` | Hero, Our Goal, Delivery & Reservations, footer |
+| `.section-stone` | `--stone` | Our Goal, Where to Find Us |
+| `.section-dark` | `--black` | Hero, Reserve your spot • Take away, footer |
+
+No two bands in a row share a background. Our Goal is on the mid tier because
+the hero above it is black — as a dark section it ran into the hero with no
+boundary. Stone carries the two text-only sections, which is what suits a mid
+grey: neither has photographs sitting on it.
 
 ### The `--accent` token
 
