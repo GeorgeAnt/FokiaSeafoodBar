@@ -48,7 +48,7 @@ const plates = PLATE_IDS.map((id) => {
 */}
 <section class="section section-dark plates" id="plates">
   <div class="wrap">
-    <header class="section-head plates__head">
+    <header class="section-head plates__head" data-reveal>
       <div>
         <h2 data-i18n="plates.heading">{t(locale, 'plates.heading')}</h2>
         <p data-i18n="plates.intro">{t(locale, 'plates.intro')}</p>
@@ -67,7 +67,7 @@ const plates = PLATE_IDS.map((id) => {
       On narrow screens it becomes a horizontal scroll-snap strip instead of a
       four-photo tower: the point of the band is that you take it in at a glance.
     */}
-    <ul class="plates__row">
+    <ul class="plates__row" data-reveal>
       {
         plates.map((plate) => (
           <li class="plates__item">

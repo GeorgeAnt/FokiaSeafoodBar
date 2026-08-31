@@ -23,11 +23,11 @@ const { locale = defaultLocale } = Astro.props;
 */}
 <section class="section section--tight section-dark" id="contact">
   <div class="wrap contact__inner">
-    <header class="section-head section-head--inline">
+    <header class="section-head section-head--inline" data-reveal>
       <h2 data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
     </header>
 
-    <p class="contact__call">
+    <p class="contact__call" data-reveal>
       <span class="contact__call-label" data-i18n="contact.callUs">{t(locale, 'contact.callUs')}</span>
       <a class="contact__phone" href={`tel:${site.phone.href}`}>
         <svg

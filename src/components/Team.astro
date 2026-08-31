@@ -12,7 +12,7 @@ const { locale = defaultLocale } = Astro.props;
 
 <section class="section" id="team">
   <div class="wrap">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <h2 data-i18n="team.heading">{t(locale, 'team.heading')}</h2>
       <p data-i18n="team.intro">{t(locale, 'team.intro')}</p>
     </header>
@@ -33,7 +33,7 @@ const { locale = defaultLocale } = Astro.props;
       The portrait stays 4:5 and every crop is still identical, which is what
       that fixed ratio was always for.
     -->
-    <div class="team__grid">
+    <div class="team__grid" data-reveal>
       {
         team.members.map((member) => (
           <article class="team__member">

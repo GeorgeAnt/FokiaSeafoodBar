@@ -337,17 +337,18 @@ against the build in `dist/`.
 
 | | |
 |---|---|
-| `/` (inc. inlined CSS, structured data) | 79 KB raw, **20 KB gzipped** |
-| `/menu` | 97 KB raw, **23 KB gzipped** |
-| `/gallery` | 84 KB raw, **21 KB gzipped** |
+| `/` (inc. inlined CSS, structured data) | 81 KB raw, **21 KB gzipped** |
+| `/menu` | 99 KB raw, **24 KB gzipped** |
+| `/gallery` | 86 KB raw, **21 KB gzipped** |
 | JavaScript requests | **0** — every script is inlined |
 | Fonts | 10 files, 162 KB total (Greek + Latin, both families) — 6 preloaded |
 | Total `dist/` | 40 MB across 390 files, almost all image variants the browser chooses between |
 
 The Food/Drinks switch, the menu, and the whole page work with JavaScript
 disabled — verified. JavaScript only adds the hero crossfade, the mobile menu
-panel, the gallery lightbox and the language switch. With it off, a gallery tile
-is still a link straight to the full-size photo.
+panel, the gallery lightbox, the language switch and the scroll reveal. With it
+off, a gallery tile is still a link straight to the full-size photo, and every
+band on the homepage is simply visible from the start.
 
 Two things are load-bearing for those numbers; changing them will cost score:
 
@@ -360,6 +361,29 @@ Two things are load-bearing for those numbers; changing them will cost score:
   (`global.css`). They sit stacked inside the viewport, so `loading="lazy"` does
   not defer them — all four would download during the initial load and slow the
   LCP image by more than a second.
+
+---
+
+## How the homepage scrolls
+
+Two things happen as you scroll the homepage on a desktop or tablet:
+
+- **The page settles on the bands.** When a scroll ends near the boundary
+  between two sections, it clicks that section neatly under the navigation bar.
+  It does **not** force one section per scroll: several bands are taller than a
+  laptop screen (Team is three and a half screens on a phone), so being forced
+  section-by-section would hide their bottom halves. Tall bands scroll through
+  normally, then the next one settles into place.
+- **Each band rises into view** as it arrives, over about seven tenths of a
+  second. The hero is excluded, because it is the first thing painted.
+
+Both switch off completely if the visitor's device is set to reduce motion, and
+the settling is desktop and tablet only. Neither affects the menu or the gallery.
+
+If you add a new band to the homepage and want it to rise in like the others,
+put `data-reveal` on the block inside it. Read the note in `CLAUDE.md` first —
+there is one rule about which script is allowed to hide things, and breaking it
+is how a section ends up invisible.
 
 ---
 

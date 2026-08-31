@@ -117,6 +117,30 @@ The gallery *tiles* are the deliberate exception and stay in the page: each is a
 `<a>` pointing at the full-size photo, so it still goes somewhere real when the
 script does not run, and JS only intercepts the click.
 
+**Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
+bands are not viewport-sized and cannot be. Measured at 1366x768: Plates 834,
+Team 1030, Find Us 1082 are all taller than the screen; on a 390x844 phone Team
+is 2961, three and a half viewports; Take away is 232, about a quarter of one.
+`mandatory` pulls the reader out of a band they are still reading and gives the
+short band a whole screen for two lines. `proximity` only settles a scroll that
+already ended near a boundary, so tall bands scroll through normally. Snapping is
+gated at 48rem (below it there is nothing to settle onto) and on
+`prefers-reduced-motion` (it moves the page without being asked). This is also
+why full scroll-hijacking — one wheel tick per section — is not on the table:
+it would hide the bottom of Team and Find Us and break every `/#anchor` in the
+nav.
+
+**A rule that hides content must be owned by the script that can un-hide it.**
+`[data-reveal]` blocks are invisible only under `.has-reveal`, and that class is
+added by the inline script in `Base.astro`'s head — which adds it *after*
+checking both `prefers-reduced-motion` and `IntersectionObserver`, and which
+collects its targets on `DOMContentLoaded` in the same script. Deliberately one
+inline script, not a deferred module: a module that failed to load would leave
+half the homepage at `opacity: 0` with nothing left to reveal it. Inline also
+means the class lands before first paint, so nothing shows and then hides. Keep
+that contract if you add reveal targets — never add `.has-reveal` from anywhere
+else.
+
 **Section eyebrows were a bug, not a device.** Every section used to render one
 from its `nav.*` key, which in five of six cases was the heading verbatim — two
 identical titles stacked. Only Our Goal keeps one, because its heading is a
@@ -247,6 +271,15 @@ Node is installed but **not on the shell PATH**; prepend it first:
   claim a Wednesday the restaurant is shut. Non-contiguous days become separate
   rows. Monday is listed as closed on purpose: it is not a working hour, but
   dropping it leaves a visitor guessing.
+- `scroll-padding-top` on the container and `scroll-margin-top` on the target
+  **both** apply and they stack. The site carried both for the sticky nav, so an
+  anchor jump landed a section 180px down a viewport whose nav is 81px tall (100
+  + 80), and a menu jump chip landed a category at 208px (100 + 108) — a fat
+  empty band under the bar on every jump, which nobody had measured. Only
+  `scroll-padding-top: 6.25rem` on `<html>` survives; it covers anchors, focus
+  scrolling and snapping in one place, and everything now lands at 100px. If a
+  jump target ever looks wrongly offset, check whether something has
+  reintroduced a `scroll-margin-top` on top of it.
 - Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
   nav links need `display: block` or the tap targets collapse to ~26px.
 - `.section--tight` exists for a band whose content is a heading and a line or

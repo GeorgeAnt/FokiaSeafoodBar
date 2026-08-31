@@ -191,6 +191,50 @@ const dictJson = JSON.stringify(dictionaries);
     {schemas.map((schema) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}
+
+    <script is:inline>
+      /**
+       * Reveal-on-scroll for anything carrying `data-reveal`.
+       *
+       * Inline and in the head on purpose, and it is one script rather than two.
+       * The CSS that hides a pending block keys off `.has-reveal`, so whatever
+       * adds that class MUST also be able to take the block out of hiding again
+       * — a deferred module that failed to load would leave half the homepage
+       * invisible. An inline script cannot fail to arrive, and it sets the class
+       * before first paint, so nothing flashes in and then hides.
+       *
+       * Both guards run before the class is added: with reduced motion, or
+       * without IntersectionObserver, the page stays plain rather than hidden.
+       */
+      (function () {
+        if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+        if (!('IntersectionObserver' in window)) return;
+
+        document.documentElement.classList.add('has-reveal');
+
+        // The body is not parsed yet, so the targets are collected on
+        // DOMContentLoaded — same script, so there is still nothing to fail.
+        document.addEventListener('DOMContentLoaded', function () {
+          var observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                entry.target.setAttribute('data-revealed', '');
+                // Once only: a band does not re-animate when scrolled back to.
+                observer.unobserve(entry.target);
+              });
+            },
+            // Held back from the very bottom edge so a band starts moving once
+            // it is properly in view rather than as its first pixel appears.
+            { rootMargin: '0px 0px -10% 0px', threshold: 0.08 }
+          );
+
+          document.querySelectorAll('[data-reveal]').forEach(function (el) {
+            observer.observe(el);
+          });
+        });
+      })();
+    </script>
   </head>
 
   <body>

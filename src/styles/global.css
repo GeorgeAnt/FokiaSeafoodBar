@@ -306,6 +306,61 @@ input {
 }
 
 /* --------------------------------------------------------------------------
+   Scroll behaviour — settling on bands, and revealing them on entry
+
+   `proximity`, never `mandatory`. The bands are not viewport-sized and cannot
+   be: measured at 1366x768, Plates (834), Team (1030) and Find Us (1082) are
+   all taller than the screen, and on a 390x844 phone Team is 2961 — three and a
+   half viewports. `mandatory` fights every one of those, pulling the reader off
+   content they are still in the middle of, and on the short band (Take away,
+   232) it hands two lines a whole screen. `proximity` only settles the scroll
+   when it already ended near a boundary, so a tall band scrolls through its own
+   content normally and then the next one clicks into place.
+
+   Gated at 48rem because below it the bands are several viewports each and
+   there is nothing to settle onto, and gated on reduced motion because snapping
+   moves the page without the reader asking.
+   -------------------------------------------------------------------------- */
+@media (min-width: 48rem) and (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+  .hero,
+  .section,
+  .footer {
+    scroll-snap-align: start;
+  }
+}
+
+/*
+  Bands rise as they enter. `.has-reveal` is set by the inline script in
+  Base.astro, which adds it only once it has confirmed both reduced-motion and
+  IntersectionObserver support — so nothing is ever hidden by a rule that has no
+  way to un-hide it. Without the script the page is simply static.
+
+  The hero is deliberately not a target: it is the first paint and carries the
+  LCP image.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .has-reveal [data-reveal] {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition:
+      opacity 0.7s var(--ease),
+      transform 0.7s var(--ease);
+  }
+  /* The second and any later block in a band comes in a beat behind the first,
+     so a band that snaps in whole still reads as head-then-content. */
+  .has-reveal [data-reveal] ~ [data-reveal] {
+    transition-delay: 0.12s;
+  }
+  .has-reveal [data-reveal][data-revealed] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Layout primitives
    -------------------------------------------------------------------------- */
 .wrap {
@@ -317,9 +372,13 @@ input {
   width: min(100% - var(--gutter) * 2, 52rem);
 }
 
+/* No scroll-margin-top here. `scroll-padding-top` on <html> already insets the
+   scrollport for the sticky nav, and the two stack: a section carrying both
+   landed 180px down a viewport whose nav is 81px tall, leaving a 100px empty
+   band under the bar on every anchor jump. One mechanism, on the container,
+   covers anchors, focus scrolling and snapping alike. */
 .section {
   padding-block: var(--section-y);
-  scroll-margin-top: 5rem;
 }
 
 /* For a band whose content is a heading and one line. The full --section-y is
@@ -1012,10 +1071,11 @@ input {
   }
 }
 
+/* Same double-count as `.section` had: the jump chips landed a category 208px
+   down. `scroll-padding-top` on <html> is the one that does this job. */
 .menu__category {
   break-inside: avoid;
   margin-bottom: 3rem;
-  scroll-margin-top: 6.75rem;
 }
 
 .menu__category-head {
