@@ -187,6 +187,16 @@ Name, phone, email, address, opening hours, social links, map links and the
 production domain. Fields still marked `PLACEHOLDER` must be replaced before
 launch — see [Before launch](#before-launch).
 
+**Changing the opening hours:** each entry in `hours.entries` must list **every
+day it covers**, not just the first and last of a range. Where to Find Us works
+out the ranges itself and only joins days that actually run consecutively, so
+`["Tuesday", "Thursday"]` correctly renders as two separate rows rather than
+"Tue – Thu", which would claim a Wednesday the restaurant is shut. Days in
+`hours.closed` are listed on the page as closed on purpose — dropping Monday
+entirely just leaves a visitor guessing. Day names are the English schema.org
+spellings in the file whatever the page language; the Greek abbreviations come
+from `hours.short.*` in `src/i18n/`.
+
 `street` and `city` are locale-keyed so the Greek page shows `Λάσκου 3
 Ελευσίνα` rather than a Latin transliteration. Where to Find Us shows the street
 and city only; the postcode and country stay in the structured data, which is

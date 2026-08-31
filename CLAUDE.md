@@ -271,6 +271,17 @@ Node is installed but **not on the shell PATH**; prepend it first:
   claim a Wednesday the restaurant is shut. Non-contiguous days become separate
   rows. Monday is listed as closed on purpose: it is not a working hour, but
   dropping it leaves a visitor guessing.
+- **Placeholder data that looks real is invisible to `npm run check`.** The
+  opening hours shipped wrong for months: `site.json` held invented times whose
+  only warning was the word PLACEHOLDER inside `hours.$comment`, and
+  `outstandingSiteFields` skipped every `$`-prefixed key outright — so the
+  checker never mentioned them, while README had already listed them under
+  "confirmed and in place". The walk now reports a PLACEHOLDER `$comment` when
+  nothing under it trips a rule of its own, which is precisely that case and
+  stays quiet where the data already flags itself (geo's nulls, seo's example
+  domain). The wider lesson is the one at the top of this file: check the claim
+  before writing it down, in both directions — README asserting something is
+  confirmed does not make the JSON agree.
 - `scroll-padding-top` on the container and `scroll-margin-top` on the target
   **both** apply and they stack. The site carried both for the sticky nav, so an
   anchor jump landed a section 180px down a viewport whose nav is 81px tall (100

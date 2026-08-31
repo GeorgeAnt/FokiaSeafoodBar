@@ -124,8 +124,15 @@ const site = read('src/data/site.json');
 /** Walks site.json and names the fields that are still unset or placeholder. */
 function outstandingSiteFields(node, trail = []) {
   const found = [];
+  let placeholderNote = null;
+
   for (const [key, value] of Object.entries(node)) {
-    if (key.startsWith('$')) continue;
+    if (key.startsWith('$')) {
+      if (typeof value === 'string' && value.includes('PLACEHOLDER')) {
+        placeholderNote = [...trail, key].join('.');
+      }
+      continue;
+    }
     const path = [...trail, key].join('.');
     if (value && typeof value === 'object' && !Array.isArray(value)) {
       found.push(...outstandingSiteFields(value, [...trail, key]));
@@ -137,6 +144,22 @@ function outstandingSiteFields(node, trail = []) {
       found.push(`${path} — still the example domain`);
     }
   }
+
+  /*
+    A `$comment` saying PLACEHOLDER only counts when nothing beneath it was
+    caught by a rule of its own.
+
+    That is exactly the case the opening hours hit: plausible times that no rule
+    could tell were invented, flagged only in prose — and because this walk used
+    to skip every `$`-prefixed key outright, `npm run check` never mentioned them
+    once, while README had already moved them to "confirmed and in place". Where
+    the data itself trips a rule (geo's nulls, seo's example domain) the note is
+    a duplicate, and the top-level one just describes the convention.
+  */
+  if (placeholderNote && found.length === 0) {
+    found.push(`${placeholderNote} — note says PLACEHOLDER and no field under it is flagged`);
+  }
+
   return found;
 }
 
