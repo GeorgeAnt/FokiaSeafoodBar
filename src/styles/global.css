@@ -12,8 +12,8 @@
    hinted. The cost is losing arbitrary weight interpolation, which this site
    never used: it renders exactly four combinations, and only those are shipped.
 
-     Inter        400, 500, 600 + 400 italic
-     EB Garamond  600
+     Open Sans   400, 500, 600 + 400 italic
+     Noto Serif  600
 
    `font-synthesis-weight: none` is set on body, so a weight that is not in this
    list will NOT be faked — it will fall back to the nearest real one. Adding a
@@ -21,91 +21,93 @@
 
    Dish names mix scripts inside a single line ("Tuna tataki με jalapeño sauce"),
    so both subsets must be present in the same family or the line renders in two
-   different typefaces.
+   different typefaces. Both families draw their Greek alongside their Latin —
+   script coverage is the whole reason Noto Serif exists — so a mixed line keeps
+   one texture across the switch.
    -------------------------------------------------------------------------- */
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('/fonts/inter-latin-400-normal.woff2') format('woff2');
+  src: url('/fonts/open-sans-latin-400-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('/fonts/inter-greek-400-normal.woff2') format('woff2');
+  src: url('/fonts/open-sans-greek-400-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
-  src: url('/fonts/inter-latin-500-normal.woff2') format('woff2');
+  src: url('/fonts/open-sans-latin-500-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
-  src: url('/fonts/inter-greek-500-normal.woff2') format('woff2');
+  src: url('/fonts/open-sans-greek-500-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('/fonts/inter-latin-600-normal.woff2') format('woff2');
+  src: url('/fonts/open-sans-latin-600-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('/fonts/inter-greek-600-normal.woff2') format('woff2');
+  src: url('/fonts/open-sans-greek-600-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: italic;
   font-display: swap;
   font-weight: 400;
-  src: url('/fonts/inter-latin-400-italic.woff2') format('woff2');
+  src: url('/fonts/open-sans-latin-400-italic.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Open Sans';
   font-style: italic;
   font-display: swap;
   font-weight: 400;
-  src: url('/fonts/inter-greek-400-italic.woff2') format('woff2');
+  src: url('/fonts/open-sans-greek-400-italic.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'EB Garamond';
+  font-family: 'Noto Serif';
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('/fonts/eb-garamond-latin-600-normal.woff2') format('woff2');
+  src: url('/fonts/noto-serif-latin-600-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'EB Garamond';
+  font-family: 'Noto Serif';
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('/fonts/eb-garamond-greek-600-normal.woff2') format('woff2');
+  src: url('/fonts/noto-serif-greek-600-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 
@@ -156,8 +158,8 @@
      tint, because Wood at this opacity would disappear on both. */
   --rule: color-mix(in srgb, var(--wood) 24%, transparent);
 
-  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'EB Garamond', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Noto Serif', Georgia, 'Times New Roman', serif;
 
   /* Fluid type scale, 360px → 1440px viewport. */
   --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.92rem);
@@ -1189,7 +1191,7 @@ input {
 /* h2, not h3 — the block's heading sits directly under the page's h1 and the
    markup has always said so. This selector said h3 and matched nothing, which
    left the one legally required heading on the site rendering at default
-   Garamond h2 size instead of as the small label it is meant to be. */
+   display-face h2 size instead of as the small label it is meant to be. */
 .menu__legal h2 {
   font-family: var(--font-body);
   font-size: var(--step--1);

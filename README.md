@@ -290,16 +290,24 @@ are hinted.
 The cost is losing arbitrary weight interpolation, which this site never used.
 It renders exactly four combinations, and only those are shipped:
 
-| Family | Weights | Scripts |
-|---|---|---|
-| Inter | 400, 500, 600, and 400 italic | Greek + Latin |
-| EB Garamond | 600 | Greek + Latin |
+| Family | Role | Weights | Scripts |
+|---|---|---|---|
+| Open Sans | Body, labels, buttons, nav | 400, 500, 600, and 400 italic | Greek + Latin |
+| Noto Serif | Headings | 600 | Greek + Latin |
 
 `font-synthesis-weight: none` is set on `body`, so a weight that is not in that
 list will **not** be faked — it falls back to the nearest real one. Adding a
 weight in the CSS means adding its `@font-face` and files too. The italic is a
 real face rather than a browser-sheared upright; it is used by the wine lines
 on `/menu`.
+
+The ten `.woff2` files in `public/fonts/` are **copied by hand**, verbatim, out
+of the `@fontsource/*` packages in `package.json` — there is no script and no
+build step that does it, which is why those packages are dependencies rather
+than devDependencies. Their `files/` directory uses exactly the names the site
+uses, so adding a weight is a copy and two `@font-face` blocks (Latin and
+Greek); the `unicode-range` values for both subsets are in each package's
+`unicode.json` and are identical across the two families.
 
 ### Favicons
 
@@ -364,9 +372,9 @@ Two things are load-bearing for those numbers; changing them will cost score:
 
 - **The six above-the-fold font faces are preloaded** in `Base.astro`. Without
   it, `font-display: swap` reflows text as each face arrives and CLS goes to
-  0.118. Preloading takes it to 0. Not all ten: Inter 500 sits lower in the page
-  and the italic only appears on `/menu`, so preloading those would push bytes
-  ahead of the LCP image for glyphs that may never paint.
+  0.118. Preloading takes it to 0. Not all ten: Open Sans 500 sits lower in the
+  page and the italic only appears on `/menu`, so preloading those would push
+  bytes ahead of the LCP image for glyphs that may never paint.
 - **Hero slides 2–4 are `display: none` until the carousel is enhanced**
   (`global.css`). They sit stacked inside the viewport, so `loading="lazy"` does
   not defer them — all four would download during the initial load and slow the

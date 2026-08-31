@@ -73,7 +73,12 @@ doing it. Find Us is now the only image-and-text split left. Before adding a
 section, check what shape its neighbours already are.
 
 **From the kitchen is not in the nav, and cannot be.** Measured clearance at
-1025px in Greek is 43px; a seventh label does not fit. The band is reached by
+1025px in Greek is 70px, and a seventh Greek label costs ~133px with its gap —
+tested by cloning one in, which pushes the bar to a 1080px scroll width on a
+1025px viewport. Note what that test does *not* show: `.nav__utils` does not
+shrink and the clearance reading stays positive at 24px, because the whole bar
+overruns the viewport rather than the two groups colliding. Measure
+`document.documentElement.scrollWidth`, not the gap. The band is reached by
 scrolling and its own button goes to `/gallery`. If a nav entry for it is ever
 wanted, something else has to come out of the bar first.
 
@@ -186,8 +191,8 @@ Node is installed but **not on the shell PATH**; prepend it first:
 
 - Fonts are **static** builds, one file per weight per script, not variable.
   Google's variable fonts are unhinted and looked blocky on Windows. The site
-  renders exactly Inter 400/500/600 + 400 italic and EB Garamond 600, and only
-  those ship. `font-synthesis-weight: none` means an unshipped weight is not
+  renders exactly Open Sans 400/500/600 + 400 italic and Noto Serif 600, and
+  only those ship. `font-synthesis-weight: none` means an unshipped weight is not
   faked — it falls back — so adding a weight in CSS means adding its files too.
 - `<picture>` must stay `display: contents` (set in `global.css`). It is inline by
   default, which silently breaks `height: 100%` on the `<img>` inside it.
@@ -221,14 +226,19 @@ Node is installed but **not on the shell PATH**; prepend it first:
   the social icons and the language switch at the other. The old bar centred a
   logo absolutely, which is why the links used to be split into two balanced
   groups — that constraint is gone, so links can be added to the single list.
-  The bar still collapses at 64rem. Measured clearance at 1025px is **43px** in
+  The bar still collapses at 64rem. Measured clearance at 1025px is **70px** in
   Greek — "Κλείστε τη θέση σας • Take away" is the longest label and Greek is
-  the longer set overall, so it is Greek that decides the fit, not English. It
-  was 62px until the social icons went from 2.15rem to 2.75rem for the touch
-  target, which spent 19px of it. There is very little slack left: lengthening
-  any label, or widening anything in `.nav__utils`, means re-measuring at 1025px
-  before trusting it. The language pill was given `min-height` only, not padding,
-  for exactly this reason — it buys the 44px without costing the row any width.
+  the longer set overall, so it is Greek that decides the fit, not English. That
+  figure has moved twice: 62px until the social icons went from 2.15rem to
+  2.75rem for the touch target, which spent 19px and left 43px; then the body
+  face changed from Inter to Open Sans, which is the narrower of the two and
+  gave 27px back. Inter set those six Greek labels 29px wider in total at the
+  nav's own size and weight, measured on a canvas against both faces. The slack
+  is real but small, and it is a property of the *face*, not of the labels:
+  lengthening any label, widening anything in `.nav__utils`, or changing
+  `--font-body` again means re-measuring at 1025px before trusting it. The
+  language pill was given `min-height` only, not padding, for exactly this
+  reason — it buys the 44px without costing the row any width.
 - Anything drawn over a photo needs its own backing, not a tint on the image.
   The hero photos are mid-grey exactly where the controls sit, so the carousel
   dashes measure 1.7-2.3:1 against them — under the 3:1 WCAG minimum for a

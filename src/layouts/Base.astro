@@ -150,18 +150,18 @@ const dictJson = JSON.stringify(dictionaries);
       text as each face arrived, and preloading removed the shift entirely.
 
       Not all ten files — the split to static builds turned four files into ten,
-      and preloading the lot would push ~160 KB ahead of the LCP image for glyphs
-      that may never render. These six are the ones a Greek page paints
-      immediately: body text, labels and buttons in Inter, headings in Garamond,
-      both scripts. Inter 500 and the italic load normally — 500 sits lower in
-      the page and the italic only appears on /menu.
+      and preloading all ten would push ~135 KB ahead of the LCP image for
+      glyphs that may never render. These six are the ones a Greek page paints
+      immediately: body text, labels and buttons in Open Sans, headings in Noto
+      Serif, both scripts. Open Sans 500 and the italic load normally — 500 sits
+      lower in the page and the italic only appears on /menu.
     */}
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin-400-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-greek-400-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin-600-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-greek-600-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-latin-600-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-greek-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-latin-400-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-greek-400-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-latin-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-greek-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/noto-serif-latin-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/noto-serif-greek-600-normal.woff2" crossorigin />
 
     <title data-i18n={titleKey}>{title}</title>
     <meta name="description" content={description} data-i18n-content={descriptionKey} />
