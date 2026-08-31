@@ -39,9 +39,11 @@ photographs sitting on it. Changing any section's tier means checking its
 neighbours.
 
 **Controls that only work with JS live in a `<template>`.** The hero carousel
-arrows and dots are cloned from `#hero-controls-template` at runtime, and the
-gallery lightbox from `#lightbox-template`, so a visitor without JS is never
-shown a button that does nothing. Never build such a control's label as a string
+dot strip is cloned from `#hero-controls-template` at runtime, and the gallery
+lightbox from `#lightbox-template`, so a visitor without JS is never shown a
+button that does nothing. The hero has no prev/next arrows — they were added and
+then reverted to the original bare dashes; see the trade-off note on
+`.hero__dots` in `global.css`. Never build such a control's label as a string
 inside the script: render it with `t(locale, …)` in the template and keep
 `data-i18n-label` on it, or the language switch cannot reach it. A label that
 counts something also needs `data-i18n-n`, which is what fills the `{n}` in
@@ -89,6 +91,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
 
 ## Gotchas hit while building this
 
+- Fonts are **static** builds, one file per weight per script, not variable.
+  Google's variable fonts are unhinted and looked blocky on Windows. The site
+  renders exactly Inter 400/500/600 + 400 italic and EB Garamond 600, and only
+  those ship. `font-synthesis-weight: none` means an unshipped weight is not
+  faked — it falls back — so adding a weight in CSS means adding its files too.
 - `<picture>` must stay `display: contents` (set in `global.css`). It is inline by
   default, which silently breaks `height: 100%` on the `<img>` inside it.
 - `<figure>` has a default `margin: 1em 40px`; the reset zeroes it. Without that,

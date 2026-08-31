@@ -144,17 +144,24 @@ const dictJson = JSON.stringify(dictionaries);
     <meta name="generator" content={Astro.generator} />
 
     {/*
-      All four font files are preloaded. This is a deliberate departure from
-      "preload only the hero image": measurement showed the page's entire
-      layout-shift score came from `font-display: swap` reflowing text as each
-      face arrived. The four files are the complete font payload (128 KB) — a
-      Greek page shows both scripts above the fold, so none of them is
-      speculative, and arriving before first paint removes the shift entirely.
+      The faces that paint above the fold are preloaded. This is a deliberate
+      departure from "preload only the hero image": measurement showed the
+      page's entire layout-shift score came from `font-display: swap` reflowing
+      text as each face arrived, and preloading removed the shift entirely.
+
+      Not all ten files — the split to static builds turned four files into ten,
+      and preloading the lot would push ~160 KB ahead of the LCP image for glyphs
+      that may never render. These six are the ones a Greek page paints
+      immediately: body text, labels and buttons in Inter, headings in Garamond,
+      both scripts. Inter 500 and the italic load normally — 500 sits lower in
+      the page and the italic only appears on /menu.
     */}
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-greek-wght-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin-wght-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-greek-wght-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-latin-wght-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin-400-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-greek-400-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-greek-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-latin-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-greek-600-normal.woff2" crossorigin />
 
     <title data-i18n={titleKey}>{title}</title>
     <meta name="description" content={description} data-i18n-content={descriptionKey} />

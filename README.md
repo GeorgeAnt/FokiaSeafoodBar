@@ -232,6 +232,27 @@ first hero photo and the hero logo load eagerly; everything else is lazy. The
 gallery additionally builds one 1400px variant per photo, which is both what the
 lightbox shows and the link a visitor without JavaScript follows.
 
+### Fonts
+
+Self-hosted, **static** builds — not variable. Google's variable fonts ship
+unhinted (`ttfautohint` does not support variable fonts), and Windows leans on
+hinting at text sizes, which made the type look blocky there. The static builds
+are hinted.
+
+The cost is losing arbitrary weight interpolation, which this site never used.
+It renders exactly four combinations, and only those are shipped:
+
+| Family | Weights | Scripts |
+|---|---|---|
+| Inter | 400, 500, 600, and 400 italic | Greek + Latin |
+| EB Garamond | 600 | Greek + Latin |
+
+`font-synthesis-weight: none` is set on `body`, so a weight that is not in that
+list will **not** be faked — it falls back to the nearest real one. Adding a
+weight in the CSS means adding its `@font-face` and files too. The italic is a
+real face rather than a browser-sheared upright; it is used by the wine lines
+on `/menu`.
+
 ### Favicons
 
 `npm run favicons` regenerates them from `src/assets/photos/logo-clean.png`
@@ -281,7 +302,7 @@ below the table are current and measured against the build in `dist/`.
 | `/menu` | 92 KB raw, **22 KB gzipped** |
 | `/gallery` | 77 KB raw, **20 KB gzipped** |
 | JavaScript requests | **0** — every script is inlined |
-| Fonts | 4 files, 128 KB total (Greek + Latin, both families) |
+| Fonts | 10 files, 162 KB total (Greek + Latin, both families) — 6 preloaded |
 | Total `dist/` | 40 MB across 390 files, almost all image variants the browser chooses between |
 
 The Food/Drinks switch, the menu, and the whole page work with JavaScript
@@ -291,9 +312,11 @@ is still a link straight to the full-size photo.
 
 Two things are load-bearing for those numbers; changing them will cost score:
 
-- **All four font files are preloaded** in `Base.astro`. Without it, `font-display:
-  swap` reflows text as each face arrives and CLS goes to 0.118. Preloading takes
-  it to 0.
+- **The six above-the-fold font faces are preloaded** in `Base.astro`. Without
+  it, `font-display: swap` reflows text as each face arrives and CLS goes to
+  0.118. Preloading takes it to 0. Not all ten: Inter 500 sits lower in the page
+  and the italic only appears on `/menu`, so preloading those would push bytes
+  ahead of the LCP image for glyphs that may never paint.
 - **Hero slides 2–4 are `display: none` until the carousel is enhanced**
   (`global.css`). They sit stacked inside the viewport, so `loading="lazy"` does
   not defer them — all four would download during the initial load and slow the
