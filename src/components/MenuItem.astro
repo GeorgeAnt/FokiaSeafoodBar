@@ -35,19 +35,21 @@ const meta = [item.unit, item.volume].filter(Boolean).join(' · ');
 
   {item.description && <p class="menu__item-desc">{item.description}</p>}
 
-  {item.variants?.length && <p class="menu__item-variants">{item.variants.join(' / ')}</p>}
+  {/* Ternary, not `&&` — see the note in MenuCategory.astro: `[]` is `0`, and
+      Astro renders that as the text "0". */}
+  {item.variants?.length ? <p class="menu__item-variants">{item.variants.join(' / ')}</p> : null}
 
   {item.wine && <p class="menu__item-wine">{wineLine(item.wine)}</p>}
 
   {meta && <p class="menu__item-meta">{meta}</p>}
 
   {
-    item.tags?.length && (
+    item.tags?.length ? (
       <ul class="menu__tags">
         {item.tags.map((tag) => (
           <li class="menu__tag">{tag}</li>
         ))}
       </ul>
-    )
+    ) : null
   }
 </li>

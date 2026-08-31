@@ -17,13 +17,17 @@ const { category, locale = defaultLocale } = Astro.props;
   </header>
 
   {
-    category.items?.length && (
+    /* Ternary, not `&&`. A zero-length array is `0`, which Astro renders as the
+       text "0" — emptying a category's items in the JSON would print a stray
+       digit on the menu rather than nothing. `undefined` short-circuits
+       cleanly, so this only bites the case the client can actually create. */
+    category.items?.length ? (
       <ul>
         {category.items.map((item) => (
           <MenuItem item={item} locale={locale} />
         ))}
       </ul>
-    )
+    ) : null
   }
 
   {

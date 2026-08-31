@@ -26,6 +26,19 @@ npm run favicons  # regenerate the favicons from the logo (only if it changes)
 Deploy by uploading `dist/` to any static host — Netlify, Vercel, Cloudflare
 Pages, GitHub Pages, or plain nginx. There is no server and no database.
 
+`@playwright/cli` is a devDependency, used only to drive a real browser when
+verifying a change — nothing in the built site depends on it:
+
+```sh
+npm run preview                                              # serve dist/ on :4321
+npx playwright-cli open http://localhost:4321/ --browser chrome
+npx playwright-cli screenshot --filename shot.png
+npx playwright-cli close
+```
+
+`--browser chrome` uses the Chrome already on the machine, so there is no
+browser download. Its scratch files go in `.playwright-cli/`, which is ignored.
+
 ### Pages
 
 | URL | What's on it |
@@ -207,6 +220,12 @@ runs. Choosing English swaps the text of every `data-i18n` element from a
 dictionary embedded in the page, sets `<html lang>`, and stores the choice in
 `localStorage`.
 
+Controls that only exist once JavaScript runs — the hero carousel dots and stop
+button, every button in the gallery lightbox — are built from a hidden template
+*after* that swap has happened, so they have to ask for it again. They do. If you
+add a new one and its label comes out Greek on the English page, that is the step
+that is missing; `CLAUDE.md` describes it.
+
 **Known trade-off, accepted:** because the switch is client-side, there is no
 separate English URL for Google to index. If English SEO becomes a priority,
 Astro can generate a static `/en/` page instead — a contained change, not a
@@ -324,6 +343,37 @@ Two things are load-bearing for those numbers; changing them will cost score:
 
 ---
 
+## Accessibility
+
+The site was audited against the Web Interface Guidelines and the findings
+fixed. Most were invisible; three changed something you can see, so they are
+worth knowing about before you look at the site and wonder:
+
+- **The hero carousel has a stop button**, bottom-right of the photo. The slides
+  advance every 6 seconds, and content that moves that long has to be stoppable
+  by anyone — holding it while the mouse is over the photo, which is what it did
+  before, is no use on a phone. It is the one control on the hero with a dark
+  circle behind it; that is deliberate, so it can be found against any slide.
+- **Tap targets are 44px.** The social icons in the nav, the language pill, the
+  menu's Food/Drinks tabs and its jump-to-category chips all grew to the size a
+  finger actually needs. The icons and text inside them did not change size.
+- **The heading above the legal notices** now renders as the small uppercase
+  label it was always meant to be. A stylesheet rule had been pointing at the
+  wrong tag, so it had been rendering at full heading size.
+
+Two things are recorded trade-offs rather than oversights:
+
+- **The carousel dashes** sit at 1.7–2.3:1 against the photos, under the 3:1 a
+  control should meet. They were given a backing panel once and it was reverted
+  for the lighter look. The stop button is the accessible way to control the
+  carousel; the dashes are a position indicator beside it.
+- **English has no separate URL**, as described under Languages above.
+
+The Lighthouse accessibility score in the table above predates all of this and
+predates the page split — re-run it before quoting it.
+
+---
+
 ## Before launch
 
 `npm run check` prints this list at any time.
@@ -375,6 +425,19 @@ two values restyles every light section.
 
 ---
 
+## Keeping these docs current
+
+`README.md` and `CLAUDE.md` are updated in the same change as the code, not
+afterwards — this file explains *what* to edit and what is outstanding, and
+`CLAUDE.md` explains the rules and gotchas to whoever works on the code next.
+`AGENTS.md` is a byte-identical copy of `CLAUDE.md` (`cp CLAUDE.md AGENTS.md`).
+
+Measured figures here — contrast ratios, page weights, nav clearance, Lighthouse
+scores — should be re-measured when they change rather than carried forward.
+Several have gone stale before.
+
+---
+
 ## Project structure
 
 ```
@@ -383,6 +446,7 @@ src/
   components/         Nav, Hero, Goal, Menu, MenuCategory, MenuItem,
                       Team, Gallery, Contact, FindUs, Footer
   data/               ← content lives here (menu, team, gallery, site, legal)
+  env.d.ts            types for the language switcher's window.fokiaI18n
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script
   lib/                i18n lookup, menu formatting, photo resolution

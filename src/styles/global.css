@@ -189,6 +189,15 @@ html {
   /* Sticky nav must not cover the heading of an anchored section. */
   scroll-padding-top: 6.25rem;
   -webkit-text-size-adjust: 100%;
+  /* The site is one fixed light theme — the dark bands are surface tiers, not a
+     dark mode. Stated so the UA paints scrollbars, the overscroll gutter and
+     form-control defaults to match, rather than following the visitor's OS and
+     putting a dark scrollbar down the side of a salt page. */
+  color-scheme: light;
+  /* Chosen rather than inherited. The default is a blue-grey wash that reads as
+     a rendering fault over the photographs and the black bands; this is the
+     palette's own accent at an opacity that registers as a tap and nothing more. */
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--wood) 20%, transparent);
 }
 
 body {
@@ -263,10 +272,24 @@ button {
   cursor: pointer;
 }
 
+/* Drops the ~300ms double-tap-to-zoom delay on things that are tapped, and
+   nowhere else — the page as a whole stays pinch-zoomable. It matters most on
+   the controls a visitor taps in sequence: the carousel dots, the menu tabs and
+   jump chips, and the lightbox arrows. */
+a,
+button,
+label,
+summary,
+input {
+  touch-action: manipulation;
+}
+
+/* No border-radius here. It applies to the *element*, not to the ring — modern
+   browsers already follow the element's own corners — so setting it rounded the
+   corners of whatever was focused, most visibly the square gallery tiles. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: var(--radius);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -524,11 +547,15 @@ button {
   align-items: center;
   gap: 0.25rem;
 }
+/* 2.75rem is the box, 1.2rem is the mark. The icon does not grow — the target
+   around it does, to the 44px these were short of at 2.15rem. Costs the nav
+   ~19px of horizontal room across the two icons; see the clearance note in
+   CLAUDE.md, which was re-measured after this change. */
 .social a {
   display: grid;
   place-items: center;
-  width: 2.15rem;
-  height: 2.15rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--radius);
   color: var(--text-muted);
   transition:
@@ -551,7 +578,10 @@ button {
   border-radius: var(--radius);
   overflow: hidden;
 }
+/* Height only — the pill's width is set by the two-letter labels and does not
+   change, so this buys the 44px target back without costing the bar any room. */
 .lang button {
+  min-height: 2.75rem;
   padding: 0.4rem 0.6rem;
   font-size: 0.72rem;
   font-weight: 600;
@@ -774,15 +804,23 @@ button {
 .hero__dots {
   position: absolute;
   z-index: 2;
-  bottom: 1.25rem;
+  /* 0.875rem, not the original 1.25rem: the hit box below grew from 2rem to
+     2.75rem tall and the dash sits at its centre, so the strip has to drop by
+     half the difference to leave the dashes on exactly the line they were on. */
+  bottom: 0.875rem;
   left: 50%;
   translate: -50% 0;
   display: flex;
   gap: 0.6rem;
 }
+/* 2rem wide by 2.75rem tall. The width is deliberately left at the dash's own
+   width — widening the box widens the dash with it (::after is `width: 100%`)
+   and spreads the strip, which is the one thing this control's design is. 32px
+   is comfortably over the 24px WCAG 2.5.8 floor, and the dashes are adjacent,
+   so the row is a continuous target with no dead ground between them. */
 .hero__dots button {
   width: 2rem;
-  height: 2rem;
+  height: 2.75rem;
   display: grid;
   place-items: center;
 }
@@ -795,6 +833,55 @@ button {
 }
 .hero__dots button[aria-current='true']::after {
   background: var(--salt);
+}
+
+/*
+  Stop / resume the carousel. WCAG 2.2.2 — see the note in Hero.astro for why
+  hover-and-focus alone was not the mechanism.
+
+  This one DOES get a scrim, unlike the dashes above, and the difference is
+  deliberate. The dashes are a position indicator whose low contrast is a
+  recorded trade-off; this is the control that stops the motion, and a visitor
+  who needs it must be able to find it on every slide. Same construction as
+  .lightbox__close, which keeps a scrim for the same reason — it sits over a
+  photograph with nothing behind it to read against.
+
+  Bottom-right rather than in the dot row, so the strip stays centred where it
+  was and nothing about the original composition moves.
+*/
+.hero__pause {
+  position: absolute;
+  z-index: 2;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  color: var(--salt);
+  background: color-mix(in srgb, var(--black) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--salt) 26%, transparent);
+  backdrop-filter: blur(10px) saturate(1.2);
+  transition:
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+/* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
+.hero__pause:hover,
+.hero__pause:focus-visible {
+  background: var(--salt);
+  color: var(--black);
+}
+.hero__pause svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+/* One glyph at a time. [hidden] is not used because the script owns the state
+   attribute and nothing else should have to know about these two children. */
+.hero__pause[data-paused='false'] [data-icon='play'],
+.hero__pause[data-paused='true'] [data-icon='pause'] {
+  display: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -844,6 +931,9 @@ button {
 }
 
 .menu__tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   padding: 0.6rem 1.6rem;
   border-radius: 999px;
   font-size: var(--step--1);
@@ -889,7 +979,12 @@ button {
   padding-bottom: 1.75rem;
   border-bottom: 1px solid var(--rule);
 }
+/* 19 chips on the food panel, tapped in sequence on a phone — they were ~34px
+   and are the strongest case on the site for the 44px minimum. */
 .menu__jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   font-size: var(--step--1);
   text-decoration: none;
   color: var(--text-muted);
@@ -1031,7 +1126,11 @@ button {
   padding-top: 2rem;
   border-top: 1px solid var(--rule);
 }
-.menu__legal h3 {
+/* h2, not h3 — the block's heading sits directly under the page's h1 and the
+   markup has always said so. This selector said h3 and matched nothing, which
+   left the one legally required heading on the site rendering at default
+   Garamond h2 size instead of as the small label it is meant to be. */
+.menu__legal h2 {
   font-family: var(--font-body);
   font-size: var(--step--1);
   font-weight: 600;
@@ -1169,8 +1268,17 @@ button {
   padding: 0;
   border: 0;
   overflow: hidden;
+  /* .has-lightbox stops the page behind from scrolling, but that is a desktop
+     fix; this is what stops the scroll chaining through to it on iOS. */
+  overscroll-behavior: contain;
   background: color-mix(in srgb, var(--black) 90%, transparent);
   color: var(--salt);
+  /* The dialog is appended to <body>, not to a section, so it inherits the
+     light tier's tokens — and the global :focus-visible ring is drawn in
+     --accent. That resolved to --wood, which is 2.3:1 on Deep Black: the focus
+     indicator on the arrows and the close button was under the 3:1 a control
+     needs, on the darkest surface in the site. The dark tier's tint is 6.4:1. */
+  --accent: var(--wood-light);
 }
 /*
   `display` is set only while the dialog is open, and this is load-bearing.
@@ -1256,8 +1364,10 @@ button {
   border-bottom-width: 0.8125rem;
 }
 
+/* Pushed in by the landscape insets, so the arrowheads are not sitting under a
+   notch or a rounded corner. Zero on everything that has no inset. */
 .lightbox__arrow--prev {
-  left: 0;
+  left: env(safe-area-inset-left, 0px);
 }
 .lightbox__arrow--prev::before {
   margin-left: 1.5625rem;
@@ -1269,7 +1379,7 @@ button {
 }
 
 .lightbox__arrow--next {
-  right: 0;
+  right: env(safe-area-inset-right, 0px);
 }
 .lightbox__arrow--next::before {
   margin-left: 2.1875rem;
@@ -1296,8 +1406,12 @@ button {
   transition:
     background-color 0.2s var(--ease),
     color 0.2s var(--ease);
-  top: clamp(0.5rem, 0.2rem + 1.5vw, 2rem);
-  right: clamp(0.5rem, 0.2rem + 1.5vw, 2rem);
+  /* The dialog is full-bleed, so these offsets are measured from the physical
+     edge of the display: on a notched phone in landscape the close button
+     landed under the cutout. max() keeps the designed offset everywhere it is
+     already clear and only grows it where the inset says it has to. */
+  top: max(clamp(0.5rem, 0.2rem + 1.5vw, 2rem), env(safe-area-inset-top, 0px));
+  right: max(clamp(0.5rem, 0.2rem + 1.5vw, 2rem), env(safe-area-inset-right, 0px));
 }
 /* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
 .lightbox__close:hover,
@@ -1312,7 +1426,8 @@ button {
 
 .lightbox__counter {
   position: absolute;
-  bottom: clamp(0.75rem, 0.4rem + 1.5vw, 2rem);
+  /* Clear of the home indicator — same reasoning as the close button. */
+  bottom: max(clamp(0.75rem, 0.4rem + 1.5vw, 2rem), env(safe-area-inset-bottom, 0px));
   left: 50%;
   translate: -50% 0;
   margin: 0;

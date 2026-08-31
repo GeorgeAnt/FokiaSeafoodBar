@@ -20,11 +20,25 @@ const { locale = defaultLocale } = Astro.props;
 
   The masters are 1707x2560, so 1400 never upscales.
 */
+const FULL_WIDTH = 1400;
+
 const items = await Promise.all(
   gallery.images.map(async (image) => {
     const src = galleryPhoto(image.file);
-    const full = await getImage({ src, format: 'webp', width: 1400 });
-    return { ...image, src, full: full.src, altKey: `gallery.${image.id}.alt` };
+    const full = await getImage({ src, format: 'webp', width: FULL_WIDTH });
+    /* Carried onto the link so the lightbox can size its <img> before the photo
+       arrives. The set is not all one shape, so it is per-photo rather than one
+       constant: an <img> whose src is swapped with no dimensions collapses to
+       zero height and then jumps, on every next/previous. */
+    const fullHeight = Math.round((FULL_WIDTH * src.height) / src.width);
+    return {
+      ...image,
+      src,
+      full: full.src,
+      fullWidth: FULL_WIDTH,
+      fullHeight,
+      altKey: `gallery.${image.id}.alt`,
+    };
   })
 );
 ---
@@ -42,7 +56,13 @@ const items = await Promise.all(
       {
         items.map((image) => (
           <figure class="gallery__item">
-            <a class="gallery__link" href={image.full} data-alt-key={image.altKey}>
+            <a
+              class="gallery__link"
+              href={image.full}
+              data-alt-key={image.altKey}
+              data-full-width={image.fullWidth}
+              data-full-height={image.fullHeight}
+            >
               <Picture
                 src={image.src}
                 formats={['avif', 'webp']}
@@ -106,7 +126,12 @@ const items = await Promise.all(
           </svg>
         </button>
 
-        <p class="lightbox__counter" data-lb-counter></p>
+        {/*
+          Announced, because moving between photos changes nothing else a screen
+          reader would notice except the alt — and the arrow keys make that a
+          silent change. aria-atomic so "4 / 23" is read as one string.
+        */}
+        <p class="lightbox__counter" data-lb-counter aria-live="polite" aria-atomic="true"></p>
       </dialog>
     </template>
   </div>
@@ -130,6 +155,10 @@ const items = await Promise.all(
     // Appended to the body, not left in the section: a modal must not be
     // clipped by an ancestor's overflow or trapped in its stacking context.
     document.body.append(dialog);
+    // Cloned nodes were invisible to the language switcher's initial pass, so
+    // without this every control in here keeps its server-rendered Greek label
+    // for a visitor who has chosen English.
+    window.fokiaI18n?.refresh();
 
     const image = dialog.querySelector<HTMLImageElement>('.lightbox__img')!;
     const counter = dialog.querySelector<HTMLElement>('[data-lb-counter]')!;
@@ -141,6 +170,10 @@ const items = await Promise.all(
       const link = links[current]!;
       const thumb = link.querySelector('img');
 
+      // Dimensions before src, so the box is the right shape for the incoming
+      // photo rather than collapsing and jumping once it decodes.
+      if (link.dataset.fullWidth) image.width = Number(link.dataset.fullWidth);
+      if (link.dataset.fullHeight) image.height = Number(link.dataset.fullHeight);
       image.src = link.href;
       // Carry the thumbnail's alt across, and its key with it, so the language
       // switch keeps translating the photo description while the box is open.

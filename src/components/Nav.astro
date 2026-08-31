@@ -35,7 +35,12 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
 ---
 
 <header class="nav">
-  <nav class="wrap nav__inner" id="nav-inner" aria-label="Main">
+  <nav
+    class="wrap nav__inner"
+    id="nav-inner"
+    aria-label={t(locale, 'a11y.mainNav')}
+    data-i18n-label="a11y.mainNav"
+  >
     <ul class="nav__links" id="nav-links">
       {
         links.map((link) => (
@@ -92,6 +97,10 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
     const setOpen = (open: boolean) => {
       inner.dataset.open = String(open);
       toggle.setAttribute('aria-expanded', String(open));
+      // The label has to follow the state, not just aria-expanded: the key is
+      // swapped rather than the string, so the language switch can still reach
+      // it afterwards. `a11y.closeMenu` had been in both dictionaries unused.
+      window.fokiaI18n?.setLabelKey(toggle, open ? 'a11y.closeMenu' : 'a11y.openMenu');
     };
 
     toggle.addEventListener('click', () => {

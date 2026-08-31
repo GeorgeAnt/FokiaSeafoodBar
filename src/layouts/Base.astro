@@ -180,7 +180,13 @@ const dictJson = JSON.stringify(dictionaries);
     <meta property="og:locale:alternate" content="en_GB" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <meta name="theme-color" content="#181414" />
+    {/*
+      Matches `body`'s background (--salt), not the hero. theme-color paints the
+      browser's own chrome and the overscroll gutter, which sit against the page
+      background — pointing it at the black hero band left a dark bar above a
+      light page on every route except the top of the homepage.
+    */}
+    <meta name="theme-color" content="#e2e8eb" />
 
     {schemas.map((schema) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
@@ -208,10 +214,22 @@ const dictJson = JSON.stringify(dictionaries);
         var node = document.getElementById('i18n-dict');
         if (!node) return;
         var dict = JSON.parse(node.textContent || '{}');
+        var current = DEFAULT;
+
+        /* Applies one element's label key in whatever locale is current. Shared
+           by apply() and by setLabelKey() below so a two-state control and the
+           language switch always resolve a label the same way. */
+        function label(el, value) {
+          // Labels that count something (the carousel dots) carry their number
+          // separately, so the translated string keeps its {n} placeholder.
+          var n = el.getAttribute('data-i18n-n');
+          el.setAttribute('aria-label', n != null ? value.replace('{n}', n) : value);
+        }
 
         function apply(lang) {
           var strings = dict[lang];
           if (!strings) return;
+          current = lang;
 
           document.documentElement.lang = lang;
 
@@ -232,18 +250,15 @@ const dictJson = JSON.stringify(dictionaries);
 
           document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
             var value = strings[el.getAttribute('data-i18n-label')];
-            if (value == null) return;
-            // Labels that count something (the carousel dots) carry their number
-            // separately, so the translated string keeps its {n} placeholder.
-            var n = el.getAttribute('data-i18n-n');
-            if (n != null) value = value.replace('{n}', n);
-            el.setAttribute('aria-label', value);
+            if (value != null) label(el, value);
           });
 
           document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
             btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang-btn') === lang));
           });
+        }
 
+        function persist(lang) {
           try {
             localStorage.setItem(KEY, lang);
           } catch (e) {
@@ -261,9 +276,37 @@ const dictJson = JSON.stringify(dictionaries);
 
         document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
           btn.addEventListener('click', function () {
-            apply(btn.getAttribute('data-lang-btn'));
+            var lang = btn.getAttribute('data-lang-btn');
+            apply(lang);
+            persist(lang);
           });
         });
+
+        /*
+          The small surface the section scripts need.
+
+          Both of them build controls by cloning a <template>, and template
+          content is a separate document fragment — `document.querySelectorAll`
+          never sees inside it, so the pass above has already run and skipped
+          those nodes by the time they are cloned. Without `refresh()` a visitor
+          on English got Greek labels on the hero dots and every lightbox
+          control, because the clone carries whatever Astro server-rendered.
+
+          `setLabelKey` is for a control whose label changes with its state (the
+          nav toggle, the hero pause button). The script picks the *key*; the
+          string still comes from the dictionary, so the language switch keeps
+          working on it afterwards.
+        */
+        window.fokiaI18n = {
+          refresh: function () {
+            apply(current);
+          },
+          setLabelKey: function (el, key) {
+            el.setAttribute('data-i18n-label', key);
+            var value = (dict[current] || {})[key];
+            if (value != null) label(el, value);
+          },
+        };
       })();
     </script>
   </body>
