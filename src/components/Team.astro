@@ -18,11 +18,22 @@ const { locale = defaultLocale } = Astro.props;
     </header>
 
     <!--
-      One portrait plus a paragraph each, as alternating rows. The photo column
-      is a fixed 4:5 so the row heights stay even whether there are four members
-      or six, and every portrait gets the same crop and treatment.
+      A grid, not alternating rows.
+
+      This used to be one full-width photo-and-paragraph row per member,
+      reversed on every second one. With four members that was four consecutive
+      image-and-text splits running to roughly 45% of the homepage's height, and
+      Find Us below it is a fifth — the same composition five times, and the one
+      the page spent most of its length on. As a grid the same four people take
+      about a third of the room and the section reads at a glance.
+
+      It also stops the section growing without bound: a fifth and sixth member
+      fill the second row rather than adding another screen and a half.
+
+      The portrait stays 4:5 and every crop is still identical, which is what
+      that fixed ratio was always for.
     -->
-    <div class="team__list">
+    <div class="team__grid">
       {
         team.members.map((member) => (
           <article class="team__member">
@@ -30,24 +41,22 @@ const { locale = defaultLocale } = Astro.props;
               <Picture
                 src={teamPhoto(member.photo)}
                 formats={['avif', 'webp']}
-                widths={[400, 600, 800]}
-                sizes="(min-width: 48rem) 40vw, 100vw"
+                widths={[300, 500, 700]}
+                sizes="(min-width: 64rem) 23vw, (min-width: 48rem) 45vw, 100vw"
                 alt={member.name}
                 loading="lazy"
                 decoding="async"
               />
             </div>
 
-            <div class="team__text">
-              {/* Names are never translated. */}
-              <h3 class="team__name">{member.name}</h3>
-              <p class="team__role" data-i18n={`team.${member.id}.role`}>
-                {t(locale, `team.${member.id}.role`)}
-              </p>
-              <p class="team__bio" data-i18n={`team.${member.id}.bio`}>
-                {t(locale, `team.${member.id}.bio`)}
-              </p>
-            </div>
+            {/* Names are never translated. */}
+            <h3 class="team__name">{member.name}</h3>
+            <p class="team__role" data-i18n={`team.${member.id}.role`}>
+              {t(locale, `team.${member.id}.role`)}
+            </p>
+            <p class="team__bio" data-i18n={`team.${member.id}.bio`}>
+              {t(locale, `team.${member.id}.bio`)}
+            </p>
           </article>
         ))
       }

@@ -12,9 +12,18 @@ const { locale = defaultLocale } = Astro.props;
    that used to sit under it only restated the heading at length. */
 ---
 
+{/*
+  Heading and number side by side, not stacked.
+
+  Stacked in a full-width band this was a heading, a label and a phone number in
+  the left third with the rest of a black screen empty beside them — the band
+  read as a gap in the page rather than as a section. Set against each other on
+  one line they fill the row, the band loses about half its height, and the
+  number lands at the end of the line where the eye finishes.
+*/}
 <section class="section section--tight section-dark" id="contact">
-  <div class="wrap">
-    <header class="section-head">
+  <div class="wrap contact__inner">
+    <header class="section-head section-head--inline">
       <h2 data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
     </header>
 

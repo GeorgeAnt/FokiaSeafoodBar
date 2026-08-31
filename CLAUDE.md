@@ -49,12 +49,28 @@ read — the shopfront sign in the team photos is rusted metal. `--wood-light` a
 toward orange. Warming any of these four back up undoes the palette.
 
 **No two bands in a row share a background.** The page steps light / mid / dark
-and back: Hero black, Our Goal stone, Team salt, Take away black, Find Us stone,
-footer black. Our Goal is on the mid tier *because* the hero above it is black —
-as a dark section it ran straight into the hero with no boundary. Stone carries
-the two text-only sections, which is what suits a mid grey: neither has
-photographs sitting on it. Changing any section's tier means checking its
-neighbours.
+and back: Hero black, Our Goal stone, From the kitchen black, Team salt, Take
+away black, Find Us stone, footer black. Our Goal is on the mid tier *because*
+the hero above it is black — as a dark section it ran straight into the hero with
+no boundary. Stone carries the two text-only sections, which is what suits a mid
+grey: neither has photographs sitting on it. From the kitchen took black because
+food photography reads best on it and because Our Goal above and Team below are
+the two lightest bands on the page. Changing any section's tier means checking
+its neighbours.
+
+**Each section on the homepage uses a different layout.** Hero is a split, Our
+Goal is two columns of text, From the kitchen is a staggered photo row, Team is
+a portrait grid, Take away is a heading against a number, Find Us is a text and
+image split. That is deliberate and it is recent: Team used to be four
+alternating photo-and-paragraph rows and Find Us is a fifth of the same shape, so
+the page ran the identical composition five times and spent 45% of its height
+doing it. Find Us is now the only image-and-text split left. Before adding a
+section, check what shape its neighbours already are.
+
+**From the kitchen is not in the nav, and cannot be.** Measured clearance at
+1025px in Greek is 43px; a seventh label does not fit. The band is reached by
+scrolling and its own button goes to `/gallery`. If a nav entry for it is ever
+wanted, something else has to come out of the bar first.
 
 **Controls that only work with JS live in a `<template>`.** The hero carousel
 controls are cloned from `#hero-controls-template` at runtime, and the gallery
@@ -148,9 +164,13 @@ Node is installed but **not on the shell PATH**; prepend it first:
   default, which silently breaks `height: 100%` on the `<img>` inside it.
 - `<figure>` has a default `margin: 1em 40px`; the reset zeroes it. Without that,
   gallery images render narrower than their column.
-- Reordering an alternating grid row needs the **track sizes swapped too**, not
-  just `order` — otherwise the portrait lands in the wide column. (Team,
-  `.team__member:nth-child(even)`.)
+- Team is a **portrait grid**, not alternating rows, and the section is sized to
+  stay that way: `.team__name` is one step down from a full-width row's heading
+  and the bio renders at `--step--1` because the column is ~285px, not half a
+  page. A fifth and sixth member fill the second row rather than adding another
+  screen and a half. The old layout's gotcha — that reordering an alternating row
+  needs the track sizes swapped as well as `order`, or the portrait lands in the
+  wide column — went with it.
 - `.section-head p:not(.eyebrow)` — the `:not()` is load-bearing. `.section-head p`
   is (0,1,1) and `.eyebrow` is (0,1,0), so without it the paragraph rule wins and
   an eyebrow inside a section head silently renders at heading size in the muted
@@ -231,7 +251,16 @@ Node is installed but **not on the shell PATH**; prepend it first:
   nav links need `display: block` or the tap targets collapse to ~26px.
 - `.section--tight` exists for a band whose content is a heading and a line or
   two (Take away). The full `--section-y` is sized for sections with a grid or a
-  photo set under the heading; on a short one it reads as a gap.
+  photo set under the heading; on a short one it reads as a gap. Padding was only
+  half the problem there: stacked, the whole section sat in the left third of a
+  full-width black band with the rest of the row empty. `.contact__inner` sets
+  the heading against the number on one line from 48rem up, which is what
+  actually made it read as a band.
+- `Plates.astro` picks its four photos **by id**, not by taking the first four in
+  `gallery.json`. The gallery is ordered for the gallery — room, sign, drinks and
+  plates interleaved — so position is not a stable way to ask for "the food", and
+  reordering that file would otherwise silently change the homepage. It throws at
+  build time if an id is missing rather than rendering a gap.
 - `logo-clean.png` is the only logo file. It carries the hero and the footer, and
   the favicons are generated from it. The badge sits centred in a wide
   transparent field, so anything using it sizes by **height**, and

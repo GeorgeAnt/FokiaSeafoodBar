@@ -43,7 +43,7 @@ browser download. Its scratch files go in `.playwright-cli/`, which is ignored.
 
 | URL | What's on it |
 |---|---|
-| `/` | Hero, Our Goal, the Team, Reserve your spot • Take away, Where to Find Us |
+| `/` | Hero, Our Goal, From the Kitchen, the Team, Reserve your spot • Take away, Where to Find Us |
 | `/menu` | The full menu and the legally required notices |
 | `/gallery` | The photographs, each opening in a lightbox |
 
@@ -127,8 +127,11 @@ and Inside-outs work). Categories appear in the order they are listed, and the
 
 ### The team — `src/data/team.json`
 
-Four members currently; the layout is designed to hold from four to six. Order in
-the file is the order on the page. `name` is a single string (never translated);
+Four members currently, shown as a grid of portraits: four across on a desktop,
+two on a tablet, one on a phone. Adding a fifth and sixth fills the second row
+rather than lengthening the page, so the section holds four to six comfortably.
+Bios read best at roughly 30 to 50 words at that column width; much longer and
+one card runs well past the others. Order in the file is the order on the page. `name` is a single string (never translated);
 `role` and `bio` have a Greek and an English version:
 
 ```json
@@ -145,6 +148,22 @@ the file is the order on the page. `name` is a single string (never translated);
 `photo` is a filename inside `src/assets/photos/team/`. Remove the
 `"placeholder": true` line once the real name and bio are in — it is only there so
 `npm run check` can report what is still outstanding.
+
+### The homepage food band — `src/components/Plates.astro`
+
+"From the Kitchen" shows four photographs from the gallery on the homepage. It
+does **not** have its own data file: it names four `id`s from
+`src/data/gallery.json` and pulls the photo and its alt text from there, so the
+alt text stays written in one place.
+
+To change which plates it shows, edit the `PLATE_IDS` list at the top of
+`src/components/Plates.astro` to four ids that exist in `gallery.json`. It is
+deliberately by id and not "the first four", because the gallery is ordered for
+the gallery. If you name an id that is not there, the build stops and tells you
+which one — it will not quietly render a gap.
+
+The heading and the button text are ordinary UI strings (`plates.*` in
+`src/i18n/`), so they are edited like any other.
 
 ### Photos — `src/data/gallery.json`
 
@@ -300,9 +319,10 @@ measured against the normalised 512×512 badge, not the file's own pixels.
 ## Performance
 
 Lighthouse, mobile, on the production build. **These were measured before the
-gallery was split onto its own page and the hero, nav, footer and Take away
-sections were reworked — re-run before quoting them.** The page-weight figures
-below the table are current and measured against the build in `dist/`.
+gallery was split onto its own page, before the hero, nav, footer and Take away
+sections were reworked, and before the homepage was recomposed — re-run before
+quoting them.** The page-weight figures below the table are current, measured
+against the build in `dist/`.
 
 | | |
 |---|---|
@@ -317,9 +337,9 @@ below the table are current and measured against the build in `dist/`.
 
 | | |
 |---|---|
-| `/` (inc. inlined CSS, structured data) | 69 KB raw, **18 KB gzipped** |
-| `/menu` | 92 KB raw, **22 KB gzipped** |
-| `/gallery` | 77 KB raw, **20 KB gzipped** |
+| `/` (inc. inlined CSS, structured data) | 79 KB raw, **20 KB gzipped** |
+| `/menu` | 97 KB raw, **23 KB gzipped** |
+| `/gallery` | 84 KB raw, **21 KB gzipped** |
 | JavaScript requests | **0** — every script is inlined |
 | Fonts | 10 files, 162 KB total (Greek + Latin, both families) — 6 preloaded |
 | Total `dist/` | 40 MB across 390 files, almost all image variants the browser chooses between |
@@ -443,14 +463,14 @@ Several have gone stale before.
 ```
 src/
   assets/photos/      downsampled masters — carousel, gallery, team, logo-clean
-  components/         Nav, Hero, Goal, Menu, MenuCategory, MenuItem,
+  components/         Nav, Hero, Goal, Plates, Menu, MenuCategory, MenuItem,
                       Team, Gallery, Contact, FindUs, Footer
   data/               ← content lives here (menu, team, gallery, site, legal)
   env.d.ts            types for the language switcher's window.fokiaI18n
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script
   lib/                i18n lookup, menu formatting, photo resolution
-  pages/index.astro   homepage — hero, goal, team, contact, find us
+  pages/index.astro   homepage — hero, goal, plates, team, contact, find us
   pages/menu.astro    the menu, at /menu
   pages/gallery.astro the photographs, at /gallery
   styles/global.css   design tokens and all styling

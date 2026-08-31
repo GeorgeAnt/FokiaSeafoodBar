@@ -1,0 +1,89 @@
+---
+import { Picture } from 'astro:assets';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { galleryPhoto } from '../lib/photos';
+import gallery from '../data/gallery.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+
+/*
+  The food, on the page that sells it.
+
+  Before this band the homepage showed one cocktail and four staff portraits:
+  every plate the kitchen actually sends out lived on /gallery, one click away
+  from anyone who never got there. This is the product.
+
+  Four ids rather than "the first four in gallery.json", because the gallery is
+  ordered for the gallery — room, sign, drinks and plates interleaved — and this
+  band wants plates only. Chosen by id so reordering gallery.json cannot quietly
+  change what the homepage shows.
+*/
+const PLATE_IDS = ['sushi-board-overhead', 'ceviche-presented', 'seared-fish-puree', 'prawns-bisque'];
+
+const plates = PLATE_IDS.map((id) => {
+  const image = gallery.images.find((candidate) => candidate.id === id);
+  if (!image) {
+    throw new Error(
+      `From the kitchen wants the gallery image "${id}", which has no entry in ` +
+        `data/gallery.json. Add one (with alt text in both locales), or point ` +
+        `PLATE_IDS in Plates.astro at an id that exists.`
+    );
+  }
+  return { ...image, src: galleryPhoto(image.file), altKey: `gallery.${image.id}.alt` };
+});
+---
+
+{/*
+  Dark tier. The bands step light / mid / dark and no two in a row share a
+  background: Hero black, Our Goal stone, this black, Team salt, Take away
+  black, Find Us stone, footer black. Black is also simply the right ground for
+  food photography, which is why this band is the one that got it.
+
+  Deliberately NOT in the nav. Measured clearance at 1025px in Greek is 43px,
+  and a seventh label does not fit — see the nav note in CLAUDE.md. The band is
+  reached by scrolling, and its own link goes to the gallery.
+*/}
+<section class="section section-dark plates" id="plates">
+  <div class="wrap">
+    <header class="section-head plates__head">
+      <div>
+        <h2 data-i18n="plates.heading">{t(locale, 'plates.heading')}</h2>
+        <p data-i18n="plates.intro">{t(locale, 'plates.intro')}</p>
+      </div>
+      <a class="btn btn--ghost plates__cta" href="/gallery" data-i18n="plates.cta">
+        {t(locale, 'plates.cta')}
+      </a>
+    </header>
+
+    {/*
+      Uneven columns and a stagger on the even ones. This is the page's one
+      expressive layout — Team is a straight grid and Find Us is a split, so the
+      variance is spent here rather than smeared across all three. The tracks are
+      fractional rather than equal so the row does not read as four cards.
+
+      On narrow screens it becomes a horizontal scroll-snap strip instead of a
+      four-photo tower: the point of the band is that you take it in at a glance.
+    */}
+    <ul class="plates__row">
+      {
+        plates.map((plate) => (
+          <li class="plates__item">
+            <Picture
+              src={plate.src}
+              formats={['avif', 'webp']}
+              widths={[300, 500, 700]}
+              sizes="(min-width: 60rem) 24vw, 70vw"
+              alt={t(locale, plate.altKey)}
+              data-i18n-alt={plate.altKey}
+              loading="lazy"
+              decoding="async"
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
