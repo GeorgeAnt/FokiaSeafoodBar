@@ -49,19 +49,24 @@ read — the shopfront sign in the team photos is rusted metal. `--wood-light` a
 toward orange. Warming any of these four back up undoes the palette.
 
 **No two bands in a row share a background.** The page steps light / mid / dark
-and back: Hero black, Our Goal stone, From the kitchen black, Team salt, Take
-away black, Find Us stone, footer black. Our Goal is on the mid tier *because*
+and back: Hero black, Our Goal stone, Team salt, From the kitchen black, Take
+away salt, Find Us stone, footer black. Our Goal is on the mid tier *because*
 the hero above it is black — as a dark section it ran straight into the hero with
-no boundary. Stone carries the two text-only sections, which is what suits a mid
-grey: neither has photographs sitting on it. From the kitchen took black because
-food photography reads best on it and because Our Goal above and Team below are
-the two lightest bands on the page. Changing any section's tier means checking
-its neighbours.
+no boundary.
+
+The tiers are a consequence of the order, not a property of each section, and
+moving one re-tiers its neighbours. When From the kitchen moved below Team it
+landed directly above Take away and both were black. Of the two, **the
+photographs keep the dark ground and the text-only band gives way**: food needs
+black and has nowhere else to go, while a heading and a phone number read on any
+tier — which is the same logic that put Our Goal and Find Us on stone. So Take
+away is now a light band. Work the sequence out in full before changing an
+order; there are only three tiers and both ends are pinned black.
 
 **Each section on the homepage uses a different layout.** Hero is a split, Our
-Goal is two columns of text, From the kitchen is a staggered photo row, Team is
-a portrait grid, Take away is a heading against a number, Find Us is a text and
-image split. That is deliberate and it is recent: Team used to be four
+Goal is two columns of text, Team is a portrait grid, From the kitchen is a
+staggered photo row, Take away is a heading against a number, Find Us is a text
+and image split. That is deliberate and it is recent: Team used to be four
 alternating photo-and-paragraph rows and Find Us is a fifth of the same shape, so
 the page ran the identical composition five times and spent 45% of its height
 doing it. Find Us is now the only image-and-text split left. Before adding a

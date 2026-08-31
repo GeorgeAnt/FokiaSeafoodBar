@@ -13,6 +13,15 @@ const { locale = defaultLocale } = Astro.props;
 ---
 
 {/*
+  Light tier, not dark, and that is a consequence of where the band now sits.
+
+  From the kitchen moved above this section and is black, because food
+  photography needs the dark ground. Two dark bands cannot run together, and of
+  the two this is the one that gives: it is text only, which is exactly what the
+  lighter tiers suit, while the photographs have nowhere else to go. The phone
+  number is `--wood` on salt here rather than `--wood-light` on black — 6.6:1,
+  and the brand red rather than its dark-tier tint.
+
   Heading and number side by side, not stacked.
 
   Stacked in a full-width band this was a heading, a label and a phone number in
@@ -21,7 +30,7 @@ const { locale = defaultLocale } = Astro.props;
   one line they fill the row, the band loses about half its height, and the
   number lands at the end of the line where the eye finishes.
 */}
-<section class="section section--tight section-dark" id="contact">
+<section class="section section--tight" id="contact">
   <div class="wrap contact__inner">
     <header class="section-head section-head--inline" data-reveal>
       <h2 data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>

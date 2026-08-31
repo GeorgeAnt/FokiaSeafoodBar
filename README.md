@@ -43,7 +43,7 @@ browser download. Its scratch files go in `.playwright-cli/`, which is ignored.
 
 | URL | What's on it |
 |---|---|
-| `/` | Hero, Our Goal, From the Kitchen, the Team, Reserve your spot • Take away, Where to Find Us |
+| `/` | Hero, Our Goal, the Team, From the Kitchen, Reserve your spot • Take away, Where to Find Us |
 | `/menu` | The full menu and the legally required notices |
 | `/gallery` | The photographs, each opening in a lightbox |
 
@@ -504,7 +504,7 @@ src/
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script
   lib/                i18n lookup, menu formatting, photo resolution
-  pages/index.astro   homepage — hero, goal, plates, team, contact, find us
+  pages/index.astro   homepage — hero, goal, team, plates, contact, find us
   pages/menu.astro    the menu, at /menu
   pages/gallery.astro the photographs, at /gallery
   styles/global.css   design tokens and all styling
@@ -530,14 +530,21 @@ only tinting text:
 
 | Class | Background | Sections |
 |---|---|---|
-| *(default)* | `--salt` | Menu, Team, Gallery |
+| *(default)* | `--salt` | Menu, Team, Gallery, Reserve your spot • Take away |
 | `.section-stone` | `--stone` | Our Goal, Where to Find Us |
-| `.section-dark` | `--black` | Hero, Reserve your spot • Take away, footer |
+| `.section-dark` | `--black` | Hero, From the Kitchen, footer |
 
 No two bands in a row share a background. Our Goal is on the mid tier because
 the hero above it is black — as a dark section it ran into the hero with no
-boundary. Stone carries the two text-only sections, which is what suits a mid
-grey: neither has photographs sitting on it.
+boundary. Stone carries text-only sections, which is what suits a mid grey:
+neither has photographs sitting on it.
+
+Which tier a section gets depends on the sections either side of it, so
+reordering the homepage can re-tier a band that did not move. From the Kitchen
+is dark because food photography needs a dark ground; when it moved below the
+Team it ended up directly above Take away, which was also dark, so Take away
+became a light band. The rule when two dark bands collide is that the
+photographs keep the dark ground and the text-only band moves.
 
 ### The `--accent` token
 
