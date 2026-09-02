@@ -1,5 +1,8 @@
 ---
+import { Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { galleryPhoto } from '../lib/photos';
+import gallery from '../data/gallery.json';
 import site from '../data/site.json';
 
 interface Props {
@@ -7,38 +10,95 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-/* Reservations and take away are the same phone call, and the heading now names
-   both, so the section is the heading and the number — the two description cards
-   that used to sit under it only restated the heading at length. */
+/*
+  Photos are chosen by gallery id, not by filename or position, for the same
+  reason Plates does it: gallery.json is ordered for the gallery, and reordering
+  it must not quietly change what the homepage shows. The alt text comes from
+  that entry too, so it stays written in one place and in both locales.
+*/
+const PANELS = [
+  { id: 'table-setting', titleKey: 'contact.reserveTitle' },
+  { id: 'takeaway-box', titleKey: 'contact.takeawayTitle' },
+];
+
+const panels = PANELS.map(({ id, titleKey }) => {
+  const image = gallery.images.find((candidate) => candidate.id === id);
+  if (!image) {
+    throw new Error(
+      `Take away wants the gallery image "${id}", which has no entry in ` +
+        `data/gallery.json. Add one (with alt text in both locales), or point ` +
+        `PANELS in Contact.astro at an id that exists.`
+    );
+  }
+  return { ...image, titleKey, src: galleryPhoto(image.file), altKey: `gallery.${image.id}.alt` };
+});
+
+/* The schedule is handed to the client as-is rather than re-stated, so the
+   after-hours swap can never disagree with the hours the section renders. */
+const schedule = JSON.stringify(site.hours.entries);
 ---
 
 {/*
-  Light tier, not dark, and that is a consequence of where the band now sits.
+  Light tier, and it has to stay light even though it carries photographs.
+  From the kitchen sits directly above and is a black band of four plates; a
+  dark full-bleed treatment here would run two photo bands together with no
+  boundary. The photos are inset panels on the salt ground instead.
 
-  From the kitchen moved above this section and is black, because food
-  photography needs the dark ground. Two dark bands cannot run together, and of
-  the two this is the one that gives: it is text only, which is exactly what the
-  lighter tiers suit, while the photographs have nowhere else to go. The phone
-  number is `--wood` on salt here rather than `--wood-light` on black — 6.6:1,
-  and the brand red rather than its dark-tier tint.
-
-  Heading and number side by side, not stacked.
-
-  Stacked in a full-width band this was a heading, a label and a phone number in
-  the left third with the rest of a black screen empty beside them — the band
-  read as a gap in the page rather than as a section. Set against each other on
-  one line they fill the row, the band loses about half its height, and the
-  number lands at the end of the line where the eye finishes.
+  The section heading is .sr-only: it carries the combined nav label so the
+  outline and the /#contact anchor still have a heading, while the two panel
+  titles say each half once.
 */}
-<section class="section section--tight" id="contact">
-  <div class="wrap contact__inner">
-    <header class="section-head section-head--inline" data-reveal>
-      <h2 data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
-    </header>
+<section class="section" id="contact">
+  <div class="wrap">
+    <h2 class="sr-only" data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
 
+    <div class="contact__panels" data-reveal>
+      {
+        panels.map((panel) => (
+          <article class="contact__panel">
+            <Picture
+              src={panel.src}
+              formats={['avif', 'webp']}
+              widths={[500, 800, 1200]}
+              sizes="(min-width: 48rem) 45vw, 100vw"
+              alt={t(locale, panel.altKey)}
+              data-i18n-alt={panel.altKey}
+              loading="lazy"
+              decoding="async"
+            />
+            <h3 class="contact__panel-title" data-i18n={panel.titleKey}>
+              {t(locale, panel.titleKey)}
+            </h3>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="contact__notes" data-reveal>
+      <p data-i18n="contact.events">{t(locale, 'contact.events')}</p>
+      <p data-i18n="contact.sourcing">{t(locale, 'contact.sourcing')}</p>
+    </div>
+
+    {/*
+      The landline is rendered by the server and is what a visitor without
+      JavaScript always gets — it is the primary number and the one in the
+      JSON-LD, so the fallback is correct rather than merely safe.
+
+      The number lives in its own <span> so the swap can replace the text
+      without touching the icon beside it. Nothing here carries data-i18n: a
+      phone number is not translated, so the language switcher never contends
+      with the script for this element.
+    */}
     <p class="contact__call" data-reveal>
       <span class="contact__call-label" data-i18n="contact.callUs">{t(locale, 'contact.callUs')}</span>
-      <a class="contact__phone" href={`tel:${site.phone.href}`}>
+      <a
+        class="contact__phone"
+        id="contact-phone"
+        href={`tel:${site.phone.href}`}
+        data-hours={schedule}
+        data-after-href={`tel:${site.phoneAfterHours.href}`}
+        data-after-display={site.phoneAfterHours.display}
+      >
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -53,8 +113,55 @@ const { locale = defaultLocale } = Astro.props;
             stroke-linejoin="round"
           />
         </svg>
-        {site.phone.display}
+        <span class="contact__phone-number">{site.phone.display}</span>
       </a>
     </p>
   </div>
 </section>
+
+<script>
+  // Outside opening hours the mobile answers instead of the landline.
+  //
+  // Evaluated in Europe/Athens, never in the visitor's own timezone: someone
+  // calling from London at 22:00 is calling a restaurant where it is already
+  // midnight, and the number they need is the one that rings after service.
+  // Intl does the conversion, so no offset is hard-coded and DST is handled.
+  //
+  // The decision itself lives in lib/hours.ts so it can be tested directly;
+  // this script only supplies the clock and swaps the two attributes.
+  import { isOpenAt, type HoursEntry } from '../lib/hours';
+
+  const link = document.getElementById('contact-phone');
+  const numberEl = link?.querySelector('.contact__phone-number');
+
+  if (link && numberEl) {
+    const athensNow = () => {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Athens',
+        weekday: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).formatToParts(new Date());
+      const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+      return { day: get('weekday'), minutes: Number(get('hour')) * 60 + Number(get('minute')) };
+    };
+
+    try {
+      const entries: HoursEntry[] = JSON.parse(link.dataset.hours || '[]');
+      const { day, minutes } = athensNow();
+
+      if (!isOpenAt(entries, day, minutes)) {
+        const href = link.dataset.afterHref;
+        const display = link.dataset.afterDisplay;
+        if (href && display) {
+          link.setAttribute('href', href);
+          numberEl.textContent = display;
+        }
+      }
+    } catch {
+      // Any failure leaves the landline in place, which is the correct number
+      // during service and a working number outside it.
+    }
+  }
+</script>

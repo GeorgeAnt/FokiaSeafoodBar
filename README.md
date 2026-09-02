@@ -125,6 +125,18 @@ and Inside-outs work). Categories appear in the order they are listed, and the
 "jump to" chips update automatically. `Κρασί` additionally uses `subcategories`
 (Ποτήρι / Φιάλη); any category can do the same.
 
+### The two phone numbers — `src/data/site.json`
+
+`phone` is the landline and `phoneAfterHours` is the mobile. The site shows the
+landline while the restaurant is open and the mobile when it is shut, working
+that out from `hours.entries` in the same file — so if you change the opening
+hours, the switch follows automatically and there is nothing else to update.
+
+The times are read on the restaurant's clock (Athens), not the visitor's, so a
+customer abroad still sees the number that will actually be answered. If a
+visitor has JavaScript turned off they see the landline, which is also the
+number given to Google in the page's structured data.
+
 ### The team — `src/data/team.json`
 
 Five members currently, shown as alternating rows: the portrait on the left for
@@ -590,6 +602,13 @@ is dark because food photography needs a dark ground; when it moved below the
 Team it ended up directly above Take away, which was also dark, so Take away
 became a light band. The rule when two dark bands collide is that the
 photographs keep the dark ground and the text-only band moves.
+
+Take away has since gained two photographs of its own, and it still stays light
+for the same reason. From the Kitchen is immediately above it, so a dark
+full-bleed treatment would run two photo bands together with nothing between
+them. The photos are inset panels on the light ground instead, and the salt
+around them is the boundary. Making that band dark means moving From the Kitchen
+first.
 
 ### The `--accent` token
 

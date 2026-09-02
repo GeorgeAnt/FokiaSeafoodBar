@@ -2,9 +2,14 @@
   "$comment": "Restaurant identity and contact details. Fields marked PLACEHOLDER still need confirming with the client — see README.",
   "name": "fokia",
   "tagline": "seafood bar",
+  "$comment-phone": "Two numbers. `phone` is the landline and is the site's primary number: it is what the server renders, what the JSON-LD advertises, and what a visitor without JavaScript always gets. `phoneAfterHours` is the mobile, swapped in by Contact.astro only when the restaurant is shut. The swap is evaluated against `hours` below in Europe/Athens, NOT in the visitor's own timezone — someone calling from London at 22:00 is calling a restaurant where it is midnight. Change the hours and the swap follows; there is no second copy of the schedule.",
   "phone": {
     "display": "21 3099 1571",
     "href": "+302130991571"
+  },
+  "phoneAfterHours": {
+    "display": "698 298 0367",
+    "href": "+306982980367"
   },
   "email": "fokiaseafoodbar@gmail.com",
   "address": {

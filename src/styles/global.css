@@ -396,19 +396,6 @@ input {
   padding-block: var(--section-y);
 }
 
-/* For a band whose content is a heading and one line. The full --section-y is
-   sized for sections with a grid or a photo set under the heading; on a short
-   one it reads as a gap rather than as breathing room. */
-.section--tight {
-  padding-block: clamp(2.5rem, 1.9rem + 2.4vw, 4.5rem);
-}
-.section--tight .section-head {
-  margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem);
-}
-.section--tight .section-head h2 {
-  font-size: var(--step-2);
-}
-
 .section-dark {
   background: var(--black);
   color: var(--salt);
@@ -1745,41 +1732,111 @@ input {
 }
 
 /* --------------------------------------------------------------------------
-   Contact — take away and reservations are one phone call. The heading names
-   both and the number answers it; there is nothing else in the section.
-   -------------------------------------------------------------------------- */
-/*
-  Heading and number on one line from 48rem up.
+   Contact — take away and reservations are one phone call, shown as two photo
+   panels with the number under both.
 
-  Stacked, the section's whole content sat in the left third of a full-width
-  black band and the rest of the row was empty — it read as a gap between Team
-  and Find Us rather than as a band of its own. Set against each other the row
-  fills, and the band loses about half its height on top of what
-  `.section--tight` already takes off.
-*/
-.contact__inner {
+   It was a heading set against the number on one line, and `.section--tight`
+   existed to stop that two-line band reading as a gap. The client asked for the
+   two services to be pictured, so the band now carries a photo set and takes
+   the full `--section-y` like every other section with images in it — which is
+   what that utility's own rule said to do. Nothing else used it, so it went.
+   -------------------------------------------------------------------------- */
+.contact__panels {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 0.6rem + 1.6vw, 1.75rem);
+  margin-bottom: clamp(1.75rem, 1.2rem + 2vw, 3rem);
 }
 @media (min-width: 48rem) {
-  .contact__inner {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: clamp(2rem, 1rem + 4vw, 5rem);
-  }
-  /* The heading is a grid cell here, not a block with a section under it. */
-  .contact__inner .section-head {
-    margin-bottom: 0;
-  }
-  .contact__call {
-    text-align: right;
+  .contact__panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* The number is the last thing in the section now, so it carries no trailing
+/*
+  4:3 on both panels, which is a compromise the sources force: dsc-4367 is
+  landscape (2560x1706) and dsc-3936 is portrait (1707x2560). A portrait frame
+  would cut the table setting to a slice; a landscape one would behead the
+  takeaway box. 4:3 costs each a little and butchers neither, and matching the
+  two matters more than either crop — side by side, unequal frames read as a
+  mistake.
+*/
+.contact__panel {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--salt-deep);
+}
+.contact__panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+  The scrim. Not a flat tint over the whole photo — that greys the image out to
+  protect one corner — but a gradient weighted to the bottom, where the title
+  is. It is on the ::before so it sits over the img and under the text.
+
+  The stops are not decoration. Both photographs have blown highlights in every
+  third of the frame, so the title cannot rely on the picture being dark under
+  it; the bottom of the ramp is opaque enough to carry white text on its own,
+  and the photo underneath only ever improves the reading.
+*/
+.contact__panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--black) 88%, transparent) 0%,
+    color-mix(in srgb, var(--black) 72%, transparent) 22%,
+    color-mix(in srgb, var(--black) 30%, transparent) 52%,
+    transparent 78%
+  );
+}
+
+.contact__panel-title {
+  position: absolute;
+  left: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem);
+  right: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem);
+  bottom: clamp(1.1rem, 0.7rem + 1.4vw, 1.9rem);
+  margin: 0;
+  color: var(--salt);
+  font-size: var(--step-2);
+  text-wrap: balance;
+}
+
+/*
+  The two service notes — private events and sourcing. Two columns from 48rem,
+  because at full width either paragraph runs well past --measure and the pair
+  reads as one block of text rather than as two separate offers.
+
+  They sit between the panels and the number on purpose: they are the reasons to
+  call, and the number is what answers them.
+*/
+.contact__notes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 0.7rem + 1.2vw, 2rem);
+  margin-bottom: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+  color: var(--text-muted);
+}
+@media (min-width: 48rem) {
+  .contact__notes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.contact__notes p {
+  max-width: var(--measure);
+}
+
+/* The number is the last thing in the section, so it carries no trailing
    margin of its own. */
 .contact__call {
   margin: 0;
+  text-align: center;
 }
 .contact__call-label {
   display: block;

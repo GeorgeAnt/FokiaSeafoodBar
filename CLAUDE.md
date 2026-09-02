@@ -54,6 +54,14 @@ away salt, Find Us stone, footer black. Our Goal is on the mid tier *because*
 the hero above it is black — as a dark section it ran straight into the hero with
 no boundary.
 
+**Take away carries photographs now and still has to stay light.** The client
+asked for the two services to be pictured, and From the kitchen sits directly
+above it as a black band of four plates. A dark, full-bleed treatment here would
+put two photo bands together with no boundary — the collision that put Our Goal
+on the mid tier. So the photos are inset panels on the salt ground: the band
+keeps its light tier, and the strip of salt around them is what separates the
+two photo groups. If this band is ever made dark, Plates above it has to move.
+
 **The nav is the one thing exempt from that, and it pays for the exemption with
 an edge.** It is black, and being sticky it cannot re-tier itself the way Our
 Goal did — it passes over all three black bands (Hero, From the kitchen, the
@@ -75,8 +83,8 @@ order; there are only three tiers and both ends are pinned black.
 **Each section on the homepage uses a different layout — except Team, which the
 client has taken back to alternating rows.** Hero is a split, Our Goal is two
 columns of text, Team is alternating photo-and-paragraph rows, From the kitchen
-is a staggered photo row, Take away is a heading against a number, Find Us is a
-text and image split.
+is a staggered photo row, Take away is two photo panels with their titles laid
+over them, Find Us is a text and image split.
 
 Team was made a portrait grid precisely to break that repetition: as rows it ran
 the same image-and-text composition once per member, with Find Us below making
@@ -158,9 +166,12 @@ script does not run, and JS only intercepts the click.
 
 **Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
 bands are not viewport-sized and cannot be. Re-measured at 1366x768 with five
-alternating rows: Plates 834, Find Us 1082 and Team **3249** are all taller than
-the screen — Team is 4.2 viewports on its own; on a 390x844 phone it is 4714,
-5.6 viewports. Take away is 232, about a quarter of one. (Team read 1030 as a
+alternating rows: Plates 834, Contact 842, Find Us 1082 and Team **3249** are
+all taller than the screen — Team is 4.2 viewports on its own; on a 390x844
+phone it is 4507, 5.3 viewports. Take away used to be the short-band case at
+232; the two photo panels took it to 842, so there is no longer a band short
+enough for a whole screen to be absurd — but the tall ones still rule out
+`mandatory`. (Team read 1030 as a
 portrait grid; the rows quadrupled it, which is the cost recorded in the layout
 note above.)
 `mandatory` pulls the reader out of a band they are still reading and gives the
@@ -471,13 +482,46 @@ Node is installed but **not on the shell PATH**; prepend it first:
   heading goes behind the bar, or sits in a band of nothing.
 - Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
   nav links need `display: block` or the tap targets collapse to ~26px.
-- `.section--tight` exists for a band whose content is a heading and a line or
-  two (Take away). The full `--section-y` is sized for sections with a grid or a
-  photo set under the heading; on a short one it reads as a gap. Padding was only
-  half the problem there: stacked, the whole section sat in the left third of a
-  full-width black band with the rest of the row empty. `.contact__inner` sets
-  the heading against the number on one line from 48rem up, which is what
-  actually made it read as a band.
+- **`.section--tight` has been removed, and the reason is worth keeping.** It
+  existed for one band — Take away, back when that was a heading and a phone
+  number — because the full `--section-y` around two lines of text reads as a
+  gap rather than as breathing room. That band now carries a photo set, so by
+  the utility's own rule it takes the full padding, and nothing else in the site
+  used the class. Rather than leave a rule that matches no markup (see the
+  `.menu__legal h3` entry below for how that goes unnoticed), it went. If a
+  short text-only band appears again, it is three lines of CSS to reinstate.
+
+- **The contact number changes with the clock, and the fallback is the point.**
+  `site.json` holds two: `phone` (the landline) and `phoneAfterHours` (the
+  mobile). The server renders the landline, the JSON-LD advertises the landline,
+  and a visitor with no JavaScript keeps the landline — so the default is the
+  *correct* number during service rather than merely a safe one. Contact.astro's
+  script swaps in the mobile only when the restaurant is shut.
+
+  Two things about it are easy to get wrong. It is evaluated in
+  **Europe/Athens**, not the visitor's timezone — someone calling from London at
+  22:00 is calling a restaurant where it is already midnight — which `Intl`
+  handles, so no offset is hard-coded and DST needs no thought. And the schedule
+  is passed to the client from `site.hours.entries` rather than restated, so
+  editing the hours moves the swap with them and the two cannot disagree.
+
+  The decision itself is `isOpenAt` in `src/lib/hours.ts`, not inline in the
+  component, so the shipped logic is the logic that gets tested. `closes:
+  "00:00"` means the *end* of the day, not the start of one: 16:00–00:00 covers
+  16:00 up to but not including midnight, which is why 00:00 Wednesday is shut
+  even though Tuesday ran "until midnight". A genuinely overnight range
+  (20:00–02:00) is handled too, though nothing uses one yet.
+
+- **Text over the Take away photos is safe because of the scrim, not the
+  photos.** Both images have blown highlights in every third of the frame —
+  brightest channel 255 in all of them — so an average reading of the source
+  proves nothing. `.contact__panel::before` is a bottom-weighted gradient that
+  is opaque enough to carry the title on its own. Verified the way it has to be
+  verified: hide the title, screenshot the rendered panel, and sample every
+  pixel of the box the text occupies. Worst *single* pixel is 11.2:1 under
+  "Κλείστε τη θέση σας" and 9.0:1 under "Take away". Re-measure that way if the
+  photos are ever swapped — the means were 14.1 and 12.4, which would have
+  hidden a bad corner.
 - `Plates.astro` picks its four photos **by id**, not by taking the first four in
   `gallery.json`. The gallery is ordered for the gallery — room, sign, drinks and
   plates interleaved — so position is not a stable way to ask for "the food", and
