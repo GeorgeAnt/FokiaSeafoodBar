@@ -515,13 +515,25 @@ input {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.6rem;
+  /* Horizontal padding is up from 1.6rem for the pill: at a 999px radius the
+     curve eats into the corners of the text box, and uppercase set at 0.08em
+     tracking has no side bearings left to give. */
+  padding: 0.85rem 2rem;
   font-size: var(--step--1);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  border-radius: var(--radius);
+  /* Fully round, not --radius. Written as a literal 999px to match every other
+     pill in this file (the menu tab group, the jump chips, the tags) rather
+     than introducing a second radius token used by one rule.
+
+     --radius (2px) is still the site's default and still correct for
+     rectangular surfaces — inputs, the language switch, image frames. This is
+     scoped to .btn, which is used in exactly three places and all three are on
+     the homepage: the hero CTA, the From the kitchen CTA and the Find Us map
+     button. There is no .btn on /menu or /gallery, so nothing else moves. */
+  border-radius: 999px;
   border: 1px solid transparent;
   transition:
     background-color 0.2s var(--ease),
