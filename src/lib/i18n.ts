@@ -4,8 +4,13 @@
  * Two tiers, and the distinction matters:
  *
  *   Tier 1 — translated. Everything that is site chrome: nav, headings, buttons,
- *   body copy, alt text, the legal block, team roles and bios. Keys live in
- *   `src/i18n/{el,en}.json`, plus the content keys derived below.
+ *   body copy, alt text, the legal block, and team names, roles and bios. Keys
+ *   live in `src/i18n/{el,en}.json`, plus the content keys derived below.
+ *
+ *   Team *names* are in tier 1 deliberately, and it is the one place that looks
+ *   like a tier-2 case and is not: a Greek name written in Greek script would
+ *   otherwise sit untransliterated on the English page. Dish names stay in tier
+ *   2 because the client's menu is Greek as printed; a person's name is not.
  *
  *   Tier 2 — never translated. The menu. Dish names, descriptions and category
  *   names are flat Greek strings in `menu-*.json` and render identically in both
@@ -44,6 +49,10 @@ function contentKeys(locale: Locale): Dict {
   const out: Dict = {};
 
   for (const m of teamData.members) {
+    // Names are locale-keyed too: a Greek name written in Greek script would
+    // otherwise sit untransliterated on the English page, the same problem
+    // address.street solves in site.json.
+    out[`team.${m.id}.name`] = m.name[locale];
     out[`team.${m.id}.role`] = m.role[locale];
     out[`team.${m.id}.bio`] = m.bio[locale];
   }

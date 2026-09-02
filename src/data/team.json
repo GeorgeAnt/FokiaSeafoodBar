@@ -1,74 +1,89 @@
 {
-  "$comment": "Order in this file is the display order. `name` is a flat string (never translated); `role` and `bio` are locale-keyed — i18n keys (team.<id>.role / .bio) are derived from this file in src/lib/i18n.ts, so a new member needs NO entry in el.json or en.json. Bios are PLACEHOLDER text at realistic length so the layout is tested at true content length — replace before launch, and clear `placeholder` when you do or npm run check keeps counting it. Layout holds from 4 to 6 members; the grid sizes its columns from the count, so adding or removing one re-flows without a CSS change.",
+  "$comment": "Order in this file is the display order. `name`, `role` and `bio` are all locale-keyed — i18n keys (team.<id>.name / .role / .bio) are derived from this file in src/lib/i18n.ts, so a new member needs NO entry in el.json or en.json. Bios are PLACEHOLDER text at realistic length so the layout is tested at true content length — replace before launch, and clear `placeholder` when you do or npm run check keeps counting it. Layout holds from 4 to 6 members; the grid sizes its columns from the count, so adding or removing one re-flows without a CSS change.",
   "members": [
     {
-      "id": "chef-john",
-      "name": "Chef John",
-      "photo": "chef-john.jpg",
-      "placeholder": true,
+      "id": "chef",
+      "name": {
+        "el": "Γιάννης Καντάρης",
+        "en": "Yannis Kantaris"
+      },
+      "photo": "john.jpg",
+      "placeholder": false,
       "role": {
-        "el": "Εκτελεστικός Σεφ",
-        "en": "Executive Chef"
+        "el": "Chef Patron",
+        "en": "Chef Patron"
       },
       "bio": {
-        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Ο σεφ μας συνδυάζει την ελληνική παράδοση του ψαριού με τεχνικές της ιαπωνικής κουζίνας. Ξεκίνησε από τις ταβέρνες του Αιγαίου και συνέχισε σε κουζίνες της Ευρώπης, φέρνοντας πίσω μια ματιά που σέβεται την πρώτη ύλη πάνω από όλα. Στη fokia σχεδιάζει ένα μενού που αλλάζει με τη θάλασσα.",
-        "en": "PLACEHOLDER — Our chef brings together the Greek tradition of fish cookery and the techniques of the Japanese kitchen. He started in the tavernas of the Aegean and went on to kitchens across Europe, returning with an approach that puts the raw ingredient above everything else. At fokia he builds a menu that changes with the sea."
+        "el": "Σχεδόν δύο δεκαετίες τώρα βρίσκεται πίσω από το πάσο ετερόκλητων εστιατορίων. Σε κάθε κουζίνα, από την ηπειρωτική και τη νησιώτικη Ελλάδα μέχρι το εξωτερικό, ο πρωταγωνιστής ήταν η πρώτη ύλη: τα ψάρια που έφερνε ο ψαράς, τα λαχανικά από το χωράφι, τα επιλεγμένα κρέατα, τα βότανα, το μέλι, το λάδι• όλα διαλεγμένα ένα προς ένα. Ο Chef μέσα από ένα μακρόπνοο γαστρονομικό ταξίδι, που τον έπλασε, τον διαμόρφωσε και τον ωρίμασε, επέστρεψε στην Ελευσίνα, την πόλη όπου μεγάλωσε, και δημιούργησε το Fokia Seafood Bar: Μία μπάρα, μία ανοιχτή κουζίνα, όπου  μαγειρεύει μπροστά σας, από πελάτες  γίνεστε επισκέπτες και η γαστρονομική εμπειρία γίνεται άμεση αλληλεπίδραση. Στη Fokia το φαγητό γίνεται αφορμή για συζήτηση, μοιράζεται και πυροδοτεί  συναίσθηματα.",
+        "en": "For almost two decades he has been behind the pass of a variety of restaurants. In every kitchen, from mainland and island Greece to abroad, the star was the raw material: the fish brought by the fisherman, the vegetables from the field, the selected meats, the herbs, the honey, the oil — all chosen one by one. The Chef returned to Elefsina, the city where he grew up, after a long gastronomic journey that shaped and matured him, and created Fokia Seafood Bar: One bar, one open kitchen, where he cooks in front of you, from customers you become visitors and the gastronomic experience becomes direct interaction. At Fokia food becomes an excuse for conversation, it is shared and sparks emotions."
       }
     },
     {
-      "id": "sous-chef",
-      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
-      "photo": "female1.jpg",
+      "id": "service-one",
+      "name": {
+        "el": "Μαίρη",
+        "en": "Mary"
+      },
+      "photo": "mary.jpg",
       "placeholder": true,
       "role": {
-        "el": "Υπεύθυνη Sushi",
-        "en": "Head of Sushi"
+        "el": "Service",
+        "en": "Service"
       },
       "bio": {
-        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Δουλεύει το ψάρι με την ακρίβεια που ζητάει το sushi και την υπομονή που ζητάει η μαθητεία. Κάθε ρολό που βγαίνει από τον πάγκο της περνάει από τα χέρια της δύο φορές, μία για τη γεύση και μία για την εικόνα. Πιστεύει ότι το καλό ψάρι δεν χρειάζεται να κρυφτεί πίσω από σάλτσες.",
-        "en": "PLACEHOLDER — She works fish with the precision sushi demands and the patience an apprenticeship demands. Every roll that leaves her counter passes through her hands twice, once for the taste and once for the look. She believes good fish never needs to hide behind a sauce."
+        "el": "Μία επιστημόνισσα στο τραπέζι σας: Γλωσσολόγος με δύο μεταπτυχιακά και δύο παράλληλες αγάπες, τη γλώσσα και το καλό φαγητό. Είναι λάτρης των ωμών γεύσεων, του sushi και όσων  μπορούν να προκαλέσουν ενδιαφέρον στους γευστικούς της κάλυκες. Είναι ο άνθρωπος που θα σας καλωσορίσει στο Fokia, θα σας ξεναγήσει στο menu, θα σας βοηθήσει να ανακαλύψετε τις γεύσεις του και, κατόπιν, θα σας φτιάξει υπέροχα cocktails.",
+        "en": "A scientist at your table: A linguist with two master's degrees and two parallel loves, language and good food. She is a lover of raw flavors, sushi and anything that can spark interest in her taste buds. She is the person who will welcome you to Fokia, guide you through the menu, help you discover its flavors and, afterwards, make you wonderful cocktails."
       }
     },
     {
-      "id": "bar-manager",
-      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
-      "photo": "male1.jpg",
-      "placeholder": true,
+      "id": "kitchen-one",
+      "name": {
+        "el": "Γιώργος",
+        "en": "Giorgos"
+      },
+      "photo": "giorgos-kitchen.jpg",
+      "placeholder": false,
       "role": {
-        "el": "Υπεύθυνος Bar",
-        "en": "Bar Manager"
+        "el": "Κουζίνα",
+        "en": "Kitchen Staff"
       },
       "bio": {
-        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Στήνει τη λίστα των cocktail γύρω από ελληνικά αποστάγματα, δουλεύοντας το τσίπουρο και το ούζο όπως άλλοι δουλεύουν το whisky. Το Twisted Greek Negroni ξεκίνησε ως πείραμα ενός βράδυ και έμεινε στον κατάλογο. Θεωρεί ότι το ποτό πρέπει να συνομιλεί με το πιάτο, όχι να το σκεπάζει.",
-        "en": "PLACEHOLDER — He builds the cocktail list around Greek spirits, working with tsipouro and ouzo the way others work with whisky. The Twisted Greek Negroni began as one evening's experiment and never left the list. He holds that a drink should talk to the plate, not cover it."
+        "el": "Έχει σύντομο μαγειρικό background, είναι ξεχασιάρης και δηλώνει λάτρης της προβατίνας. Στη Fokia, όμως, θα σε μαγέψει με βελούδινες υφές του ταραμά και της sour cream, τα ντελικάτα κομμένα carpaccio μέχρι και  τα umami udon noodles με ανανά, κάρυ και νότες λεμονιού.",
+        "en": "He has a short culinary background, is forgetful and declares himself a lover of lamb. At Fokia, however, he will enchant you with the velvety textures of taramasalata and sour cream, the delicately sliced carpaccio and even the umami udon noodles with pineapple, curry and hints of lemon."
       }
     },
     {
-      "id": "service-lead",
-      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
-      "photo": "male2.jpg",
-      "placeholder": true,
+      "id": "service-two",
+      "name": {
+        "el": "Γιώργος",
+        "en": "Giorgos"
+      },
+      "photo": "giorgos-service.jpg",
+      "placeholder": false,
       "role": {
-        "el": "Υπεύθυνος Αίθουσας",
-        "en": "Front of House"
+        "el": "Σέρβις",
+        "en": "Service"
       },
       "bio": {
-        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Θυμάται τι παρήγγειλε ο κάθε πελάτης την προηγούμενη φορά και ποιο κρασί του άρεσε. Φροντίζει ώστε το τραπέζι να έχει τον ρυθμό του, χωρίς βιασύνη και χωρίς κενά. Λέει ότι η δουλειά της αίθουσας φαίνεται μόνο όταν δεν τη χρειάζεσαι.",
-        "en": "PLACEHOLDER — He remembers what each guest ordered last time and which wine they liked. He keeps a table moving at its own pace, never rushed and never left waiting. He says front-of-house work only shows when you do not need it."
+        "el": "Νεαρός, γοητευτικός, ευγενέστατος και πάντα χαλαρός, ο Γιώργος είναι ο άνθρωπος με τον οποίο, όσο είστε στη Fokia, θα μιλήσετε και θα ανταλλάξετε χαμόγελα. Πάντα πρόθυμος και με την καλή του διάθεση θα κάνει ό,τι περνά από το χέρι του για να περάσετε όμορφα. Θα τον συναντήσετε πίσω από τη μπάρα να δίνει τον ρυθμό κουνώντας ένα shaker, να ποτίζει τα λουλούδια, και, φυσικά, να σας σερβίρει ένα ροδισμένο σολομό με teriyaki, μια δροσερή σαλάτα ή ένα King Crab California.",
+        "en": "Young, charming, polite and always relaxed, Giorgos is the person you will talk to and exchange smiles with while at Fokia. Always willing and in a good mood, he will do whatever he can to make sure you have a great time. You will find him behind the bar setting the rhythm with a shaker, watering the flowers, and of course serving you a seared salmon with teriyaki, a refreshing salad or a King Crab California."
       }
     },
     {
-      "id": "member-5",
-      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
-      "photo": "placeholder.jpg",
-      "placeholder": true,
+      "id": "kitchen-two",
+      "name": {
+        "el": "Ευτυχία",
+        "en": "Eftichia"
+      },
+      "photo": "eftichia.jpg",
+      "placeholder": false,
       "role": {
-        "el": "ΠΡΟΣΩΡΙΝΟΣ ΡΟΛΟΣ",
-        "en": "PLACEHOLDER ROLE"
+        "el": "Κουζίνα",
+        "en": "Kitchen Staff"
       },
       "bio": {
-        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Το πέμπτο μέλος της ομάδας. Το κείμενο αυτό υπάρχει μόνο για να κρατήσει το ύψος της στήλης στο πραγματικό του μέγεθος μέχρι να έρθει το κανονικό βιογραφικό από τον πελάτη, μαζί με το όνομα, τον ρόλο και τη φωτογραφία.",
-        "en": "PLACEHOLDER — The fifth member of the team. This text exists only to hold the column at its true height until the real bio arrives from the client, along with the name, the role and the photograph."
+        "el": "Μία δόση γυναικείας στοργής και φροντίδας χαρακτηρίζει κάθε πιάτο στη Fokia. Η Ευτυχία —που συχνά θα ακούσεις να αποκαλούμε Εύχαρις, Ευανθία, Ευλαμπία κ.λπ.— είναι εκείνη που φροντίζει για την οργάνωση της κουζίνας και, φυσικά, για την άψογη εκτέλεση κάθε πιάτου: από το ακόνισμα των μαχαιριών, την τακτοποίηση των προμηθειών, την καθαριότητα της κουζίνας, μέχρι και τη φρεσκάδα των πρώτων υλών, τη σωστή εκτέλεση κάθε συνταγής και την ισορροπία των γεύσεων. Η Ευτυχία είναι παρούσα μέσα από όλες αυτές τις αθέατες λεπτομέρειες που κρύβονται πίσω από όσα απολαμβάνετε στη Fokia.",
+        "en": "Eftichia brings a touch of feminine warmth and care to every dish at Fokia. Known by various names like Eucharis, Euanthia, or Eulampia, she is the one who ensures the kitchen runs smoothly and every dish is executed to perfection: from sharpening the knives, organizing the supplies, maintaining the cleanliness of the kitchen, to ensuring the freshness of ingredients, following each recipe correctly, and achieving a perfect balance of flavors. Eftichia is present in every detail that goes into making your dining experience at Fokia exceptional."
       }
     }
   ]

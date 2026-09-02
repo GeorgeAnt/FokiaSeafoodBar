@@ -127,19 +127,19 @@ and Inside-outs work). Categories appear in the order they are listed, and the
 
 ### The team — `src/data/team.json`
 
-Four members currently, shown as a grid of portraits: four across on a desktop,
-two on a tablet, one on a phone. Adding a fifth and sixth fills the second row
-rather than lengthening the page, so the section holds four to six comfortably.
-Bios read best at roughly 30 to 50 words at that column width; much longer and
-one card runs well past the others. Order in the file is the order on the page. `name` is a single string (never translated);
-`role` and `bio` have a Greek and an English version:
+Five members currently, shown as alternating rows: the portrait on the left for
+the first, the right for the second, and so on down the section. They stack to a
+single column on a phone. The section grows by about one row per person, so
+adding someone lengthens the homepage rather than tightening a column. Bios read best at roughly 30 to 50
+words; much longer and the text column runs well past its portrait. Order in the
+file is the order on the page, and `name`, `role` and `bio` each have a Greek
+and an English version:
 
 ```json
 {
-  "id": "chef-john",
-  "name": "Chef John",
-  "photo": "chef-john.jpg",
-  "placeholder": true,
+  "id": "chef",
+  "name": { "el": "Γιάννης Καντάρης", "en": "Yannis Kantaris" },
+  "photo": "john.jpg",
   "role": { "el": "Εκτελεστικός Σεφ", "en": "Executive Chef" },
   "bio":  { "el": "…", "en": "…" }
 }
@@ -148,6 +148,13 @@ one card runs well past the others. Order in the file is the order on the page. 
 `photo` is a filename inside `src/assets/photos/team/`. Remove the
 `"placeholder": true` line once the real name and bio are in — it is only there so
 `npm run check` can report what is still outstanding.
+
+The name is locale-keyed like the role and the bio. If a member's name is the
+same in both languages, write it twice rather than dropping one — `npm run check`
+treats a missing side as an error. It is also what the portrait's alt text uses,
+so both follow the language switch together. You never need to touch
+`src/i18n/el.json` or `en.json` for a team member: those keys are derived from
+this file.
 
 ### The homepage food band — `src/components/Plates.astro`
 
@@ -485,8 +492,12 @@ while back and nothing had rendered the field since.
 
 - **9 unpriced items** — 4 dishes and 5 Λαφαζάνη wines. `npm run check` lists them
   by name, label and grape.
-- **Team names and bios** for 3 of the 4 members (all 4 bios are placeholder text
-  at realistic length, so the layout is already tested).
+- **Mary's portrait.** Her name, role and bio are all real — the only thing
+  missing is the photograph. `mary.jpg` is the generated placeholder graphic,
+  which has the word PLACEHOLDER drawn across it and **will be visible on the
+  page if it ships**. The entry keeps `"placeholder": true` for exactly that
+  reason, so `npm run check` keeps counting it (1/5); drop the flag when the
+  real photo replaces the file. The other four members are complete.
 - **Social links** — hidden while empty.
 - **A cropped or vector logo.** `logo-clean.png` has a transparent surround, so
   it carries the hero, the nav and the footer, and the typeset wordmark it

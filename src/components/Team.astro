@@ -39,15 +39,20 @@ const { locale = defaultLocale } = Astro.props;
                 formats={['avif', 'webp']}
                 widths={[400, 600, 800]}
                 sizes="(min-width: 48rem) 40vw, 100vw"
-                alt={member.name}
+                alt={t(locale, `team.${member.id}.name`)}
+                data-i18n-alt={`team.${member.id}.name`}
                 loading="lazy"
                 decoding="async"
               />
             </div>
 
             <div class="team__text">
-              {/* Names are never translated. */}
-              <h3 class="team__name">{member.name}</h3>
+              {/* Locale-keyed like the role and bio — see team.json. The alt
+                  on the portrait above carries the same key, so the language
+                  switch reaches both. */}
+              <h3 class="team__name" data-i18n={`team.${member.id}.name`}>
+                {t(locale, `team.${member.id}.name`)}
+              </h3>
               <p class="team__role" data-i18n={`team.${member.id}.role`}>
                 {t(locale, `team.${member.id}.role`)}
               </p>

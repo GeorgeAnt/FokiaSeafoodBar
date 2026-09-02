@@ -86,8 +86,10 @@ went back to rows when the fifth member arrived — five equal grid columns are
 measure over the page length, explicitly "for now".
 
 So the page now runs that composition six times. That is a known, accepted cost,
-not an oversight — but it means **Team and Find Us are no longer distinguishable
-shapes**, and a seventh instance would be the third. Before adding a section,
+not an oversight — and it is measurable: Team went from 1030px as a grid to
+**3249px** as five rows at 1366x768, 4.2 viewports of the homepage in one band.
+It also means **Team and Find Us are no longer distinguishable shapes**, and a
+seventh instance would be the third. Before adding a section,
 check what shape its neighbours already are, and if Team is ever revisited this
 is the first thing to weigh.
 
@@ -155,9 +157,12 @@ The gallery *tiles* are the deliberate exception and stay in the page: each is a
 script does not run, and JS only intercepts the click.
 
 **Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
-bands are not viewport-sized and cannot be. Measured at 1366x768: Plates 834,
-Team 1030, Find Us 1082 are all taller than the screen; on a 390x844 phone Team
-is 2961, three and a half viewports; Take away is 232, about a quarter of one.
+bands are not viewport-sized and cannot be. Re-measured at 1366x768 with five
+alternating rows: Plates 834, Find Us 1082 and Team **3249** are all taller than
+the screen — Team is 4.2 viewports on its own; on a 390x844 phone it is 4714,
+5.6 viewports. Take away is 232, about a quarter of one. (Team read 1030 as a
+portrait grid; the rows quadrupled it, which is the cost recorded in the layout
+note above.)
 `mandatory` pulls the reader out of a band they are still reading and gives the
 short band a whole screen for two lines. `proximity` only settles a scroll that
 already ended near a boundary, so tall bands scroll through normally. Snapping is

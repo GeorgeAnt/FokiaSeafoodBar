@@ -46,7 +46,7 @@ console.log(`  ${elKeys.length} keys in each locale`);
 /* --- Locale-keyed content ------------------------------------------------ */
 console.log('\nlocale-keyed content');
 for (const m of team.members) {
-  for (const field of ['role', 'bio']) {
+  for (const field of ['name', 'role', 'bio']) {
     for (const loc of ['el', 'en']) {
       if (!m[field]?.[loc]?.trim()) fail(`team "${m.id}" is missing ${field}.${loc}`);
     }
