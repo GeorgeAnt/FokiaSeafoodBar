@@ -18,22 +18,18 @@ const { locale = defaultLocale } = Astro.props;
     </header>
 
     <!--
-      A grid, not alternating rows.
+      One portrait plus a paragraph each, as alternating rows: photo left on odd
+      members, photo right on even ones. The photo column is a fixed 4:5 so row
+      heights stay even from four members to six, and every portrait gets the
+      same crop.
 
-      This used to be one full-width photo-and-paragraph row per member,
-      reversed on every second one. With four members that was four consecutive
-      image-and-text splits running to roughly 45% of the homepage's height, and
-      Find Us below it is a fifth — the same composition five times, and the one
-      the page spent most of its length on. As a grid the same four people take
-      about a third of the room and the section reads at a glance.
-
-      It also stops the section growing without bound: a fifth and sixth member
-      fill the second row rather than adding another screen and a half.
-
-      The portrait stays 4:5 and every crop is still identical, which is what
-      that fixed ratio was always for.
+      This is the layout the section had before the portrait grid, restored at
+      the client's request because five columns put the bios in ~220px tracks —
+      about four words a line. The cost is the one the grid was built to avoid:
+      the page runs this composition once per member, and Find Us below is
+      another of the same shape. Revisit if the section grows again.
     -->
-    <div class="team__grid" data-reveal>
+    <div class="team__list" data-reveal>
       {
         team.members.map((member) => (
           <article class="team__member">
@@ -41,22 +37,24 @@ const { locale = defaultLocale } = Astro.props;
               <Picture
                 src={teamPhoto(member.photo)}
                 formats={['avif', 'webp']}
-                widths={[300, 500, 700]}
-                sizes="(min-width: 64rem) 23vw, (min-width: 48rem) 45vw, 100vw"
+                widths={[400, 600, 800]}
+                sizes="(min-width: 48rem) 40vw, 100vw"
                 alt={member.name}
                 loading="lazy"
                 decoding="async"
               />
             </div>
 
-            {/* Names are never translated. */}
-            <h3 class="team__name">{member.name}</h3>
-            <p class="team__role" data-i18n={`team.${member.id}.role`}>
-              {t(locale, `team.${member.id}.role`)}
-            </p>
-            <p class="team__bio" data-i18n={`team.${member.id}.bio`}>
-              {t(locale, `team.${member.id}.bio`)}
-            </p>
+            <div class="team__text">
+              {/* Names are never translated. */}
+              <h3 class="team__name">{member.name}</h3>
+              <p class="team__role" data-i18n={`team.${member.id}.role`}>
+                {t(locale, `team.${member.id}.role`)}
+              </p>
+              <p class="team__bio" data-i18n={`team.${member.id}.bio`}>
+                {t(locale, `team.${member.id}.bio`)}
+              </p>
+            </div>
           </article>
         ))
       }

@@ -1,5 +1,5 @@
 {
-  "$comment": "Order in this file is the display order. `name` is a flat string (never translated); `role` and `bio` are locale-keyed. Bios are PLACEHOLDER text at realistic length so the layout is tested at true content length — replace before launch. Layout holds from 4 to 6 members.",
+  "$comment": "Order in this file is the display order. `name` is a flat string (never translated); `role` and `bio` are locale-keyed — i18n keys (team.<id>.role / .bio) are derived from this file in src/lib/i18n.ts, so a new member needs NO entry in el.json or en.json. Bios are PLACEHOLDER text at realistic length so the layout is tested at true content length — replace before launch, and clear `placeholder` when you do or npm run check keeps counting it. Layout holds from 4 to 6 members; the grid sizes its columns from the count, so adding or removing one re-flows without a CSS change.",
   "members": [
     {
       "id": "chef-john",
@@ -55,6 +55,20 @@
       "bio": {
         "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Θυμάται τι παρήγγειλε ο κάθε πελάτης την προηγούμενη φορά και ποιο κρασί του άρεσε. Φροντίζει ώστε το τραπέζι να έχει τον ρυθμό του, χωρίς βιασύνη και χωρίς κενά. Λέει ότι η δουλειά της αίθουσας φαίνεται μόνο όταν δεν τη χρειάζεσαι.",
         "en": "PLACEHOLDER — He remembers what each guest ordered last time and which wine they liked. He keeps a table moving at its own pace, never rushed and never left waiting. He says front-of-house work only shows when you do not need it."
+      }
+    },
+    {
+      "id": "member-5",
+      "name": "ΟΝΟΜΑ ΜΕΛΟΥΣ",
+      "photo": "placeholder.jpg",
+      "placeholder": true,
+      "role": {
+        "el": "ΠΡΟΣΩΡΙΝΟΣ ΡΟΛΟΣ",
+        "en": "PLACEHOLDER ROLE"
+      },
+      "bio": {
+        "el": "ΠΡΟΣΩΡΙΝΟ ΚΕΙΜΕΝΟ — Το πέμπτο μέλος της ομάδας. Το κείμενο αυτό υπάρχει μόνο για να κρατήσει το ύψος της στήλης στο πραγματικό του μέγεθος μέχρι να έρθει το κανονικό βιογραφικό από τον πελάτη, μαζί με το όνομα, τον ρόλο και τη φωτογραφία.",
+        "en": "PLACEHOLDER — The fifth member of the team. This text exists only to hold the column at its true height until the real bio arrives from the client, along with the name, the role and the photograph."
       }
     }
   ]

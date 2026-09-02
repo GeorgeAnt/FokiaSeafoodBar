@@ -1437,28 +1437,43 @@ input {
 }
 
 /* --------------------------------------------------------------------------
-   Team — a portrait grid. Reads correctly at 4 members and at 6.
+   Team — alternating photo / text rows. Reads correctly at 4 members and at 6.
 
-   It was alternating full-width photo-and-text rows, reversed on every second
-   member. At four people that was four consecutive image-and-text splits and
-   roughly 45% of the homepage's height, with Find Us below making a fifth of
-   the same composition. The grid says the same thing in about a third of the
-   room, and a fifth member fills the second row instead of adding another
-   screen and a half.
+   Restored from the portrait grid at the client's request. The grid existed
+   because these rows are the homepage's most repeated shape — one per member,
+   plus Find Us below in the same composition — and at four people that ran to
+   roughly 45% of the page's height. What sent it back was the fifth member:
+   five equal columns are ~220px each, which sets the bio about four words to
+   the line. Rows give the paragraph a real measure again. If a sixth member
+   arrives, weigh the page length before adding a sixth row.
    -------------------------------------------------------------------------- */
-.team__grid {
+.team__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 2rem + 4vw, 6rem);
+}
+
+.team__member {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(1.75rem, 1.2rem + 2vw, 3rem) clamp(1.25rem, 0.8rem + 1.6vw, 2.5rem);
+  gap: clamp(1.25rem, 0.8rem + 2vw, 3rem);
+  align-items: center;
 }
 @media (min-width: 48rem) {
-  .team__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .team__member {
+    /* The portrait is deliberately the narrower column: at 4:5 a wider one makes
+       each row tall enough to push the next member entirely off screen. */
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
   }
-}
-@media (min-width: 64rem) {
-  .team__grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  /* Reverse every second row. The track sizes have to be swapped along with the
+     items — reordering alone would drop the portrait into the wide track and
+     double that row's height. This is the gotcha that came back with the
+     layout; it is not optional. */
+  .team__member:nth-child(even) {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  }
+  .team__member:nth-child(even) .team__photo {
+    order: 2;
   }
 }
 
@@ -1474,11 +1489,9 @@ input {
   object-fit: cover;
 }
 
-/* One step down from the old full-width row: the name now sits over a ~290px
-   column rather than beside a portrait across half the page. */
+/* Beside a portrait across half the page again, not over a ~290px column. */
 .team__name {
-  font-size: var(--step-1);
-  margin-top: 1rem;
+  font-size: var(--step-2);
 }
 .team__role {
   font-family: var(--font-body);
@@ -1487,12 +1500,10 @@ input {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
-  margin: 0.35rem 0 0.6rem;
+  margin: 0.5rem 0 1rem;
 }
 .team__bio {
   color: var(--text-muted);
-  font-size: var(--step--1);
-  line-height: 1.55;
   max-width: var(--measure);
 }
 

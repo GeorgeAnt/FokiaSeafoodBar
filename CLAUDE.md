@@ -72,14 +72,24 @@ tier — which is the same logic that put Our Goal and Find Us on stone. So Take
 away is now a light band. Work the sequence out in full before changing an
 order; there are only three tiers and both ends are pinned black.
 
-**Each section on the homepage uses a different layout.** Hero is a split, Our
-Goal is two columns of text, Team is a portrait grid, From the kitchen is a
-staggered photo row, Take away is a heading against a number, Find Us is a text
-and image split. That is deliberate and it is recent: Team used to be four
-alternating photo-and-paragraph rows and Find Us is a fifth of the same shape, so
-the page ran the identical composition five times and spent 45% of its height
-doing it. Find Us is now the only image-and-text split left. Before adding a
-section, check what shape its neighbours already are.
+**Each section on the homepage uses a different layout — except Team, which the
+client has taken back to alternating rows.** Hero is a split, Our Goal is two
+columns of text, Team is alternating photo-and-paragraph rows, From the kitchen
+is a staggered photo row, Take away is a heading against a number, Find Us is a
+text and image split.
+
+Team was made a portrait grid precisely to break that repetition: as rows it ran
+the same image-and-text composition once per member, with Find Us below making
+one more, and at four people that was roughly 45% of the homepage's height. It
+went back to rows when the fifth member arrived — five equal grid columns are
+~220px, which sets a bio about four words to the line. The client chose the
+measure over the page length, explicitly "for now".
+
+So the page now runs that composition six times. That is a known, accepted cost,
+not an oversight — but it means **Team and Find Us are no longer distinguishable
+shapes**, and a seventh instance would be the third. Before adding a section,
+check what shape its neighbours already are, and if Team is ever revisited this
+is the first thing to weigh.
 
 **From the kitchen is not in the nav — but the width argument that used to
 forbid it is gone, so do not repeat it.** It said "cannot be", and that was
@@ -241,13 +251,22 @@ Node is installed but **not on the shell PATH**; prepend it first:
   default, which silently breaks `height: 100%` on the `<img>` inside it.
 - `<figure>` has a default `margin: 1em 40px`; the reset zeroes it. Without that,
   gallery images render narrower than their column.
-- Team is a **portrait grid**, not alternating rows, and the section is sized to
-  stay that way: `.team__name` is one step down from a full-width row's heading
-  and the bio renders at `--step--1` because the column is ~285px, not half a
-  page. A fifth and sixth member fill the second row rather than adding another
-  screen and a half. The old layout's gotcha — that reordering an alternating row
-  needs the track sizes swapped as well as `order`, or the portrait lands in the
-  wide column — went with it.
+- Team is **alternating photo-and-text rows**, and the type is sized for that:
+  `.team__name` is `--step-2` and the bio takes `--measure` rather than the
+  `--step-1`/`--step--1` pair the ~285px grid column needed. If it ever goes
+  back to a grid, both move again — they are a property of the column width, not
+  of the section.
+
+  **The reversal brought its gotcha back with it: reversing a row needs the
+  track sizes swapped as well as `order`.** `.team__member:nth-child(even)`
+  flips `grid-template-columns` from `4fr 8fr` to `8fr 4fr` *and* sets
+  `order: 2` on the photo. Setting `order` alone drops the portrait into the
+  wide track, which at 4:5 doubles that row's height and pushes the next member
+  off screen. Verified after the restore: the photo measures 402px and the text
+  804px on every row, odd and even alike.
+
+  The member count is otherwise free — rows stack, so five or six need no CSS
+  change. The cost is page height; see the layout note above.
 - `.section-head p:not(.eyebrow)` — the `:not()` is load-bearing. `.section-head p`
   is (0,1,1) and `.eyebrow` is (0,1,0), so without it the paragraph rule wins and
   an eyebrow inside a section head silently renders at heading size in the muted
