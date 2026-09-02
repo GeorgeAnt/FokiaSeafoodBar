@@ -489,14 +489,18 @@ while back and nothing had rendered the field since.
   at realistic length, so the layout is already tested).
 - **Social links** — hidden while empty.
 - **A cropped or vector logo.** `logo-clean.png` has a transparent surround, so
-  it now carries the hero and the footer, and the typeset wordmark it replaced is
-  gone. Two things would still improve it: the concrete texture is baked *inside*
-  the badge, so on the black hero it reads as a pale disc rather than a mark on
-  the ground; and the file is 1672×940 with the badge centred in a wide empty
-  field, about 44% of the width, which the layout has to size around. A tight
-  crop or a vector would fix both. It is now the only logo file: the opaque
-  512px square was deleted with the nav logo it existed for, and the favicons
-  are generated from this one.
+  it carries the hero, the nav and the footer, and the typeset wordmark it
+  replaced is gone. It is the only logo file, and the favicons are generated
+  from it. Two things would still improve it: the concrete texture is baked
+  *inside* the badge, so on the black hero it reads as a pale disc rather than a
+  mark on the ground; and the file is 1672×940 around an 888×899 badge — 47% of
+  the width is empty field, which every layout using it has to size around.
+
+  Not urgent any more. The nav crops the field away with `object-fit: cover` on
+  a square box rather than shipping a trimmed copy, so the empty field costs
+  layout nothing there. A tight crop or a vector would still be better, and
+  would remove the one fragile assumption that trick rests on — that the badge
+  stays horizontally centred in its canvas.
 
 **One decision to confirm:** the client palette has no light background tone, so
 this site proposes one, `--salt: #E2E8EB` — a cool off-white drawn from the

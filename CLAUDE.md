@@ -331,7 +331,23 @@ Node is installed but **not on the shell PATH**; prepend it first:
   The menu renderers were all three written the unsafe way.
 - `border-radius` in the `:focus-visible` rule applies to the *element*, not to
   the ring; browsers already follow the element's own corners. It was rounding
-  whatever had focus, most visibly the square gallery tiles.
+  whatever had focus, most visibly the square gallery tiles. The pill buttons
+  are the same mechanism seen from the other side — their focus ring is a
+  rounded capsule without the rule knowing anything about it.
+
+- **`.btn` is fully round (999px); `--radius` (2px) is still everything else.**
+  The site's default is near-square and that is still right for rectangular
+  surfaces — inputs, the language switch, image frames. The pill is scoped to
+  `.btn`, which exists in exactly three places and all three are on the
+  homepage: the hero CTA, the From the kitchen CTA, the Find Us map button.
+  Nothing on /menu or /gallery uses `.btn`, so the change could not leak.
+
+  Written as a literal `999px` to match every other pill already in the file
+  (the menu tab group, the jump chips, the tags) rather than adding a second
+  radius token for one rule — the menu page was already round, so this brought
+  the two into line rather than apart. Horizontal padding went 1.6rem → 2rem
+  with it: at that radius the curve eats the corners of the text box, and
+  uppercase at 0.08em tracking has no side bearings left to give.
 - The `button` reset does not clear the UA's `padding: 1px 6px`. A carousel dash
   set to `width: 100%` inside a 2rem button is therefore 20px, not 32px — worth
   knowing before "fixing" a measurement that looks 12px short.
