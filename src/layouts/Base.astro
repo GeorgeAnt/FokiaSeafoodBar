@@ -181,12 +181,20 @@ const dictJson = JSON.stringify(dictionaries);
     <meta name="twitter:card" content="summary_large_image" />
 
     {/*
-      Matches `body`'s background (--salt), not the hero. theme-color paints the
-      browser's own chrome and the overscroll gutter, which sit against the page
-      background — pointing it at the black hero band left a dark bar above a
-      light page on every route except the top of the homepage.
+      Matches the nav (--black), which is what the browser's chrome actually
+      butts against now that the bar is a dark sticky surface on every route.
+
+      This was --salt, and the reasoning was sound at the time: theme-color also
+      paints the overscroll gutter, and while the bar was translucent salt a
+      black value put a dark strip above a light page everywhere except the top
+      of the homepage. The bar going black inverts that exactly — salt is now
+      the value that strands a light strip above a black bar, on every route and
+      at every scroll position. Both ends of the document are black (the bar
+      above, the footer below), so the gutter agrees at both ends too.
+
+      If the bar ever goes light again, this goes back to #e2e8eb with it.
     */}
-    <meta name="theme-color" content="#e2e8eb" />
+    <meta name="theme-color" content="#181414" />
 
     {schemas.map((schema) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />

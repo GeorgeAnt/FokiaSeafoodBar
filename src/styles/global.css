@@ -188,8 +188,15 @@
 
 html {
   scroll-behavior: smooth;
-  /* Sticky nav must not cover the heading of an anchored section. */
-  scroll-padding-top: 6.25rem;
+  /* Sticky nav must not cover the heading of an anchored section. This is the
+     ONLY offset for it — see the note above .wrap; adding scroll-margin-top to
+     a target stacks with this rather than replacing it.
+
+     Bar is 6rem + 1px of border = 97px, and this leaves the same ~19px of air
+     under it that the old 81px bar had at 6.25rem. Both numbers move together:
+     changing .nav__inner min-height without changing this drops every anchored
+     heading behind the bar. */
+  scroll-padding-top: 7.25rem;
   -webkit-text-size-adjust: 100%;
   /* The site is one fixed light theme — the dark bands are surface tiers, not a
      dark mode. Stated so the UA paints scrollbars, the overscroll gutter and
@@ -545,33 +552,103 @@ input {
 /* --------------------------------------------------------------------------
    Navigation
    -------------------------------------------------------------------------- */
+/*
+  The bar is a dark surface sitting inside the light tier, so it has to carry
+  the dark tier's tokens itself — exactly as .section-dark and .lightbox do.
+  Without them the links inherit --stone on Deep Black and the hover state
+  inherits --wood at 2.3:1, which is the same trap the lightbox's focus ring
+  fell into. It is the tokens that make this safe, not the background alone.
+
+  Opaque, not the old translucent salt: the bar crosses three black bands (Hero,
+  From the kitchen, the footer) and a blur over black is just black, so the
+  translucency bought nothing and cost a compositing layer.
+
+  The bottom rule is load-bearing rather than decorative. --rule resolves here
+  to Light Stone at 30%, which is the only thing separating the bar from the
+  hero directly beneath it — both are --black, and without the edge they read as
+  one field. See the note in CLAUDE.md: this is the same collision that put Our
+  Goal on the mid tier, and the bar cannot solve it by moving.
+*/
 .nav {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--salt) 88%, transparent);
-  backdrop-filter: blur(12px);
+  background: var(--black);
+  color: var(--salt);
+  --text: var(--salt);
+  --text-muted: var(--light-stone);
+  --accent: var(--wood-light);
+  --ghost-hover-bg: var(--salt);
+  --ghost-hover-fg: var(--black);
+  --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
   border-bottom: 1px solid var(--rule);
 }
 
 /*
-  Links at one end, utilities at the other. Nothing is out of flow: the bar used
+  Logo, links, utilities — three items in flow, nothing positioned. The bar used
   to centre a logo absolutely, which is why the links were split into two
-  balanced groups. With the logo gone there is no gap to protect, so they are a
-  single list and the row is just two items pushed apart.
+  balanced groups; in flow the logo only costs the row its own width, so the
+  links stay one list.
+
+  `justify-content` is gone: with three children it would push the links into
+  the middle of the bar and leave a gap on both sides. `margin-inline-start:
+  auto` on .nav__utils does the same job for the one item that needs it, and
+  keeps the logo and the links together at the start.
+
+  6rem = 96px, +1px of border. Raising this means raising scroll-padding-top on
+  <html> in the same edit or every anchor jump lands under the bar.
 */
 .nav__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1.5rem;
-  min-height: 5rem;
+  min-height: 6rem;
 }
 
 .nav__utils {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  /* Replaces the row's old space-between; see .nav__inner. */
+  margin-inline-start: auto;
+}
+
+/*
+  The logo is cropped by the box, not by a second asset.
+
+  logo-clean.png is 1672x940 with the badge — 888x899, near enough square —
+  centred inside it: 393px of transparent field to the left, 391px to the right.
+  Sized by height, as CLAUDE.md requires, the file would therefore spend 93px of
+  bar width to show a 52px mark, and there is not 93px to spend at 1025px.
+
+  A square box with object-fit: cover shows the central 940px of the source,
+  which contains the whole 888px badge with 26px to spare each side. So the
+  field is cropped away for free, the mark is as big as the box, and the nav
+  reuses the asset the hero has already loaded rather than shipping a trimmed
+  copy that would have to be regenerated whenever the logo changes.
+
+  This depends on the badge staying horizontally centred in its canvas. If a new
+  logo file arrives off-centre, re-measure before trusting the crop — the
+  failure is silent and looks like a badly cropped logo.
+*/
+.nav__logo {
+  display: block;
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  /* Outdented past the wrap's gutter on purpose. The mark is a disc, and a
+     circle set flush to the same edge as the flat-sided text below it reads as
+     inset — this pulls it back to where the eye expects the column to start.
+     It is optical, not structural: nothing else in the bar moves, and the
+     collapse block below returns it to 0 because on a phone the gutter is
+     20px and there is no room to spend. */
+  margin-inline-start: -0.75rem;
+}
+.nav__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .nav__links {
@@ -652,9 +729,19 @@ input {
     background-color 0.18s var(--ease),
     color 0.18s var(--ease);
 }
+/*
+  The one place a --wood tint is used as a surface rather than as text, and the
+  bar going black moved which tint is correct. Wood filled the pill at 6.6:1
+  against the old salt bar; against Deep Black it is 2.2:1 and the selected
+  language stops reading as selected at all. The dark tier's own tint is 6.4:1
+  there and takes a dark label instead of a pale one.
+
+  aria-pressed already carries the state for assistive tech — this is the visual
+  half of it, and it is the only thing a sighted visitor has.
+*/
 .lang button[aria-pressed='true'] {
-  background: var(--wood);
-  color: var(--paper);
+  background: var(--wood-light);
+  color: var(--black);
 }
 
 .nav__toggle {
@@ -667,12 +754,20 @@ input {
 }
 
 /*
-  Below this width the split layout runs out of room and the two link groups
-  slide under the centred logo. Measured: the groups stay clear down to 990px
-  and collide at 961px, so 64rem (1024px) leaves a margin without giving up the
-  full nav on landscape tablets.
+  The bar collapses to the toggle here.
+
+  This was 64rem while the row was links + utilities only, where the measured
+  clearance at 1025px was 70px in Greek. The logo spends 48px of that plus the
+  row's 24px gap — 72px against 70px — so the full bar no longer fits at the old
+  breakpoint and has to hand over to the toggle sooner. 75rem (1200px) is the
+  first round figure that clears it with room to spare rather than by a pixel;
+  re-measure at 1201px, not at 1025px, if a label or the logo size changes.
+
+  Measure document.documentElement.scrollWidth, not the gap between the two
+  groups: .nav__utils does not shrink, so an overrun shows up as the whole bar
+  running past the viewport while the gap reading stays positive.
 */
-@media (max-width: 64rem) {
+@media (max-width: 75rem) {
   .nav__toggle {
     display: block;
   }
@@ -689,11 +784,20 @@ input {
     overflow-y: auto;
   }
 
-  /* The utilities stay visible in the collapsed bar and push the toggle to the
-     far edge; the links drop below as a full-width panel. */
+  /* Logo at the start, utilities and toggle at the end, links below as a
+     full-width panel. The logo keeps the default order: 0 and the auto margin
+     on .nav__utils (set in the base rule) does the pushing, so the collapsed
+     bar only has to clear the old margin-inline-end that used to do it. */
+  .nav__logo {
+    order: 0;
+    /* Flush and smaller on the collapsed bar — see the base rule. */
+    width: 3rem;
+    height: 3rem;
+    margin-inline-start: 0;
+  }
   .nav__utils {
     order: 1;
-    margin-inline-end: auto;
+    margin-inline-end: 0;
   }
   .nav__toggle {
     order: 2;
@@ -721,6 +825,42 @@ input {
     padding-block: 0.9rem;
     font-size: var(--step-0);
     border-bottom: 1px solid var(--rule);
+  }
+  /* The rules separate one link from the next, so the last one has nothing to
+     separate from — it drew a line across the foot of the panel with only the
+     hero beneath it. */
+  .nav__links li:last-child a {
+    border-bottom: 0;
+  }
+}
+
+/*
+  Narrow phones — 320px and the like.
+
+  The collapsed bar is logo + utilities + toggle, and at 320px it needs 297px
+  against the 280px the wrap leaves it, so the toggle wrapped onto a second row.
+  It did not make the bar any taller, which is why it was easy to miss: two
+  stacked rows of ~44px still fit inside the 6rem min-height, so the only
+  symptom was the toggle sitting under the logo instead of beside it.
+
+  The 17px comes out of spacing, not out of targets. Every touch target in here
+  is 44px and stays 44px: the social icons keep their 2.75rem box and the
+  language buttons keep their min-height. What shrinks is the gaps between them
+  and the language pill's horizontal padding, which was never what bought the
+  44px — see the note on .lang button. The logo is untouched at 3rem, since it
+  is the one thing in the bar that is there to be looked at.
+
+  Budget at 320px after this: 48 + 44 + 40 + gaps = 264px against 280px.
+*/
+@media (max-width: 22.5rem) {
+  .nav__inner {
+    column-gap: 0.5rem;
+  }
+  .nav__utils {
+    gap: 0.5rem;
+  }
+  .lang button {
+    padding-inline: 0.4rem;
   }
 }
 

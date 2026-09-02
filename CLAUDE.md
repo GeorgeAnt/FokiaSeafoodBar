@@ -54,6 +54,15 @@ away salt, Find Us stone, footer black. Our Goal is on the mid tier *because*
 the hero above it is black — as a dark section it ran straight into the hero with
 no boundary.
 
+**The nav is the one thing exempt from that, and it pays for the exemption with
+an edge.** It is black, and being sticky it cannot re-tier itself the way Our
+Goal did — it passes over all three black bands (Hero, From the kitchen, the
+footer) and would merge with each in turn. What keeps it a bar is
+`border-bottom: 1px solid var(--rule)`, which on the bar's own dark tokens is
+Light Stone at 30%: the only thing between the bar and the hero directly beneath
+it, both `--black`. Removing that hairline does not look like removing a border,
+it looks like the nav disappearing into the hero. Do not "tidy" it.
+
 The tiers are a consequence of the order, not a property of each section, and
 moving one re-tiers its neighbours. When From the kitchen moved below Team it
 landed directly above Take away and both were black. Of the two, **the
@@ -72,15 +81,23 @@ the page ran the identical composition five times and spent 45% of its height
 doing it. Find Us is now the only image-and-text split left. Before adding a
 section, check what shape its neighbours already are.
 
-**From the kitchen is not in the nav, and cannot be.** Measured clearance at
-1025px in Greek is 70px, and a seventh Greek label costs ~133px with its gap —
-tested by cloning one in, which pushes the bar to a 1080px scroll width on a
-1025px viewport. Note what that test does *not* show: `.nav__utils` does not
-shrink and the clearance reading stays positive at 24px, because the whole bar
-overruns the viewport rather than the two groups colliding. Measure
-`document.documentElement.scrollWidth`, not the gap. The band is reached by
-scrolling and its own button goes to `/gallery`. If a nav entry for it is ever
-wanted, something else has to come out of the bar first.
+**From the kitchen is not in the nav — but the width argument that used to
+forbid it is gone, so do not repeat it.** It said "cannot be", and that was
+true while the bar collapsed at 64rem: a seventh Greek label cost ~133px against
+70px of clearance at 1025px and pushed the bar to a 1080px scroll width.
+
+Moving the collapse to 75rem for the logo changed the answer. Re-tested at
+1201px by cloning a label in: it costs 117px, clearance goes 150px → 24px, and
+`scrollWidth` stays at 1201. **It fits.** So the band is out of the nav as a
+content decision — it is reached by scrolling and its own button goes to
+`/gallery` — not because the bar has no room.
+
+24px is not room to spend casually, though, and 117px is a guess at copy that
+does not exist yet. Measure with the real label before adding one. And measure
+`document.documentElement.scrollWidth`, not the gap: `.nav__utils` does not
+shrink, so an overrun shows up as the whole bar running past the viewport while
+the clearance reading stays positive — which is exactly how the old test read at
+1025px.
 
 **Controls that only work with JS live in a `<template>`.** The hero carousel
 controls are cloned from `#hero-controls-template` at runtime, and the gallery
@@ -222,23 +239,45 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - Colours on a section come from tokens the surface tier sets (`--accent`,
   `--text-muted`, `--ghost-hover-*`). Don't reference `--wood` directly for
   text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
-- The nav has no logo and nothing out of flow: one list of links at one end,
-  the social icons and the language switch at the other. The old bar centred a
-  logo absolutely, which is why the links used to be split into two balanced
-  groups — that constraint is gone, so links can be added to the single list.
-  The bar still collapses at 64rem. Measured clearance at 1025px is **70px** in
-  Greek — "Κλείστε τη θέση σας • Take away" is the longest label and Greek is
-  the longer set overall, so it is Greek that decides the fit, not English. That
-  figure has moved twice: 62px until the social icons went from 2.15rem to
-  2.75rem for the touch target, which spent 19px and left 43px; then the body
-  face changed from Inter to Open Sans, which is the narrower of the two and
-  gave 27px back. Inter set those six Greek labels 29px wider in total at the
-  nav's own size and weight, measured on a canvas against both faces. The slack
-  is real but small, and it is a property of the *face*, not of the labels:
-  lengthening any label, widening anything in `.nav__utils`, or changing
-  `--font-body` again means re-measuring at 1025px before trusting it. The
-  language pill was given `min-height` only, not padding, for exactly this
-  reason — it buys the 44px without costing the row any width.
+- The nav is logo, links, utilities — three items in flow, nothing positioned.
+  The bar once centred a logo *absolutely*, which is why the links were split
+  into two balanced groups; the logo is back but it is in flow at the start, so
+  it only costs the row its own width and the links stay a single list.
+  `.nav__inner` has no `justify-content` — with three children that would push
+  the links into the middle — and `margin-inline-start: auto` on `.nav__utils`
+  does the pushing instead.
+
+  **The bar collapses at 75rem, not 64rem, and the logo is why.** Clearance at
+  1025px was 70px in Greek; the logo spends 48px of that plus the row's 24px gap
+  — 72px against 70px — so the full bar stopped fitting at the old breakpoint
+  and hands over to the toggle sooner. Measured at 1201px, the first width above
+  the new breakpoint, clearance is **146px** and `scrollWidth` equals the
+  viewport. Re-measure at 1201px, not at 1025px.
+
+  History worth keeping, because the figure has moved three times and each move
+  was a different cause: 62px, until the social icons went 2.15rem → 2.75rem for
+  the touch target and spent 19px; 43px, until `--font-body` went Inter →
+  Open Sans, the narrower face, which gave 27px back (Inter set those six Greek
+  labels 29px wider in total, measured on a canvas at the nav's own size); 70px,
+  until the logo took 72px and moved the breakpoint instead. "Κλείστε τη θέση
+  σας • Take away" is still the longest label and Greek is still the longer set,
+  so Greek decides the fit, not English. The language pill was given
+  `min-height` only, not padding, for exactly this reason — it buys the 44px
+  without costing the row any width.
+
+- **The nav is a dark surface inside the light tier, so it carries the dark
+  tier's tokens itself.** `.nav` sets `--text`, `--text-muted`, `--accent`,
+  `--ghost-hover-*` and `--rule` the same way `.section-dark` and `.lightbox` do.
+  Painting the background black without them leaves the links at `--stone` and
+  the hover at `--wood` (2.3:1 on Deep Black) — the background is the easy half.
+  Measured on the rendered bar: links, social icons and the inactive language
+  button are all 6.55:1, the active pill's fill is 6.42:1 against the bar.
+
+  That pill is the one place a Wood tint is used as a *surface* rather than as
+  text, and the bar going black moved which tint is correct: `--wood` filled it
+  at 6.6:1 against the old salt bar and at **2.2:1** against Deep Black, where
+  the selected language stopped reading as selected. It is `--wood-light` with a
+  `--black` label now. If the bar ever goes light again, that goes back too.
 - Anything drawn over a photo needs its own backing, not a tint on the image.
   The hero photos are mid-grey exactly where the controls sit, so the carousel
   dashes measure 1.7-2.3:1 against them — under the 3:1 WCAG minimum for a
@@ -266,16 +305,41 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - The `button` reset does not clear the UA's `padding: 1px 6px`. A carousel dash
   set to `width: 100%` inside a 2rem button is therefore 20px, not 32px — worth
   knowing before "fixing" a measurement that looks 12px short.
+- **The collapsed bar has its own width budget, and it is measured at 320px.**
+  It holds logo + utilities + toggle, which wants 297px against the 280px the
+  wrap leaves at 320px, so the toggle wrapped onto a second row. The bar did
+  *not* get taller when it did — two stacked ~44px rows still fit inside the
+  6rem min-height — so the only symptom was the toggle sitting under the logo,
+  which is easy to miss and was shipped once. Measure the toggle's `top` against
+  the logo's `bottom`; neither the bar's height nor `scrollWidth` will tell you.
+
+  The `max-width: 22.5rem` block buys the 17px back out of spacing only: the
+  row's column gap, `.nav__utils`'s gap, and the language pill's horizontal
+  padding. Budget after it is 264px against 280px. No target shrinks — the
+  social icons keep their 2.75rem box and the language buttons keep their
+  `min-height`, so both stay 44px tall (the pill narrows from 35px to 28px wide,
+  still over the 24px floor and still a contiguous row). The logo stays 3rem
+  because it is the one thing in that bar meant to be looked at.
+
+  **It still wraps below ~305px** (a 280px Galaxy Fold cover screen, say). The
+  remaining 24px can only come out of the two 44px social targets, which is a
+  deliberate decision documented below — so that is a trade to make on purpose,
+  not a bug to quietly fix.
 - Touch targets are 44px, and the hero dots are the one deliberate exception:
   the box is 2rem wide because `::after` is `width: 100%`, so widening the target
   widens the dash and spreads the strip, which is the whole of that control's
   design. They are 2rem × 2.75rem — over the 24px WCAG 2.5.8 floor, and adjacent,
   so the row is one continuous target. When the hit box grew, `.hero__dots`
   `bottom` dropped from 1.25rem to 0.875rem to leave the dashes on the same line.
-- `theme-color` is the page background (`--salt`), not the hero. It paints the
-  browser's own chrome and the overscroll gutter, which sit against `body` — the
-  black it used to carry put a dark bar above a light page everywhere except the
-  very top of the homepage.
+- `theme-color` is the **nav** (`--black`), and this one has now been correct in
+  both directions. It paints the browser's own chrome and the overscroll gutter.
+  While the bar was translucent salt, a black value stranded a dark strip above
+  a light page on every route except the top of the homepage — so it was salt.
+  The bar going black inverts that exactly: salt now strands a *light* strip
+  above a black bar, everywhere, at every scroll position. Both ends of the
+  document are black (bar above, footer below), so the gutter agrees at both.
+  The rule is "match what the chrome actually butts against", not "match
+  `body`" — and what it butts against is the sticky bar.
 - Selectors drift away from the markup silently. `.menu__legal h3` matched
   nothing for as long as the block has rendered an `<h2>`, which left the one
   legally required heading on the site at default Garamond `h2` size instead of
@@ -299,13 +363,19 @@ Node is installed but **not on the shell PATH**; prepend it first:
   confirmed does not make the JSON agree.
 - `scroll-padding-top` on the container and `scroll-margin-top` on the target
   **both** apply and they stack. The site carried both for the sticky nav, so an
-  anchor jump landed a section 180px down a viewport whose nav is 81px tall (100
-  + 80), and a menu jump chip landed a category at 208px (100 + 108) — a fat
-  empty band under the bar on every jump, which nobody had measured. Only
-  `scroll-padding-top: 6.25rem` on `<html>` survives; it covers anchors, focus
-  scrolling and snapping in one place, and everything now lands at 100px. If a
-  jump target ever looks wrongly offset, check whether something has
-  reintroduced a `scroll-margin-top` on top of it.
+  anchor jump landed a section 180px down a viewport whose nav was 81px tall
+  (100 + 80), and a menu jump chip landed a category at 208px (100 + 108) — a
+  fat empty band under the bar on every jump, which nobody had measured. Only
+  `scroll-padding-top` on `<html>` survives; it covers anchors, focus scrolling
+  and snapping in one place. If a jump target ever looks wrongly offset, check
+  whether something has reintroduced a `scroll-margin-top` on top of it.
+
+  **It is paired with the bar's height and the two move together.** The bar is
+  `min-height: 6rem` + 1px of border = 97px, and `scroll-padding-top: 7.25rem`
+  (116px) leaves 19px of air under it — the same air the old 81px bar had at
+  6.25rem. Verified by jumping to `/#team`: the bar's bottom is at 97px and the
+  section lands at 116px. Change one without the other and every anchored
+  heading goes behind the bar, or sits in a band of nothing.
 - Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
   nav links need `display: block` or the tap targets collapse to ~26px.
 - `.section--tight` exists for a band whose content is a heading and a line or
@@ -320,12 +390,26 @@ Node is installed but **not on the shell PATH**; prepend it first:
   plates interleaved — so position is not a stable way to ask for "the food", and
   reordering that file would otherwise silently change the homepage. It throws at
   build time if an id is missing rather than rendering a gap.
-- `logo-clean.png` is the only logo file. It carries the hero and the footer, and
-  the favicons are generated from it. The badge sits centred in a wide
-  transparent field, so anything using it sizes by **height**, and
-  `prepare-favicons.mjs` trims to the badge and normalises to 512×512 before
-  cropping — every box in that script is measured against the normalised square,
-  not the file's own pixels.
+- `logo-clean.png` is the only logo file. It carries the hero, the nav and the
+  footer, and the favicons are generated from it. The measured geometry: the
+  canvas is **1672×940**, the badge inside it is **888×899** — near enough square
+  — with 393px of transparent field to its left and 391px to its right. So it is
+  horizontally centred, and 47% of the file's width is empty.
+
+  That is why anything sizing it by **height** pays for the field: at 56px tall
+  the file wants 93px of width to show a 56px mark. `prepare-favicons.mjs` deals
+  with it by trimming to the badge and normalising to 512×512 before cropping —
+  every box in that script is measured against the normalised square, not the
+  file's own pixels.
+
+  **The nav deals with it without a second asset.** `.nav__logo` is a square box
+  with `object-fit: cover`, which shows the central 940px of the source — the
+  whole 888px badge with 26px to spare each side. The field is cropped away for
+  free, the mark fills the box, and the bar reuses the asset the hero has already
+  loaded instead of a trimmed copy that would need regenerating whenever the logo
+  changes. This works *because* the badge is horizontally centred; a replacement
+  logo that is off-centre will crop wrong, silently, and look like sloppy
+  cropping rather than like a geometry change. Re-measure before trusting it.
 - When screenshotting to verify, disable Chrome's HTTP cache, force
   `scroll-behavior: auto` before scrolling to trigger lazy images, and clear
   `localStorage['fokia:lang']` before testing the default locale. A clip whose

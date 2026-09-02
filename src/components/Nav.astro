@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import SocialLinks from './SocialLinks.astro';
+import { logoClean } from '../lib/photos';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 
 interface Props {
@@ -8,13 +10,17 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 /*
-  One list, in reading order, with the utilities after it.
+  Logo, then one list in reading order, with the utilities after it.
 
-  There is no centred logo any more, so the links no longer have to be split
-  into two balanced groups to leave a gap in the middle of the bar — they are a
-  single run, and the social icons and the language switch sit at the end
-  because that is where you go looking for them rather than because something
-  needed counterweighting.
+  The logo is at the start of the row, not centred. The bar used to centre one
+  absolutely, which is what forced the links into two balanced groups; in flow
+  at the left it costs the row its own width and nothing else, so the links stay
+  a single run and the social icons and the language switch sit at the end
+  because that is where you go looking for them.
+
+  It renders logo-clean.png, the same file the hero and the footer use, cropped
+  by `object-fit` rather than by a second asset — see the note on `.nav__logo`
+  in global.css for why that is safe and what it saves.
 
   Section links are rooted ("/#team", not "#team") because the nav also renders
   on /menu and /gallery, where those sections do not exist. From the homepage a
@@ -41,6 +47,16 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
     aria-label={t(locale, 'a11y.mainNav')}
     data-i18n-label="a11y.mainNav"
   >
+    <a class="nav__logo" href="/" aria-label={t(locale, 'a11y.home')} data-i18n-label="a11y.home">
+      {/*
+        alt="" on purpose. The link carries the accessible name, so a non-empty
+        alt here would announce the mark twice — and on the homepage the <h1> is
+        this same logo, whose alt is what gives the page its heading. Two
+        identical accessible names in one document is what that would produce.
+      */}
+      <Image src={logoClean} alt="" widths={[112, 224]} sizes="56px" loading="eager" />
+    </a>
+
     <ul class="nav__links" id="nav-links">
       {
         links.map((link) => (
