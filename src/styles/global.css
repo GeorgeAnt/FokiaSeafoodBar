@@ -9,105 +9,97 @@
    Static builds, not variable. Google's variable fonts ship unhinted —
    ttfautohint does not support them — and Windows leans on hinting at text
    sizes, which is what made the type look blocky there. The static builds are
-   hinted. The cost is losing arbitrary weight interpolation, which this site
-   never used: it renders exactly four combinations, and only those are shipped.
+   hinted.
 
-     Open Sans   400, 500, 600 + 400 italic
-     Noto Serif  600
+   One family for the whole site, which is the client's decision: the hierarchy
+   is carried by weight, not by a serif/sans pairing, so there is no display
+   face to pair against.
 
-   `font-synthesis-weight: none` is set on body, so a weight that is not in this
-   list will NOT be faked — it will fall back to the nearest real one. Adding a
-   weight to the CSS means adding its files here too.
+     Manrope  400 body · 500 secondary · 600 labels and buttons · 700 headings
+
+   `font-synthesis: none` is set on body, so a weight or a slant that is not in
+   this list will NOT be faked — it falls back to the nearest real one. Adding a
+   weight in the CSS means adding its files here too.
+
+   **Manrope ships no italic, in any weight.** That is why synthesis is off for
+   style as well as weight: left on, the browser shears an upright into a fake
+   oblique, and mechanically slanted Greek is conspicuously wrong — Greek
+   italics are a different construction, not the upright at an angle. The one
+   place the site used a real italic (the wine producer line on /menu) carries
+   its distinction with weight instead. Do not add `font-style: italic`
+   anywhere; it will silently render as upright.
 
    Dish names mix scripts inside a single line ("Tuna tataki με jalapeño sauce"),
    so both subsets must be present in the same family or the line renders in two
-   different typefaces. Both families draw their Greek alongside their Latin —
-   script coverage is the whole reason Noto Serif exists — so a mixed line keeps
-   one texture across the switch.
+   different typefaces. Manrope covers Greek, which is not a given for a
+   geometric sans and is the reason this swap was possible at all.
    -------------------------------------------------------------------------- */
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('/fonts/open-sans-latin-400-normal.woff2') format('woff2');
+  src: url('/fonts/manrope-latin-400-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('/fonts/open-sans-greek-400-normal.woff2') format('woff2');
+  src: url('/fonts/manrope-greek-400-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
-  src: url('/fonts/open-sans-latin-500-normal.woff2') format('woff2');
+  src: url('/fonts/manrope-latin-500-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
-  src: url('/fonts/open-sans-greek-500-normal.woff2') format('woff2');
+  src: url('/fonts/manrope-greek-500-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('/fonts/open-sans-latin-600-normal.woff2') format('woff2');
+  src: url('/fonts/manrope-latin-600-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Open Sans';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('/fonts/open-sans-greek-600-normal.woff2') format('woff2');
+  src: url('/fonts/manrope-greek-600-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 @font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
+  font-family: 'Manrope';
+  font-style: normal;
   font-display: swap;
-  font-weight: 400;
-  src: url('/fonts/open-sans-latin-400-italic.woff2') format('woff2');
+  font-weight: 700;
+  src: url('/fonts/manrope-latin-700-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-display: swap;
-  font-weight: 400;
-  src: url('/fonts/open-sans-greek-400-italic.woff2') format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-@font-face {
-  font-family: 'Noto Serif';
+  font-family: 'Manrope';
   font-style: normal;
   font-display: swap;
-  font-weight: 600;
-  src: url('/fonts/noto-serif-latin-600-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Noto Serif';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 600;
-  src: url('/fonts/noto-serif-greek-600-normal.woff2') format('woff2');
+  font-weight: 700;
+  src: url('/fonts/manrope-greek-700-normal.woff2') format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 
@@ -158,8 +150,12 @@
      tint, because Wood at this opacity would disappear on both. */
   --rule: color-mix(in srgb, var(--wood) 24%, transparent);
 
-  --font-body: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  /* Both are Manrope. They stay two tokens rather than collapsing into one:
+     every rule in this file already says which role it wants, so a future
+     display face can be reintroduced by editing one line instead of hunting
+     down which of ~20 font-family declarations meant "heading". */
+  --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Fluid type scale, 360px → 1440px viewport. */
   --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.92rem);
@@ -216,7 +212,9 @@ body {
   font-family: var(--font-body);
   font-size: var(--step-0);
   line-height: 1.6;
-  font-synthesis-weight: none;
+  /* Style as well as weight: Manrope has no italic, and a sheared upright is
+     worse than no italic at all — see the note in the @font-face block. */
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -240,8 +238,16 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 600;
+  /* 700, a step above the 600 that labels and buttons use, because with one
+     family across the whole site the weight is the only thing separating a
+     heading from the text under it. The old serif could sit at 600 and still
+     read as a different voice. */
+  font-weight: 700;
   line-height: 1.12;
+  /* Geometric sans set large needs the tracking pulled in; at --step-4 (up to
+     70px) the default spacing reads loose and the word stops holding together.
+     Deliberately not applied to body copy, which needs the room. */
+  letter-spacing: -0.02em;
   margin: 0;
   text-wrap: balance;
 }
@@ -1291,8 +1297,15 @@ input {
   margin-top: 0.2rem;
 }
 
+/*
+  Was italic. Manrope has no italic and synthesis is off, so `font-style:
+  italic` here would have rendered as plain upright — identical to
+  .menu__item-desc, which is the one thing this line has to be distinguishable
+  from. The register is carried by weight now: 500 against the 400 around it,
+  still muted, still --step--1.
+*/
 .menu__item-wine {
-  font-style: italic;
+  font-weight: 500;
 }
 
 .menu__item-meta {

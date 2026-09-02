@@ -208,9 +208,35 @@ Node is installed but **not on the shell PATH**; prepend it first:
 
 - Fonts are **static** builds, one file per weight per script, not variable.
   Google's variable fonts are unhinted and looked blocky on Windows. The site
-  renders exactly Open Sans 400/500/600 + 400 italic and Noto Serif 600, and
-  only those ship. `font-synthesis-weight: none` means an unshipped weight is not
-  faked — it falls back — so adding a weight in CSS means adding its files too.
+  renders exactly Manrope 400/500/600/700 and only those ship.
+  `font-synthesis: none` means an unshipped weight is not faked — it falls back
+  — so adding a weight in CSS means adding its files too.
+
+- **One family, and the client asked for it that way.** Manrope carries
+  everything; `--font-body` and `--font-display` both resolve to it. They stay
+  two tokens so a display face can be reintroduced by editing one line rather
+  than by working out which of ~20 `font-family` declarations meant "heading".
+  Headings are 700 against the 600 that labels and buttons use — with a single
+  family the weight is the only thing separating a heading from the text under
+  it, where the old serif could sit at 600 and still read as another voice.
+  Headings also carry `letter-spacing: -0.02em`: a geometric sans at `--step-4`
+  (up to 70px) reads loose at default tracking. Body copy deliberately does not.
+
+- **Manrope ships no italic, in any weight, so `font-synthesis` is off for style
+  too.** Left on, the browser shears an upright into a fake oblique, and
+  mechanically slanted Greek is conspicuously wrong — Greek italics are a
+  different construction, not the upright at an angle. Consequence:
+  `font-style: italic` anywhere in this codebase now renders as plain upright,
+  silently. The one place that used a real italic — `.menu__item-wine`, the
+  producer line on /menu — carries its distinction with weight 500 instead,
+  which matters because upright it would be identical to `.menu__item-desc`,
+  the one thing it has to be told apart from.
+
+- **Manrope covers Greek, which is why this swap was possible at all.** Not a
+  given for a geometric sans — check `unicode.json` in the `@fontsource` package
+  before agreeing to any future face. A Latin-only family would leave the whole
+  Greek site on a fallback and split mixed-script dish names across two
+  typefaces mid-line.
 - `<picture>` must stay `display: contents` (set in `global.css`). It is inline by
   default, which silently breaks `height: 100%` on the `<img>` inside it.
 - `<figure>` has a default `margin: 1em 40px`; the reset zeroes it. Without that,
@@ -251,7 +277,7 @@ Node is installed but **not on the shell PATH**; prepend it first:
   1025px was 70px in Greek; the logo spends 48px of that plus the row's 24px gap
   — 72px against 70px — so the full bar stopped fitting at the old breakpoint
   and hands over to the toggle sooner. Measured at 1201px, the first width above
-  the new breakpoint, clearance is **146px** and `scrollWidth` equals the
+  the new breakpoint, clearance is **160px** and `scrollWidth` equals the
   viewport. Re-measure at 1201px, not at 1025px.
 
   History worth keeping, because the figure has moved three times and each move
@@ -259,7 +285,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
   the touch target and spent 19px; 43px, until `--font-body` went Inter →
   Open Sans, the narrower face, which gave 27px back (Inter set those six Greek
   labels 29px wider in total, measured on a canvas at the nav's own size); 70px,
-  until the logo took 72px and moved the breakpoint instead. "Κλείστε τη θέση
+  until the logo took 72px and moved the breakpoint to 75rem instead; then 146px
+  at the new breakpoint, and 160px once `--font-body` went Open Sans → Manrope,
+  narrower again by 14px across the six. Every one of those moves except the
+  logo was a change of *face*, which is the pattern: re-measure whenever
+  `--font-body` changes. "Κλείστε τη θέση
   σας • Take away" is still the longest label and Greek is still the longer set,
   so Greek decides the fit, not English. The language pill was given
   `min-height` only, not padding, for exactly this reason — it buys the 44px

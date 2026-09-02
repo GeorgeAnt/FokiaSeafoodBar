@@ -98,7 +98,7 @@ Optional fields, each safe to leave out:
 | `unit` | Portion size | `"2 τεμάχια"` |
 | `volume` | For drinks | `"330 ml"` |
 | `variants` | One price, several choices | `["Σολομός", "Τόνος", "Λαβράκι"]` |
-| `wine` | Renders on its own italic line | `{ "producer": "…", "label": "…", "grape": "…", "style": "…" }` |
+| `wine` | Renders on its own line, in medium weight | `{ "producer": "…", "label": "…", "grape": "…", "style": "…" }` |
 | `tags` | Small chips beside the item | `["spicy"]` |
 
 **Prices.** Write them as numbers with a **dot**, not a comma — `2.5`, not `2,5`.
@@ -292,14 +292,21 @@ It renders exactly four combinations, and only those are shipped:
 
 | Family | Role | Weights | Scripts |
 |---|---|---|---|
-| Open Sans | Body, labels, buttons, nav | 400, 500, 600, and 400 italic | Greek + Latin |
-| Noto Serif | Headings | 600 | Greek + Latin |
+| Manrope | Everything | 400 body · 500 secondary · 600 labels and buttons · 700 headings | Greek + Latin |
 
-`font-synthesis-weight: none` is set on `body`, so a weight that is not in that
-list will **not** be faked — it falls back to the nearest real one. Adding a
-weight in the CSS means adding its `@font-face` and files too. The italic is a
-real face rather than a browser-sheared upright; it is used by the wine lines
-on `/menu`.
+One family for the whole site, which is the client's decision: the hierarchy is
+carried by weight rather than by pairing a serif against a sans.
+
+`font-synthesis: none` is set on `body`, so a weight that is not in that list
+will **not** be faked — it falls back to the nearest real one. Adding a weight
+in the CSS means adding its `@font-face` and files too.
+
+**Manrope has no italic, in any weight**, which is why synthesis is off for
+slant as well. Left on, the browser shears an upright into a fake oblique, and
+mechanically slanted Greek is visibly wrong. The practical consequence: writing
+`font-style: italic` anywhere now renders as ordinary upright text, with no
+error. The wine producer line on `/menu` used to be the one real italic and is
+set in weight 500 instead.
 
 The ten `.woff2` files in `public/fonts/` are **copied by hand**, verbatim, out
 of the `@fontsource/*` packages in `package.json` — there is no script and no
@@ -372,9 +379,9 @@ Two things are load-bearing for those numbers; changing them will cost score:
 
 - **The six above-the-fold font faces are preloaded** in `Base.astro`. Without
   it, `font-display: swap` reflows text as each face arrives and CLS goes to
-  0.118. Preloading takes it to 0. Not all ten: Open Sans 500 sits lower in the
-  page and the italic only appears on `/menu`, so preloading those would push
-  bytes ahead of the LCP image for glyphs that may never paint.
+  0.118. Preloading takes it to 0. Not all eight: Manrope 500 is secondary copy
+  and the wine lines on `/menu`, never above the fold, so preloading it would
+  push bytes ahead of the LCP image for glyphs that may never paint.
 - **Hero slides 2–4 are `display: none` until the carousel is enhanced**
   (`global.css`). They sit stacked inside the viewport, so `loading="lazy"` does
   not defer them — all four would download during the initial load and slow the

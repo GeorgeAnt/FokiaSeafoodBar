@@ -149,19 +149,18 @@ const dictJson = JSON.stringify(dictionaries);
       page's entire layout-shift score came from `font-display: swap` reflowing
       text as each face arrived, and preloading removed the shift entirely.
 
-      Not all ten files — the split to static builds turned four files into ten,
-      and preloading all ten would push ~135 KB ahead of the LCP image for
-      glyphs that may never render. These six are the ones a Greek page paints
-      immediately: body text, labels and buttons in Open Sans, headings in Noto
-      Serif, both scripts. Open Sans 500 and the italic load normally — 500 sits
-      lower in the page and the italic only appears on /menu.
+      Not all eight — preloading the lot would push bytes ahead of the LCP image
+      for glyphs that may never render. These six are the ones a Greek page
+      paints immediately: body text at 400, labels and buttons at 600, headings
+      at 700, both scripts. Manrope 500 loads normally; it is the wine line on
+      /menu and secondary copy further down the page, never above the fold.
     */}
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-latin-400-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-greek-400-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-latin-600-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/open-sans-greek-600-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/noto-serif-latin-600-normal.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/noto-serif-greek-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-latin-400-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-greek-400-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-latin-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-greek-600-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-latin-700-normal.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-greek-700-normal.woff2" crossorigin />
 
     <title data-i18n={titleKey}>{title}</title>
     <meta name="description" content={description} data-i18n-content={descriptionKey} />
