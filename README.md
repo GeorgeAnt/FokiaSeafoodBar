@@ -183,8 +183,8 @@ To add new photos, drop the originals into the source folder and run
 
 ### Restaurant details — `src/data/site.json`
 
-Name, phone, email, address, opening hours, social links, map links and the
-production domain. Fields still marked `PLACEHOLDER` must be replaced before
+Name, phone, email, address, geo coordinates, opening hours, social links, the
+map link and the production domain. Fields still marked `PLACEHOLDER` must be replaced before
 launch — see [Before launch](#before-launch).
 
 **Changing the opening hours:** each entry in `hours.entries` must list **every
@@ -450,11 +450,29 @@ predates the page split — re-run it before quoting it.
 
 **Confirmed and in place:** address (Laskou 3, Elefsina 19200), phone
 (21 3099 1571), email (fokiaseafoodbar@gmail.com), opening hours (Tue–Fri
-16:00–00:00, Sat–Sun 14:00–00:00, closed Monday), Instagram and Facebook.
-The map link is built from the address, so it works now; swap it for a Google
-Maps place link if you want the exact pin. `directionsUrl` is still in
-`site.json` but nothing renders it — the "Get directions" button was removed, so
-delete the field or restore a button if it is wanted back.
+16:00–00:00, Sat–Sun 14:00–00:00, closed Monday), Instagram and Facebook, and
+the map coordinates (38.04136874195106, 23.54054582764447), supplied by the
+client — so the `geo` block now appears in the structured data instead of being
+omitted.
+The map link addresses the restaurant by its **Place ID**, in the form Google
+documents for exactly this:
+
+    https://www.google.com/maps/place/?q=place_id:ChIJJ4njfgCvoRQRnpRBOQOfYQk
+
+To change it, get the new Place ID from Google's
+[Place ID finder](https://developers.google.com/maps/documentation/places/web-service/place-id)
+and swap the one string. There is nothing else in the URL to get wrong.
+
+**Why not the long URL the browser gives you.** A `/maps/place/…` URL ends in a
+`data=` blob that is length-prefixed — `!4m6` means "six tokens follow", `!3m5`
+means "five" — so deleting a token that looks redundant leaves the counts short,
+Google cannot parse it, and the button silently degrades to a name search on the
+wrong pin. Nothing errors, the link still opens Maps, and a build, a content
+check and a review all pass. That shipped once. The Place ID form has no such
+structure and nothing safe-looking to delete, which is the whole reason for it.
+
+`directionsUrl` has been deleted: the "Get directions" button was removed a
+while back and nothing had rendered the field since.
 
 **Content still outstanding:**
 
@@ -462,23 +480,16 @@ delete the field or restore a button if it is wanted back.
   by name, label and grape.
 - **Team names and bios** for 3 of the 4 members (all 4 bios are placeholder text
   at realistic length, so the layout is already tested).
-- **Map link** — `mapUrl` in `site.json`. The button is hidden while it is empty
-  rather than linking nowhere.
 - **Social links** — hidden while empty.
-- **Latitude and longitude** — omitted from the structured data while unset.
 - **A cropped or vector logo.** `logo-clean.png` has a transparent surround, so
-  it carries the hero, the nav and the footer, and the typeset wordmark it
-  replaced is gone. It is the only logo file, and the favicons are generated
-  from it. Two things would still improve it: the concrete texture is baked
-  *inside* the badge, so on the black hero it reads as a pale disc rather than a
-  mark on the ground; and the file is 1672×940 around an 888×899 badge — 47% of
-  the width is empty field, which every layout using it has to size around.
-
-  Not urgent any more. The nav crops the field away with `object-fit: cover` on
-  a square box rather than shipping a trimmed copy, so the empty field costs
-  layout nothing there. A tight crop or a vector would still be better, and
-  would remove the one fragile assumption that trick rests on — that the badge
-  stays horizontally centred in its canvas.
+  it now carries the hero and the footer, and the typeset wordmark it replaced is
+  gone. Two things would still improve it: the concrete texture is baked *inside*
+  the badge, so on the black hero it reads as a pale disc rather than a mark on
+  the ground; and the file is 1672×940 with the badge centred in a wide empty
+  field, about 44% of the width, which the layout has to size around. A tight
+  crop or a vector would fix both. It is now the only logo file: the opaque
+  512px square was deleted with the nav logo it existed for, and the favicons
+  are generated from this one.
 
 **One decision to confirm:** the client palette has no light background tone, so
 this site proposes one, `--salt: #E2E8EB` — a cool off-white drawn from the

@@ -345,6 +345,28 @@ Node is installed but **not on the shell PATH**; prepend it first:
   legally required heading on the site at default Garamond `h2` size instead of
   the small uppercase label it is written to be. Grep the tag, not just the
   class, when a rule looks like it is not doing anything.
+- **`mapUrl` addresses the place by Place ID, and that is a deliberate retreat
+  from the browser's own URL.** A `/maps/place/…` URL ends in a `data=` blob
+  that is length-prefixed — `!4m6` declares six following tokens, `!3m5`
+  declares five — so removing one that looks redundant (`!16s`, a
+  knowledge-graph id already implied by the `!1s` feature id) leaves the counts
+  short and Google falls back to a name search on the wrong pin. The failure is
+  silent in every way that matters: the URL stays well-formed, the button still
+  opens Maps, `astro check` and `npm run check` both pass. It shipped, and it
+  took the client to catch it.
+
+  `https://www.google.com/maps/place/?q=place_id:<id>` is Google's documented
+  form and has no such structure — one opaque string, nothing prunable. If
+  someone ever puts a long place URL back, the rule is: paste it whole, never
+  edit it. **Verifying a map link from here is not possible** — Google 302s to
+  a consent page — so the check that actually counts is a human clicking the
+  button once. What *can* be checked offline is identity: a `ChIJ…` Place ID
+  base64-decodes to the two 64-bit ids in a place URL's `!1s` field, which is
+  how this one was confirmed to be the same listing.
+
+  `geo` is deliberately *not* kept in sync with the coordinates Google holds for
+  the place: the client supplied `geo` themselves and it sits 1.3m off Google's
+  marker. Both are right about different things — don't reconcile them.
 - Opening hours are rendered as *contiguous* runs of days, not each entry's first
   and last. An entry listing Tuesday and Thursday must not render "Tue – Thu" and
   claim a Wednesday the restaurant is shut. Non-contiguous days become separate
@@ -357,8 +379,9 @@ Node is installed but **not on the shell PATH**; prepend it first:
   checker never mentioned them, while README had already listed them under
   "confirmed and in place". The walk now reports a PLACEHOLDER `$comment` when
   nothing under it trips a rule of its own, which is precisely that case and
-  stays quiet where the data already flags itself (geo's nulls, seo's example
-  domain). The wider lesson is the one at the top of this file: check the claim
+  stays quiet where the data already flags itself (seo's example domain; geo's
+  nulls were the other such case until the client supplied them).
+  The wider lesson is the one at the top of this file: check the claim
   before writing it down, in both directions — README asserting something is
   confirmed does not make the JSON agree.
 - `scroll-padding-top` on the container and `scroll-margin-top` on the target
