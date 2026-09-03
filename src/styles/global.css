@@ -1160,53 +1160,16 @@ input {
 }
 
 /*
-  Stop / resume the carousel. WCAG 2.2.2 — see the note in Hero.astro for why
-  hover-and-focus alone was not the mechanism.
+  `.hero__pause` used to live here — a 2.75rem scrimmed disc in the bottom-right
+  corner, the WCAG 2.2.2 stop control. It was removed at the client's request;
+  the reasoning and what it costs are on `start()` in Hero.astro.
 
-  This one DOES get a scrim, unlike the dashes above, and the difference is
-  deliberate. The dashes are a position indicator whose low contrast is a
-  recorded trade-off; this is the control that stops the motion, and a visitor
-  who needs it must be able to find it on every slide. Same construction as
-  .lightbox__close, which keeps a scrim for the same reason — it sits over a
-  photograph with nothing behind it to read against.
-
-  Bottom-right rather than in the dot row, so the strip stays centred where it
-  was and nothing about the original composition moves.
+  Worth keeping from its note, because it is the reason the two hero controls
+  looked different: the dashes are a position indicator whose low contrast over
+  the photos is a recorded trade-off, while a control that has to be *found* on
+  every slide gets a scrim of its own — the .lightbox__close construction. If a
+  stop control ever comes back, it comes back with the scrim.
 */
-.hero__pause {
-  position: absolute;
-  z-index: 2;
-  bottom: 1.25rem;
-  right: 1.25rem;
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 50%;
-  color: var(--salt);
-  background: color-mix(in srgb, var(--black) 62%, transparent);
-  border: 1px solid color-mix(in srgb, var(--salt) 26%, transparent);
-  backdrop-filter: blur(10px) saturate(1.2);
-  transition:
-    background-color 0.2s var(--ease),
-    color 0.2s var(--ease);
-}
-/* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
-.hero__pause:hover,
-.hero__pause:focus-visible {
-  background: var(--salt);
-  color: var(--black);
-}
-.hero__pause svg {
-  width: 1.1rem;
-  height: 1.1rem;
-}
-/* One glyph at a time. [hidden] is not used because the script owns the state
-   attribute and nothing else should have to know about these two children. */
-.hero__pause[data-paused='false'] [data-icon='play'],
-.hero__pause[data-paused='true'] [data-icon='pause'] {
-  display: none;
-}
 
 /* --------------------------------------------------------------------------
    Our Goal

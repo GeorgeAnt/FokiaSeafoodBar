@@ -268,8 +268,8 @@ runs. Choosing English swaps the text of every `data-i18n` element from a
 dictionary embedded in the page, sets `<html lang>`, and stores the choice in
 `localStorage`.
 
-Controls that only exist once JavaScript runs — the hero carousel dots and stop
-button, every button in the gallery lightbox — are built from a hidden template
+Controls that only exist once JavaScript runs — the hero carousel dots, every
+button in the gallery lightbox — are built from a hidden template
 *after* that swap has happened, so they have to ask for it again. They do. If you
 add a new one and its label comes out Greek on the English page, that is the step
 that is missing; `CLAUDE.md` describes it.
@@ -437,11 +437,6 @@ The site was audited against the Web Interface Guidelines and the findings
 fixed. Most were invisible; three changed something you can see, so they are
 worth knowing about before you look at the site and wonder:
 
-- **The hero carousel has a stop button**, bottom-right of the photo. The slides
-  advance every 6 seconds, and content that moves that long has to be stoppable
-  by anyone — holding it while the mouse is over the photo, which is what it did
-  before, is no use on a phone. It is the one control on the hero with a dark
-  circle behind it; that is deliberate, so it can be found against any slide.
 - **Tap targets are 44px.** The social icons in the nav, the language button, the
   menu's Food/Drinks tabs and its jump-to-category chips all grew to the size a
   finger actually needs. The icons and text inside them did not change size.
@@ -453,8 +448,15 @@ Two things are recorded trade-offs rather than oversights:
 
 - **The carousel dashes** sit at 1.7–2.3:1 against the photos, under the 3:1 a
   control should meet. They were given a backing panel once and it was reverted
-  for the lighter look. The stop button is the accessible way to control the
-  carousel; the dashes are a position indicator beside it.
+  for the lighter look. They are a position indicator, not the control.
+- **The hero carousel can no longer be stopped.** The slides change every 3
+  seconds and run indefinitely. The stop button that used to sit in the
+  bottom-right of the photo was removed at your request, and with it the only
+  way a visitor had to halt the motion — hovering the photo still holds it, but
+  there is no hover on a phone. This is a known accessibility failure (WCAG
+  2.2.2, "Pause, Stop, Hide"), not an oversight, and it is the one item in this
+  file that would fail an audit outright. Putting the button back is a small
+  change if you ever want it.
 - **English has no separate URL**, as described under Languages above.
 
 The Lighthouse accessibility score in the table above predates all of this and

@@ -148,24 +148,40 @@ after putting the clone in the page:
 
 - `refresh()` — re-apply the current locale over the whole document, clones
   included. Call it right after `append`.
-- `setLabelKey(el, key)` — for a control whose label changes with its *state*
-  (the nav toggle, the hero stop button). The script picks the key; the string
-  still comes from the dictionary, so the switch keeps working on it afterwards.
-  This is the only sanctioned way for a script to change an `aria-label`.
+- `setLabelKey(el, key)` — for a control whose label changes with its *state*.
+  The nav toggle is the only caller now that the hero stop button is gone; the
+  API stays because it is the only sanctioned way for a script to change an
+  `aria-label`. The script picks the key; the string still comes from the
+  dictionary, so the switch keeps working on it afterwards.
 
 Both are called with `?.` — the section scripts are modules and run after the
 inline one, but a control still has to work if it never loaded. The type lives in
 `src/env.d.ts`.
 
-**The hero carousel needs a stop button, and hover is not it.** WCAG 2.2.2: the
-slides advance every 6s, so there must be a mechanism to stop them. Holding on
-`pointerenter`/`focusin` is a convenience, not the mechanism — a touch visitor
-has no hover and the hold ends the moment the pointer leaves. `.hero__pause`
-(bottom-right of the hero, its own `<template>` child) is the real one, and it
-keeps two separate flags: `hovering` is the transient hold, `stopped` is the
-button. `start()` bails on either, so hover can never restart something the
-visitor stopped. Under `prefers-reduced-motion` the whole block is skipped, which
-is why there is no button to find there — there is also no motion.
+**The hero carousel has no stop button any more, and that is a known WCAG 2.2.2
+failure the client accepted.** This section used to say the button was required,
+because it is. Recording what changed rather than deleting the rule:
+
+The slides advance every **3s** (was 6s) and never stop on their own. WCAG 2.2.2
+requires that anything moving automatically for more than five seconds can be
+paused, stopped or hidden. `.hero__pause` — bottom-right of the hero, its own
+`<template>` child, a scrimmed disc — was that mechanism, and it was removed on
+request along with the `stopped` flag and the `a11y.heroPause` /
+`a11y.heroPlay` keys.
+
+What is left is **not** a substitute, and neither half of it ever was:
+
+- The `pointerenter`/`focusin` hold is a convenience. A touch visitor has no
+  hover, and the hold ends the moment the pointer leaves. That is precisely why
+  the button existed; `start()` now bails on `hovering` alone.
+- The dots jump between slides. They do not stop the timer.
+- `prefers-reduced-motion` skips the whole block, so that visitor gets a still
+  hero. It covers the vestibular case, not 2.2.2, which is about control.
+
+Shortening the interval does not help either: 2.2.2 counts the total duration of
+the movement, not the gap between steps. Restoring compliance means putting a
+stop control back — and if one returns, it returns with its scrim, for the
+reason in the note on the dashes below.
 
 The gallery *tiles* are the deliberate exception and stay in the page: each is an
 `<a>` pointing at the full-size photo, so it still goes somewhere real when the
@@ -402,12 +418,14 @@ Node is installed but **not on the shell PATH**; prepend it first:
   dashes measure 1.7-2.3:1 against them — under the 3:1 WCAG minimum for a
   control, on every slide. That one is a **recorded trade-off**: the dashes were
   given a scrim pill and it was reverted for the lighter look, so they stay as
-  they are. It does not extend to the other two controls over those photos.
-  `.hero__pause` carries the scrim (same construction as `.lightbox__close`)
-  because it is the control that *stops* the motion and has to be findable on
-  every slide; the lightbox arrows use the reference gallery's two-triangle
-  construction, a light arrowhead over a larger dark one, which does the same
-  job. If the dashes' contrast is ever raised, put the surface back rather than
+  they are. It does not extend to the other controls over those photos. The
+  lightbox arrows use the reference gallery's two-triangle construction, a light
+  arrowhead over a larger dark one, which does the same job as a scrim.
+  `.hero__pause` used to be the other example and is gone, but the principle it
+  illustrated is the one to keep: a *position indicator* can carry a contrast
+  trade-off, a control someone has to find on every slide cannot. Any control
+  put back over these photos gets a backing. If the dashes' contrast is ever
+  raised, put the surface back rather than
   only darkening the dash — the photo underneath changes on every slide.
 - A `<dialog>` appended to `<body>` inherits the **light** tier's tokens, not
   the dark surface it paints itself. `:focus-visible` draws its ring in

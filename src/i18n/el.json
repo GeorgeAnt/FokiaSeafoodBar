@@ -21,8 +21,6 @@
   "lang.short.el": "ΕΛ",
   "lang.short.en": "EN",
   "a11y.heroGoTo": "Μετάβαση στη φωτογραφία {n}",
-  "a11y.heroPause": "Παύση προβολής φωτογραφιών",
-  "a11y.heroPlay": "Συνέχεια προβολής φωτογραφιών",
   "a11y.galleryDialog": "Προβολή φωτογραφίας",
   "a11y.galleryClose": "Κλείσιμο",
   "a11y.galleryPrevious": "Προηγούμενη φωτογραφία",

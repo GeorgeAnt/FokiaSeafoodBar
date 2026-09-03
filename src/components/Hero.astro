@@ -85,33 +85,15 @@ const { locale = defaultLocale } = Astro.props;
         switcher's initial pass, so the script calls `fokiaI18n.refresh()` once
         they are in the page.
 
-        Two children, positioned independently rather than as one row: the dot
-        strip stays centred exactly where it was, and the stop button sits in
-        the corner out of its way.
+        One child now: the dot strip. The stop button that used to sit in the
+        bottom-right corner was removed at the client's request — see the WCAG
+        note on `start()` below for what that costs, because it is not nothing.
 
         Dashes only for the dots, as originally designed: no arrows and no scrim
-        pill behind them. See the note in global.css about what that costs — and
-        about why the stop button, unlike them, does carry a scrim.
+        pill behind them. See the note in global.css about what that costs.
       */}
       <template id="hero-controls-template">
         <div class="hero__dots"></div>
-        <button
-          type="button"
-          class="hero__pause"
-          data-hero-pause
-          data-paused="false"
-          aria-label={t(locale, 'a11y.heroPause')}
-          data-i18n-label="a11y.heroPause"
-        >
-          {/* Both glyphs ship; CSS shows whichever matches [data-paused]. */}
-          <svg data-icon="pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <rect x="7" y="5" width="3.4" height="14" rx="1" />
-            <rect x="13.6" y="5" width="3.4" height="14" rx="1" />
-          </svg>
-          <svg data-icon="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M8 5.2v13.6a1 1 0 0 0 1.53.85l10.2-6.8a1 1 0 0 0 0-1.7L9.53 4.35A1 1 0 0 0 8 5.2Z" />
-          </svg>
-        </button>
       </template>
 
       {/*
@@ -141,15 +123,12 @@ const { locale = defaultLocale } = Astro.props;
   const dotTemplate = document.querySelector<HTMLTemplateElement>('#hero-dot-template');
 
   if (media && controlsTemplate && dotTemplate && slides.length > 1 && !reduceMotion.matches) {
-    const INTERVAL = 6000;
+    const INTERVAL = 3000;
     let current = 0;
     let timer: number | undefined;
-    /* Two different kinds of not-advancing, and they must not overwrite each
-       other. `hovering` is the transient hold while a pointer or the keyboard
-       is in the hero; `stopped` is the visitor having pressed stop, which
-       outlives the pointer leaving and is the WCAG 2.2.2 mechanism. */
+    /* The transient hold while a pointer or the keyboard is in the hero. It was
+       one of two flags; the other, `stopped`, went with the stop button. */
     let hovering = false;
-    let stopped = false;
 
     // Reveals slides 2..n, which until now were display:none so they would not
     // download during the initial load. Deferred to the load event so they never
@@ -159,12 +138,9 @@ const { locale = defaultLocale } = Astro.props;
     else window.addEventListener('load', reveal, { once: true });
 
     // Controls come from templates so they exist only once JS is running, but
-    // still arrive with Astro-rendered labels in the current locale. The clone
-    // is the whole fragment: the dot strip and the stop button, which are
-    // positioned separately rather than sharing a row.
+    // still arrive with Astro-rendered labels in the current locale.
     const controls = controlsTemplate.content.cloneNode(true) as DocumentFragment;
     const dotList = controls.querySelector<HTMLElement>('.hero__dots')!;
-    const pauseButton = controls.querySelector<HTMLButtonElement>('[data-hero-pause]')!;
 
     const dots = slides.map((_, i) => {
       const dot = dotTemplate.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
@@ -191,36 +167,45 @@ const { locale = defaultLocale } = Astro.props;
       });
     };
 
+    /*
+      KNOWN WCAG 2.2.2 FAILURE, accepted by the client. Read before "fixing"
+      either half of it.
+
+      2.2.2 requires that anything moving automatically for more than five
+      seconds can be paused, stopped or hidden by the visitor. This carousel
+      advances every 3s and never stops on its own, and the control that used to
+      satisfy the criterion — `.hero__pause`, bottom-right, its own scrim — was
+      removed on request along with `a11y.heroPause` / `a11y.heroPlay` and the
+      `stopped` flag.
+
+      The hold below is NOT a substitute and never was: a touch visitor has no
+      hover, and the hold ends the moment the pointer leaves. That was the whole
+      reason the button existed. The dots are not one either — they jump between
+      slides, they do not stop the timer.
+
+      `prefers-reduced-motion` still skips this block entirely, so a visitor who
+      has asked for less motion gets a still hero. That covers the vestibular
+      case; it does not cover 2.2.2, which is about control and attention.
+
+      Restoring compliance means putting a stop control back. Shortening the
+      interval does not help — 2.2.2 counts total duration of the movement, not
+      the gap between steps.
+    */
     const start = () => {
       window.clearInterval(timer);
-      if (hovering || stopped) return;
+      if (hovering) return;
       timer = window.setInterval(() => show(current + 1), INTERVAL);
     };
 
-    /*
-      WCAG 2.2.2: content that moves for more than five seconds needs a
-      mechanism to stop it, and it has to be one every visitor can operate.
-      Holding on hover and focus is not that — a touch visitor has no hover, and
-      the hold ends the moment the pointer leaves. This button is the mechanism;
-      the hold below is a convenience on top of it.
-    */
-    pauseButton.addEventListener('click', () => {
-      stopped = !stopped;
-      pauseButton.dataset.paused = String(stopped);
-      window.fokiaI18n?.setLabelKey(pauseButton, stopped ? 'a11y.heroPlay' : 'a11y.heroPause');
-      start();
-    });
-
     media.append(controls);
     // Cloned nodes never went through the switcher's initial pass — see the
-    // note on the template. Without this the dots and this button keep their
-    // server-rendered Greek labels for a visitor who has chosen English.
+    // note on the template. Without this the dots keep their server-rendered
+    // Greek labels for a visitor who has chosen English.
     window.fokiaI18n?.refresh();
     start();
 
     // Hovering or tabbing into the hero holds the current photo, so nobody
-    // loses the frame they were looking at — or the button they were reaching
-    // for. It never overrides an explicit stop.
+    // loses the frame they were looking at. A convenience, not a mechanism.
     const setHovering = (value: boolean) => {
       hovering = value;
       start();

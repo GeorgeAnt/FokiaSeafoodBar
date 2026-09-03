@@ -21,8 +21,6 @@
   "lang.short.el": "ΕΛ",
   "lang.short.en": "EN",
   "a11y.heroGoTo": "Go to photo {n}",
-  "a11y.heroPause": "Pause photo slideshow",
-  "a11y.heroPlay": "Resume photo slideshow",
   "a11y.galleryDialog": "Photo viewer",
   "a11y.galleryClose": "Close",
   "a11y.galleryPrevious": "Previous photo",
