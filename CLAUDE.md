@@ -48,38 +48,65 @@ read — the shopfront sign in the team photos is rusted metal. `--wood-light` a
 `--wood-pale` lighten Wood along that oxidation path, dusty and pink, never
 toward orange. Warming any of these four back up undoes the palette.
 
-**No two bands in a row share a background.** The page steps light / mid / dark
-and back: Hero black, Our Goal stone, From the kitchen black, Take away salt,
-Find Us stone, footer black. Team used to be the salt band between Our Goal and
-From the kitchen; taking it out left stone directly above black, which still
-alternates, so nothing had to be re-tiered. Verified on the rendered page, not
-assumed — Take away reads `rgba(0,0,0,0)` in the DOM because `.section` sets no
-background and inherits salt from the body. Our Goal is on the mid tier *because*
-the hero above it is black — as a dark section it ran straight into the hero with
-no boundary.
+**The homepage is one ground with drawn edges. It used to be alternating tiers,
+and the older rule is gone — do not reinstate it piecemeal.**
 
-**Take away carries photographs now and still has to stay light.** The client
-asked for the two services to be pictured, and From the kitchen sits directly
-above it as a black band of four plates. A dark, full-bleed treatment here would
-put two photo bands together with no boundary — the collision that put Our Goal
-on the mid tier. So the photos are inset panels on the salt ground: the band
-keeps its light tier, and the strip of salt around them is what separates the
-two photo groups. If this band is ever made dark, Plates above it has to move.
+Every band below the hero is `--charcoal` (#221f1f): Our Goal, From the kitchen,
+Take away and Find Us. The hero, the nav and the footer stay `--black`
+(#181414), one step darker, so the page reads as a single dark ground with its
+two ends pinned slightly deeper. Measured on the rendered page: bands
+`rgb(34,31,31)`, hero and footer `rgb(24,20,20)`.
 
-**The nav is the one thing exempt from that, and it pays for the exemption with
-an edge.** It is black, and being sticky it cannot re-tier itself the way Our
-Goal did — it passes over all three black bands (Hero, From the kitchen, the
-footer) and would merge with each in turn. What keeps it a bar is
+**What separates one band from the next is now a line, not a tone.**
+`.section-dark` carries `border-top: 1px solid var(--rule)` — Light Stone at
+30%, the same hairline the nav has always carried under itself — and
+`main > .section-dark:last-child` adds a matching bottom edge so the run closes
+against the footer rather than stopping short of it. Four boundaries, one
+construction. If you remove that border you do not get a subtler page, you get
+one undifferentiated column: the tone step that used to do the work is not
+there any more to fall back on.
+
+The rule this replaced was **"no two bands in a row share a background"**, and
+the whole tier system existed to serve it — `.section-stone` was invented so the
+page could step light / mid / dark instead of slamming salt into black, and Our
+Goal sat on the mid tier *because* the hero above it is black. None of that
+applies now. `.section-stone` is consequently unused; it is kept, with a note on
+the rule saying so, because it and `--wood-pale` only make sense together and
+would have to be reinvented as a pair.
+
+**Take away was the band that rule cost the most, and it is worth knowing what
+was traded.** It was light *specifically* to keep two photo bands apart: From
+the kitchen sits directly above it as four plates on a dark ground, and the
+strip of light around Take away's two inset panels was the boundary between the
+two photo groups. That strip is gone and the hairline does the job instead,
+which is a thinner boundary than a whole tier change. What keeps the two groups
+from reading as one continuous run of photographs is that the panels are still
+**inset, not full-bleed** — so that part is load-bearing now in a way it was
+not before. Verified on the rendered page.
+
+Contrast was re-measured on the new ground rather than carried over, since every
+one of these sections changed tier: headings and CTAs (`--salt`) 13.22:1, body
+and muted text (`--light-stone`) 5.86:1, eyebrows and the phone number
+(`--wood-light`) 5.75:1. All comfortably over. The hairline itself composites to
+about 1.7:1 against the band — it is a decorative divider, not a control or
+meaningful graphic, so no non-text minimum applies to it, but it *is* faint by
+design and that is the look that was asked for.
+
+**The nav was the first thing to solve this, and the bands now copy it.** It is
+black and sticky, so it could never re-tier itself the way sections could, and
+it passes over dark ground the whole way down. What keeps it a bar is
 `border-bottom: 1px solid var(--rule)`, which on the bar's own dark tokens is
 Light Stone at 30%: the only thing between the bar and the hero directly beneath
 it, both `--black`. Removing that hairline does not look like removing a border,
 it looks like the nav disappearing into the hero. Do not "tidy" it.
 
-The tiers are a consequence of the order, not a property of each section, and
-moving one re-tiers its neighbours. When From the kitchen moved below Team it
-landed directly above Take away and both were black. Of the two, **the
-photographs keep the dark ground and the text-only band gives way**: food needs
-black and has nowhere else to go, while a heading and a phone number read on any
+**History, kept because the reasoning was sound and may be needed again if the
+page ever goes back to tiers.** Tiers were a consequence of the *order*, not a
+property of each section, so moving one re-tiered its neighbours. When From the
+kitchen moved below Team it landed directly above Take away and both were black.
+Of the two, **the photographs kept the dark ground and the text-only band gave
+way**: food needs black and has nowhere else to go, while a heading and a phone
+number read on any
 tier — which is the same logic that put Our Goal and Find Us on stone. So Take
 away is now a light band. Work the sequence out in full before changing an
 order; there are only three tiers and both ends are pinned black.

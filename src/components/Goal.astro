@@ -8,11 +8,16 @@ const { locale = defaultLocale } = Astro.props;
 ---
 
 {/*
-  The mid tier, not dark. The hero is already --black, so a dark Goal ran
-  straight into it with no boundary and made the top of the page one mass. Stone
-  suits a text-only section: there are no photographs here to sit against it.
+  Charcoal, like every band below the hero.
+
+  This used to be the mid tier, and the reason was real: the hero above is
+  --black, so a dark Goal ran straight into it and made the top of the page one
+  mass. What changed is that the boundary no longer comes from the tone. Every
+  band is --charcoal now and .section-dark carries a 1px hairline on top, so the
+  hero-to-Goal edge is drawn rather than implied — and --charcoal is a step up
+  from --black besides, so the two are not the same value either.
 */}
-<section class="section section-stone" id="goal">
+<section class="section section-dark" id="goal">
   {/* One reveal for the whole band: the eyebrow, the lead and the two columns
       are a single thought, and staggering them made the eyebrow arrive on its
       own above nothing. */}

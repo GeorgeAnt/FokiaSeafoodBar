@@ -591,37 +591,40 @@ supplied:
 | Stone `#625E60` | all secondary text on light sections, and the Find Us band |
 | Light Stone `#A09A91` | dividers, borders, secondary text on dark sections |
 
-### Three surface tiers
+### Surfaces
 
-The page steps light → mid → dark, so Stone does structural work rather than
-only tinting text:
+The homepage is one dark ground. Every band below the hero is Charcoal, and the
+sections are told apart by a hairline between them rather than by a change of
+tone:
 
-| Class | Background | Sections |
+| Class | Background | Where |
 |---|---|---|
-| *(default)* | `--salt` | Menu, Team, Gallery, Reserve your spot • Take away |
-| `.section-stone` | `--stone` | Our Goal, Where to Find Us |
-| `.section-dark` | `--black` | Hero, From the Kitchen, footer |
+| *(default)* | `--salt` | Menu, Team, Gallery — the other three pages |
+| `.section-dark` | `--charcoal` `#221F1F` | Our Goal, From the Kitchen, Reserve your spot • Take away, Where to Find Us |
+| — | `--black` `#181414` | Hero, navigation bar, footer |
 
-No two bands in a row share a background. Our Goal is on the mid tier because
-the hero above it is black — as a dark section it ran into the hero with no
-boundary. Stone carries text-only sections, which is what suits a mid grey:
-neither has photographs sitting on it.
+Charcoal is one step up from Deep Black, and the hero, the bar and the footer
+stay Deep Black, so the top and bottom of the page sit slightly deeper than the
+middle. The line between bands is 1px of Light Stone at 30% — the same line the
+navigation bar has always had under it.
 
-Which tier a section gets depends on the sections either side of it, so
-reordering the homepage can re-tier a band that did not move. From the Kitchen
-is dark because food photography needs a dark ground; when it moved below the
-Team it ended up directly above Take away, which was also dark, so Take away
-became a light band. (The Team has since moved to its own page, which left the
-stone of Our Goal directly above that dark band — still an alternation, so
-nothing needed re-tiering.) The rule when two dark bands collide is that the
-photographs keep the dark ground and the text-only band moves.
+**If that line is removed the page loses its structure**, because the tone
+change that used to separate the bands is no longer there to fall back on.
 
-Take away has since gained two photographs of its own, and it still stays light
-for the same reason. From the Kitchen is immediately above it, so a dark
-full-bleed treatment would run two photo bands together with nothing between
-them. The photos are inset panels on the light ground instead, and the salt
-around them is the boundary. Making that band dark means moving From the Kitchen
-first.
+This replaced an alternating light / mid / dark scheme, and one thing it traded
+is worth knowing: Reserve your spot • Take away used to be a light band
+*specifically* so that its photographs did not run into From the Kitchen's
+directly above. The light strip around its two panels was the boundary. Now the
+hairline is, which is thinner — so the fact that those photos are **inset panels
+rather than full-bleed** is what keeps the two groups apart. Don't make them
+full-bleed.
+
+Text was re-measured on the new ground: headings and buttons 13.2:1, body and
+muted text 5.9:1, eyebrows and the phone number 5.8:1.
+
+`.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
+on purpose — it and the `--wood-pale` accent only make sense together — and is
+labelled as such so nobody removes half of it.
 
 ### The `--accent` token
 

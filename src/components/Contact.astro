@@ -39,16 +39,26 @@ const schedule = JSON.stringify(site.hours.entries);
 ---
 
 {/*
-  Light tier, and it has to stay light even though it carries photographs.
-  From the kitchen sits directly above and is a black band of four plates; a
-  dark full-bleed treatment here would run two photo bands together with no
-  boundary. The photos are inset panels on the salt ground instead.
+  Charcoal, like every band below the hero — and this is the band where that
+  decision costs the most, so it is worth being explicit about.
+
+  This section was light *specifically* to keep two photo bands apart: From the
+  kitchen sits directly above it as four plates on a dark ground, and the strip
+  of light around these two inset panels was the boundary between the two photo
+  groups. That strip is gone. What separates them now is the 1px hairline
+  .section-dark puts on top of this section, which is a thinner boundary than a
+  whole tier change — a deliberate trade, not an oversight. The panels stay
+  inset rather than full-bleed, which is what keeps the two groups from reading
+  as one continuous run of photographs.
+
+  The panel titles are unaffected: they were never carried by the band, only by
+  .contact__panel::before, the gradient scrim over each photo.
 
   The section heading is .sr-only: it carries the combined nav label so the
   outline and the /#contact anchor still have a heading, while the two panel
   titles say each half once.
 */}
-<section class="section" id="contact">
+<section class="section section-dark" id="contact">
   <div class="wrap">
     <h2 class="sr-only" data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
 
