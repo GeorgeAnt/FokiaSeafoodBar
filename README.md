@@ -212,8 +212,10 @@ day it covers**, not just the first and last of a range. Where to Find Us works
 out the ranges itself and only joins days that actually run consecutively, so
 `["Tuesday", "Thursday"]` correctly renders as two separate rows rather than
 "Tue – Thu", which would claim a Wednesday the restaurant is shut. Days in
-`hours.closed` are listed on the page as closed on purpose — dropping Monday
-entirely just leaves a visitor guessing. Day names are the English schema.org
+`hours.closed` are listed on the page as closed on purpose — dropping a shut day
+entirely just leaves a visitor guessing. That list is empty at the moment,
+because the restaurant opens every day; leave the key in place rather than
+deleting it. Day names are the English schema.org
 spellings in the file whatever the page language; the Greek abbreviations come
 from `hours.short.*` in `src/i18n/`.
 
@@ -483,8 +485,8 @@ predates the page split — re-run it before quoting it.
   Greek page, which needs a native-speaker check.
 
 **Confirmed and in place:** address (Laskou 3, Elefsina 19200), phone
-(21 3099 1571), email (fokiaseafoodbar@gmail.com), opening hours (Tue–Fri
-16:00–00:00, Sat–Sun 14:00–00:00, closed Monday), Instagram and Facebook, and
+(21 3099 1571), email (fokiaseafoodbar@gmail.com), opening hours (Mon–Sat
+18:00–00:00, Sun 16:00–00:00, open seven days), Instagram and Facebook, and
 the map coordinates (38.04136874195106, 23.54054582764447), supplied by the
 client — so the `geo` block now appears in the structured data instead of being
 omitted.

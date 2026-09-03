@@ -752,8 +752,9 @@ client's request — and the hours themselves run Monday first.** That second on
 is a sort, not a reordering of the data: every run, open and closed, is ordered
 by `dayIndex(run.from)`. It used to be the open ranges in the order the client
 listed them followed by the closed days, which put Monday last precisely because
-Monday is the closed one. Sorting by day keeps working if the closed day ever
-moves; nothing assumes which day is shut.
+Monday was the closed one. **It no longer is — the restaurant opens seven days —
+and the sort is why that change needed no code**: nothing here assumes which day
+is shut, or that any day is.
 
 **The text column is centred; the photograph is not.** `.find__col` carries
 `text-align: center` and the photo keeps its own grid column beside it. Making
@@ -801,8 +802,12 @@ dependency decision, not a styling one.
 - Opening hours are rendered as *contiguous* runs of days, not each entry's first
   and last. An entry listing Tuesday and Thursday must not render "Tue – Thu" and
   claim a Wednesday the restaurant is shut. Non-contiguous days become separate
-  rows. Monday is listed as closed on purpose: it is not a working hour, but
-  dropping it leaves a visitor guessing.
+  rows. Any day in `hours.closed` is still listed on the page as closed rather
+  than dropped — a shut day is not a working hour, but omitting it leaves a
+  visitor guessing. That array is **empty** at the moment: the schedule is
+  Mon–Sat 18:00–00:00 and Sun 16:00–00:00, so nothing is shut. Keep the key
+  rather than deleting it; `FindUs.astro` and the JSON-LD both read it, and the
+  renderer handles an empty list without special-casing.
 - **Placeholder data that looks real is invisible to `npm run check`.** The
   opening hours shipped wrong for months: `site.json` held invented times whose
   only warning was the word PLACEHOLDER inside `hours.$comment`, and
