@@ -274,16 +274,61 @@ much harder as a button label. The CTA's hover therefore goes *lighter*, to
 `--wood` fill did: mixing black into a mid stone walks the label back toward the
 2.9:1 that ruled `--stone` out to begin with.
 
-That fill is also the reason `.btn--primary` can be restyled freely — it is the
-hero CTA and nothing else. The other two `.btn`s on the site are `.btn--ghost`
-(From the kitchen, Find Us), and `--wood` is still a surface on `/menu`, where
-the selected menu tab uses it.
+**`.btn--primary` is now every button on the site.** It was the hero CTA
+alone, with From the kitchen and Find Us outlined as `.btn--ghost` against it;
+the client asked for all three to match, so the ghosts went. One pair of numbers
+covers the set now: the fill is 6.55:1 on the hero's Deep Black and 5.86:1 on the
+charcoal bands, both well over the 3:1 a control's boundary needs, and the black
+label is 6.55:1 on the fill in every case. Measured on the rendered page.
 
-**Section eyebrows were a bug, not a device.** Every section used to render one
-from its `nav.*` key, which in five of six cases was the heading verbatim — two
-identical titles stacked. Only Our Goal keeps one, because its heading is a
-sentence and the eyebrow is the only thing naming the section. Do not add them
-back per-section without new copy that says something the heading does not.
+`.btn--ghost` is consequently unused. It is kept, and flagged as such in the
+stylesheet, because it is the only consumer of `--ghost-hover-bg` /
+`--ghost-hover-fg` and those are declared on eight surfaces — the rule and the
+tokens have to go together or not at all. This is the second kept-but-unused
+block, after `.section-stone`; both are labelled, neither is an oversight.
+
+`--wood` is still a surface on `/menu`, where the selected menu tab uses it.
+
+**Section eyebrows were a bug, not a device, and there are none left.** Every
+section used to render one from its `nav.*` key, which in five of six cases was
+the heading verbatim — two identical titles stacked. Our Goal was the last
+holdout, kept because its heading was a *sentence* ("To serve fish with the
+respect it deserves") and the eyebrow was the only thing naming the section.
+That stopped being true when the client asked for one title instead of two: the
+eyebrow's words were promoted to the heading at the sentence's size, the
+sentence was cut, and `goal.lead` was deleted with it. Do not add eyebrows back
+per-section without new copy that says something the heading does not.
+
+Two consequences worth knowing. `.eyebrow` now matches no markup — it is kept
+because `.section-head p:not(.eyebrow)` still names it, and that guard should
+stay defensive whether or not an eyebrow exists today (see the specificity note
+further down for what happens without it). And Our Goal's heading reads
+`nav.goal`, not a heading key of its own: there was a `goal.heading` once and a
+dead-key sweep removed it for never being rendered, so rather than re-adding a
+second key holding the same two words, the nav label and the section title share
+one string deliberately.
+
+**Our Goal is also the only band with a link out of it.** `.goal__cta` is a
+"Meet the team" button at the end of the second column, pointing at `/team` —
+added when Team moved off the homepage, so the section that talks about how the
+place works still leads somewhere. The second column is a `<div>` wrapping the
+paragraph and the button; `.goal__grid p` is a descendant selector, so the
+paragraph keeps its muted colour and measure through the wrapper, and the grid
+still has two children and so still two columns.
+
+Above 48rem it is pushed to the end of its column so it lands on the same
+vertical line as From the kitchen's `.plates__cta` in the band below.
+Neither hard-codes a position: both sections share one `.wrap`, and that
+button is already pinned to the wrap's right edge because its grid track is
+auto-sized to it, so ending this one at the same edge lines the two up at every
+width. Verified at 768 / 1201 / 1366 / 1600 / 1920 — right edges identical,
+delta 0px. It squares off against its own paragraph too, which fills the column
+and so ends on that edge as well.
+
+`margin-inline-start: auto` only moves a *block-level* box and `.btn` is
+inline-flex, so `display` and `width` travel with it. It is deliberately
+not applied below the breakpoint: on a single narrow column a right-shoved
+button reads as a mistake, not as alignment.
 
 **Four pages.** `/` is the scrolling homepage; `/menu` is the menu and its
 legal block; `/gallery` is the photographs; `/team` is the five member rows,
@@ -530,8 +575,10 @@ Node is installed but **not on the shell PATH**; prepend it first:
   and its own `min-height`.
 
   `.btn` itself is three places and all three are on the homepage: the hero CTA,
-  the From the kitchen CTA, the Find Us map button. Nothing on /menu or /gallery
-  uses `.btn`, so that change could not leak.
+  the From the kitchen CTA, the Find Us map button — and all three are
+  `.btn--primary` since the client asked for them to match, so the pill, the
+  fill and the label are one style rather than two. Nothing on /menu, /gallery or
+  /team uses `.btn`, so that change could not leak.
 
   Written as a literal `999px` to match every other pill already in the file
   (the menu tab group, the jump chips, the tags) rather than adding a second

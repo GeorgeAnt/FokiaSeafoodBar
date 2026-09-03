@@ -500,7 +500,13 @@ main > .section-dark:last-child {
   translate: -50% 0;
 }
 
-/* Section heading: small letterspaced eyebrow above a display heading. */
+/* Section heading: small letterspaced eyebrow above a display heading.
+
+   CURRENTLY UNRENDERED: Our Goal was the last section carrying one, and its
+   heading now names the section itself. The class is kept because
+   `.section-head p:not(.eyebrow)` still names it — that guard is what stops a
+   paragraph rule outranking this one, and it should stay defensive whether or
+   not an eyebrow exists today. See the eyebrow note in CLAUDE.md. */
 .eyebrow {
   font-family: var(--font-body);
   font-size: var(--step--1);
@@ -574,8 +580,10 @@ main > .section-dark:last-child {
 }
 
 /*
-  Stone fill, black label — the hero CTA is the only .btn--primary on the site
-  (the other two buttons are .btn--ghost), so this is scoped to it.
+  Stone fill, black label — every .btn on the site, which is the three CTAs on
+  the homepage: the hero's "see the menu", From the kitchen's link to /gallery
+  and Find Us's link to the map. They were an outlined pair against this one
+  until the client asked for all three to match it.
 
   It is --light-stone, not --stone. --stone under a --black label measures
   2.9:1, which fails the 4.5:1 minimum for button text outright; --light-stone
@@ -596,6 +604,13 @@ main > .section-dark:last-child {
 .btn--primary:hover {
   background: var(--salt);
 }
+/*
+  All three sit on --charcoal now rather than on three different tiers, so one
+  pair of numbers covers the set: the fill is 5.86:1 against the band, well over
+  the 3:1 a control's boundary needs, and the label is 6.55:1 on the fill.
+  Hovered, the salt fill is 13.22:1 against the band. Measured on the rendered
+  page.
+*/
 /* Pressed goes the other way from hover — down off --salt, past the resting
    stone, so a tap that never hovers still registers as a press. 5.2:1 under the
    black label, still over the 4.5:1 minimum. */
@@ -610,6 +625,20 @@ main > .section-dark:last-child {
   — including a `color` set in the same block. Paired with `color: var(--black)`
   it made the fill, the text and the border all Deep Black on the Deep Black
   hero, so hovering the button made it disappear entirely.
+*/
+/*
+  CURRENTLY UNUSED, kept deliberately — like .section-stone above, and for a
+  similar reason. Nothing carries .btn--ghost since the two outlined CTAs were
+  made to match the hero's, and it is the only consumer of the
+  --ghost-hover-bg / --ghost-hover-fg pair, which is declared on eight surfaces
+  (:root, .hero, .nav, .footer, .section-dark, .section-stone, .lightbox and the
+  menu). Deleting the rule without those tokens leaves them orphaned across the
+  file; deleting the tokens without the rule breaks any ghost button brought
+  back. They go together or not at all.
+
+  Keeping it also keeps the note that earned it: the hover pair is explicit
+  precisely because "background: currentColor" in a block that also sets "color"
+  resolves both to the same value and makes the control vanish.
 */
 .btn--ghost {
   border-color: currentColor;
@@ -1236,11 +1265,17 @@ main > .section-dark:last-child {
 /* --------------------------------------------------------------------------
    Our Goal
    -------------------------------------------------------------------------- */
-.goal__lead {
+/*
+  Renamed from .goal__lead, which is what it was: a lead *sentence* under a
+  small eyebrow. The eyebrow's words are the heading now and the sentence is
+  gone, so the size stayed and the name had to move with the content. The 24ch
+  measure went with the sentence too — it existed to stop a long line, and this
+  is two words.
+*/
+.goal__heading {
   font-family: var(--font-display);
   font-size: var(--step-2);
   line-height: 1.25;
-  max-width: 24ch;
   margin-bottom: 1.75rem;
 }
 
@@ -1256,6 +1291,35 @@ main > .section-dark:last-child {
 .goal__grid p {
   color: var(--text-muted);
   max-width: var(--measure);
+}
+/* Sits under the second column's paragraph, not beside it. .btn is
+   inline-flex, so it needs the block context and the space above spelled out. */
+.goal__cta {
+  margin-top: 1.75rem;
+}
+/*
+  Above the two-column breakpoint this button is pushed to the end of its
+  column, which puts it on the same vertical line as From the kitchen's
+  "see the gallery" button in the band below.
+
+  Both sections are inside the same .wrap, and that button is already pinned to
+  the wrap's right edge (its grid track is auto-sized to the button, so the
+  track's end *is* the wrap's end). Ending this one at the same edge lines the
+  two up at every width above the breakpoint without either of them hard-coding
+  a position — and it also squares the button off against its own paragraph,
+  which fills the column and so ends on that edge too.
+
+  margin-inline-start: auto only pushes a *block-level* box, and .btn is
+  inline-flex, so the display and the width go with it. Below 48rem the grid is
+  one column and this is deliberately not applied: a button shoved to the right
+  of a narrow single column reads as a mistake rather than as alignment.
+*/
+@media (min-width: 48rem) {
+  .goal__cta {
+    display: flex;
+    width: fit-content;
+    margin-inline-start: auto;
+  }
 }
 
 /* --------------------------------------------------------------------------

@@ -18,16 +18,44 @@ const { locale = defaultLocale } = Astro.props;
   from --black besides, so the two are not the same value either.
 */}
 <section class="section section-dark" id="goal">
-  {/* One reveal for the whole band: the eyebrow, the lead and the two columns
-      are a single thought, and staggering them made the eyebrow arrive on its
-      own above nothing. */}
+  {/* One reveal for the whole band: the heading and the two columns are a
+      single thought, and staggering them made the heading arrive on its own
+      above nothing. */}
   <div class="wrap" data-reveal>
-    <p class="eyebrow" data-i18n="nav.goal">{t(locale, 'nav.goal')}</p>
-    <h2 class="goal__lead" data-i18n="goal.lead">{t(locale, 'goal.lead')}</h2>
+    {/*
+      The heading names the section, which it did not use to.
+
+      This band carried two stacked titles: a small wood eyebrow reading
+      "Our Goal" and, under it, a --step-2 sentence ("To serve fish with the
+      respect it deserves"). The client asked for one, so the eyebrow's words
+      were promoted into the sentence's size and the sentence itself was cut —
+      `goal.lead` went with it.
+
+      It reads `nav.goal` rather than a heading key of its own, which is what
+      the eyebrow did too. There was a `goal.heading` once and it was deleted in
+      a dead-key sweep for never being rendered; re-adding it would put the same
+      two words in two keys that can drift apart silently. The nav label and the
+      section title should agree, so they share one string.
+
+      This also makes Our Goal the last section to stop carrying an eyebrow —
+      see the note in CLAUDE.md about why they were a bug rather than a device.
+    */}
+    <h2 class="goal__heading" data-i18n="nav.goal">{t(locale, 'nav.goal')}</h2>
 
     <div class="goal__grid">
       <p data-i18n="goal.body">{t(locale, 'goal.body')}</p>
-      <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
+      {/*
+        The second column is a <div> so the button can sit under its paragraph
+        rather than beside it. `.goal__grid p` is a descendant selector, so the
+        paragraph keeps its muted colour and its measure through the wrapper,
+        and the grid still has exactly two children and so still two columns.
+      */}
+      <div>
+        <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
+        <a class="btn btn--primary goal__cta" href="/team" data-i18n="goal.cta">
+          {t(locale, 'goal.cta')}
+        </a>
+      </div>
     </div>
   </div>
 </section>
