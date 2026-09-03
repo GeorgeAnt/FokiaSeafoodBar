@@ -49,8 +49,12 @@ read — the shopfront sign in the team photos is rusted metal. `--wood-light` a
 toward orange. Warming any of these four back up undoes the palette.
 
 **No two bands in a row share a background.** The page steps light / mid / dark
-and back: Hero black, Our Goal stone, Team salt, From the kitchen black, Take
-away salt, Find Us stone, footer black. Our Goal is on the mid tier *because*
+and back: Hero black, Our Goal stone, From the kitchen black, Take away salt,
+Find Us stone, footer black. Team used to be the salt band between Our Goal and
+From the kitchen; taking it out left stone directly above black, which still
+alternates, so nothing had to be re-tiered. Verified on the rendered page, not
+assumed — Take away reads `rgba(0,0,0,0)` in the DOM because `.section` sets no
+background and inherits salt from the body. Our Goal is on the mid tier *because*
 the hero above it is black — as a dark section it ran straight into the hero with
 no boundary.
 
@@ -80,26 +84,29 @@ tier — which is the same logic that put Our Goal and Find Us on stone. So Take
 away is now a light band. Work the sequence out in full before changing an
 order; there are only three tiers and both ends are pinned black.
 
-**Each section on the homepage uses a different layout — except Team, which the
-client has taken back to alternating rows.** Hero is a split, Our Goal is two
-columns of text, Team is alternating photo-and-paragraph rows, From the kitchen
-is a staggered photo row, Take away is two photo panels with their titles laid
-over them, Find Us is a text and image split.
+**Each section on the homepage uses a different layout.** Hero is a split, Our
+Goal is two columns of text, From the kitchen is a staggered photo row, Take
+away is two photo panels with their titles laid over them, Find Us is a text and
+image split.
 
-Team was made a portrait grid precisely to break that repetition: as rows it ran
-the same image-and-text composition once per member, with Find Us below making
-one more, and at four people that was roughly 45% of the homepage's height. It
-went back to rows when the fifth member arrived — five equal grid columns are
-~220px, which sets a bio about four words to the line. The client chose the
-measure over the page length, explicitly "for now".
+**That rule was being broken by Team, and moving Team to `/team` is what fixed
+it** — worth recording, because the repetition problem was live for a long time
+and two different attempts were made on it. As alternating rows the section ran
+the same image-and-text composition once per member, and Find Us below is
+another of the same shape, so at five people the homepage ran that composition
+six times and **Team and Find Us were no longer distinguishable shapes**. The
+first attempt was a portrait grid, which held the section to 1030px and did
+break the repetition — and was reverted, because five equal columns are ~220px
+and set a bio about four words to the line. The client chose the measure over
+the page length.
 
-So the page now runs that composition six times. That is a known, accepted cost,
-not an oversight — and it is measurable: Team went from 1030px as a grid to
-**3249px** as five rows at 1366x768, 4.2 viewports of the homepage in one band.
-It also means **Team and Find Us are no longer distinguishable shapes**, and a
-seventh instance would be the third. Before adding a section,
-check what shape its neighbours already are, and if Team is ever revisited this
-is the first thing to weigh.
+The second attempt is the page. The rows keep their full width, the homepage
+loses the repetition, and neither had to be traded for the other. The numbers:
+Team was **3249px** at 1366x768, 4.2 viewports in one band, and 4507px on a
+390x844 phone. The homepage went from ~7786px to **4537px** — it lost 42% of its
+height to one move. Before adding a section here, still check what shape its
+neighbours already are; Find Us is now the only instance of that composition on
+the page.
 
 **From the kitchen is not in the nav — but the width argument that used to
 forbid it is gone, so do not repeat it.** It said "cannot be", and that was
@@ -188,23 +195,21 @@ The gallery *tiles* are the deliberate exception and stay in the page: each is a
 script does not run, and JS only intercepts the click.
 
 **Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
-bands are not viewport-sized and cannot be. Re-measured at 1366x768 with five
-alternating rows: Plates 834, Contact 842, Find Us 1082 and Team **3249** are
-all taller than the screen — Team is 4.2 viewports on its own; on a 390x844
-phone it is 4507, 5.3 viewports. Take away used to be the short-band case at
-232; the two photo panels took it to 842, so there is no longer a band short
-enough for a whole screen to be absurd — but the tall ones still rule out
-`mandatory`. (Team read 1030 as a
-portrait grid; the rows quadrupled it, which is the cost recorded in the layout
-note above.)
+bands are not viewport-sized and cannot be. Re-measured at 1366x768 after Team
+moved to its own page: Plates 834, Contact 1004 and Find Us 1082 are all taller
+than the screen. Team was the extreme case at **3249px**, 4.2 viewports on its
+own, and it is gone from this page — but the remaining three still rule
+`mandatory` out on their own. Take away used to be the short-band case at 232;
+the two photo panels took it past a full screen, so there is no longer a band
+short enough for a whole screen to be absurd either.
 `mandatory` pulls the reader out of a band they are still reading and gives the
 short band a whole screen for two lines. `proximity` only settles a scroll that
 already ended near a boundary, so tall bands scroll through normally. Snapping is
 gated at 48rem (below it there is nothing to settle onto) and on
 `prefers-reduced-motion` (it moves the page without being asked). This is also
 why full scroll-hijacking — one wheel tick per section — is not on the table:
-it would hide the bottom of Team and Find Us and break every `/#anchor` in the
-nav.
+it would hide the bottom of Find Us and Take away and break every `/#anchor` in
+the nav.
 
 **A rule that hides content must be owned by the script that can un-hide it.**
 `[data-reveal]` blocks are invisible only under `.has-reveal`, and that class is
@@ -253,12 +258,16 @@ identical titles stacked. Only Our Goal keeps one, because its heading is a
 sentence and the eyebrow is the only thing naming the section. Do not add them
 back per-section without new copy that says something the heading does not.
 
-**Three pages.** `/` is the scrolling homepage; `/menu` is the menu and its
-legal block; `/gallery` is the photographs. Nav links to homepage sections must
-stay rooted (`/#team`) so they work from the other two. The `Restaurant` JSON-LD
+**Four pages.** `/` is the scrolling homepage; `/menu` is the menu and its
+legal block; `/gallery` is the photographs; `/team` is the five member rows,
+moved off the homepage for its height. Nav links to homepage sections must stay
+rooted (`/#goal`) so they work from the other three — only two of the six nav
+entries are anchors now, the rest are pages. The `Restaurant` JSON-LD
 lives on `/` with `hasMenu` pointing at `/menu`; the `Menu` graph is emitted
-only on `/menu` via Base's `menuSchema` prop. Each page needs exactly one `h1`
-— Gallery's heading is an `h1`, and on the homepage the `h1` is the hero
+only on `/menu` via Base's `menuSchema` prop. `/team` adds no graph of its own.
+Each page needs exactly one `h1` — Gallery's and Team's section headings are
+`h1`s (Team's was an `h2` while it sat on the homepage, and its member names
+went `h3` -> `h2` with it, so the page does not skip a level), and on the homepage the `h1` is the hero
 wordmark, which is now **typeset, not an image**. It is two spans, the name and
 the tagline, and the accessible name comes from the text itself rather than from
 an `alt`. Verified in Chrome's a11y tree: the heading computes as "fokia seafood
@@ -326,7 +335,8 @@ Node is installed but **not on the shell PATH**; prepend it first:
   default, which silently breaks `height: 100%` on the `<img>` inside it.
 - `<figure>` has a default `margin: 1em 40px`; the reset zeroes it. Without that,
   gallery images render narrower than their column.
-- Team is **alternating photo-and-text rows**, and the type is sized for that:
+- Team lives on `/team` and is **alternating photo-and-text rows**, and the type
+  is sized for that:
   `.team__name` is `--step-2` and the bio takes `--measure` rather than the
   `--step-1`/`--step--1` pair the ~285px grid column needed. If it ever goes
   back to a grid, both move again — they are a property of the column width, not
@@ -644,8 +654,9 @@ Node is installed but **not on the shell PATH**; prepend it first:
   **It is paired with the bar's height and the two move together.** The bar is
   `min-height: 6rem` + 1px of border = 97px, and `scroll-padding-top: 7.25rem`
   (116px) leaves 19px of air under it — the same air the old 81px bar had at
-  6.25rem. Verified by jumping to `/#team`: the bar's bottom is at 97px and the
-  section lands at 116px. Change one without the other and every anchored
+  6.25rem. Re-verified by jumping to `/#goal` — the `/#team` anchor this used
+  to cite is a page of its own now: the bar's bottom is at 97px and the section
+  lands at 116px. Change one without the other and every anchored
   heading goes behind the bar, or sits in a band of nothing.
 - Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
   nav links need `display: block` or the tap targets collapse to ~26px.

@@ -4,7 +4,6 @@ import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import Goal from '../components/Goal.astro';
 import Plates from '../components/Plates.astro';
-import Team from '../components/Team.astro';
 import Contact from '../components/Contact.astro';
 import FindUs from '../components/FindUs.astro';
 import Footer from '../components/Footer.astro';
@@ -12,9 +11,12 @@ import { defaultLocale } from '../lib/i18n';
 
 /* Greek is what the server renders; the switcher swaps chrome to English on the
    client. Every section here is an anchor target except Plates, which is not in
-   the nav — the bar has 43px of clearance left at 1025px in Greek and a seventh
-   label does not fit. The menu and the gallery are their own pages — see the
-   notes in src/pages/menu.astro and gallery.astro. */
+   the nav — it is reached by scrolling and its own button goes to /gallery.
+
+   The menu, the gallery and the team are their own pages; see the notes at the
+   top of each. Team left this file for its height — five alternating rows ran
+   3249px, 4.2 viewports at 1366x768 — and its removal is why the bands here
+   read black, stone, black, salt, stone, black and still alternate. */
 const locale = defaultLocale;
 ---
 
@@ -24,7 +26,6 @@ const locale = defaultLocale;
   <main id="main">
     <Hero locale={locale} />
     <Goal locale={locale} />
-    <Team locale={locale} />
     <Plates locale={locale} />
     <Contact locale={locale} />
     <FindUs locale={locale} />

@@ -1,7 +1,7 @@
 # fokia — seafood bar
 
 A marketing site for the restaurant — a single scrolling homepage plus a
-dedicated menu page at `/menu` and a gallery at `/gallery`. Built with [Astro](https://astro.build),
+dedicated menu page at `/menu`, a gallery at `/gallery` and the team at `/team`. Built with [Astro](https://astro.build),
 which ships **zero JavaScript frameworks** — the homepage loads about 18 KB of
 HTML/CSS (gzipped) plus images.
 
@@ -43,9 +43,10 @@ browser download. Its scratch files go in `.playwright-cli/`, which is ignored.
 
 | URL | What's on it |
 |---|---|
-| `/` | Hero, Our Goal, the Team, From the Kitchen, Reserve your spot • Take away, Where to Find Us |
+| `/` | Hero, Our Goal, From the Kitchen, Reserve your spot • Take away, Where to Find Us |
 | `/menu` | The full menu and the legally required notices |
 | `/gallery` | The photographs, each opening in a lightbox |
+| `/team` | The five team members, one photo-and-bio row each |
 
 The menu has a page of its own rather than being a section on the homepage. It
 is 98 items across 19 sections — over half the site's DOM — but the real reason
@@ -57,8 +58,8 @@ The gallery is split out for the same reasons: 23 full-width photographs are a
 large share of the homepage's weight, and a link sent to someone should land on
 the photos rather than partway down the homepage.
 
-Nav links to homepage sections are written rooted (`/#team`, not `#team`) so
-they work from `/menu` and `/gallery` too. From the homepage a rooted fragment is still a
+Nav links to homepage sections are written rooted (`/#goal`, not `#goal`) so
+they work from `/menu`, `/gallery` and `/team` too. From the homepage a rooted fragment is still a
 same-document jump, so nothing reloads.
 
 ---
@@ -415,8 +416,8 @@ Two things happen as you scroll the homepage on a desktop or tablet:
 - **The page settles on the bands.** When a scroll ends near the boundary
   between two sections, it clicks that section neatly under the navigation bar.
   It does **not** force one section per scroll: several bands are taller than a
-  laptop screen (Team is three and a half screens on a phone), so being forced
-  section-by-section would hide their bottom halves. Tall bands scroll through
+  laptop screen — Where to Find Us is one and a half on a laptop — so being
+  forced section-by-section would hide their bottom halves. Tall bands scroll through
   normally, then the next one settles into place.
 - **Each band rises into view** as it arrives, over about seven tenths of a
   second. The hero is excluded, because it is the first thing painted.
@@ -571,7 +572,7 @@ src/
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script
   lib/                i18n lookup, menu formatting, photo resolution
-  pages/index.astro   homepage — hero, goal, team, plates, contact, find us
+  pages/index.astro   homepage — hero, goal, plates, contact, find us
   pages/menu.astro    the menu, at /menu
   pages/gallery.astro the photographs, at /gallery
   styles/global.css   design tokens and all styling
@@ -610,7 +611,9 @@ Which tier a section gets depends on the sections either side of it, so
 reordering the homepage can re-tier a band that did not move. From the Kitchen
 is dark because food photography needs a dark ground; when it moved below the
 Team it ended up directly above Take away, which was also dark, so Take away
-became a light band. The rule when two dark bands collide is that the
+became a light band. (The Team has since moved to its own page, which left the
+stone of Our Goal directly above that dark band — still an alternation, so
+nothing needed re-tiering.) The rule when two dark bands collide is that the
 photographs keep the dark ground and the text-only band moves.
 
 Take away has since gained two photographs of its own, and it still stays light

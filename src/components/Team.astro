@@ -10,10 +10,15 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 ---
 
+{/*
+  This renders on /team and nowhere else, which is why the heading is an <h1>:
+  it is that page's only one. It was an <h2> while the section sat on the
+  homepage under the hero logo's h1. See src/pages/team.astro for why it moved.
+*/}
 <section class="section" id="team">
   <div class="wrap">
     <header class="section-head" data-reveal>
-      <h2 data-i18n="team.heading">{t(locale, 'team.heading')}</h2>
+      <h1 data-i18n="team.heading">{t(locale, 'team.heading')}</h1>
       <p data-i18n="team.intro">{t(locale, 'team.intro')}</p>
     </header>
 
@@ -50,9 +55,12 @@ const { locale = defaultLocale } = Astro.props;
               {/* Locale-keyed like the role and bio — see team.json. The alt
                   on the portrait above carries the same key, so the language
                   switch reaches both. */}
-              <h3 class="team__name" data-i18n={`team.${member.id}.name`}>
+              {/* h2, not h3: the section heading above is now this page's h1,
+                  and h1 -> h3 skips a level. .team__name is a class selector so
+                  the tag change moves nothing visually. */}
+              <h2 class="team__name" data-i18n={`team.${member.id}.name`}>
                 {t(locale, `team.${member.id}.name`)}
-              </h3>
+              </h2>
               <p class="team__role" data-i18n={`team.${member.id}.role`}>
                 {t(locale, `team.${member.id}.role`)}
               </p>

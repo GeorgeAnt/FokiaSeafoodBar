@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Team from '../components/Team.astro';
+import Footer from '../components/Footer.astro';
+import { defaultLocale } from '../lib/i18n';
+
+/*
+  The team has its own page because of its height, not its weight.
+
+  As five alternating photo-and-paragraph rows the section measured 3249px at
+  1366x768 — 4.2 viewports — and 4507px on a 390x844 phone, 5.3 viewports. That
+  was roughly a third of the homepage in one band, and it sat between Our Goal
+  and From the kitchen, so anyone scrolling to the food went through all five
+  bios to get there. Moving it out is the alternative to shortening it, which
+  the client had already declined once: the portrait grid that used to keep it
+  to 1030px put the bios in ~220px columns, about four words a line, and was
+  reverted for that reason. On its own page the rows can stay full width and
+  cost the homepage nothing.
+
+  Two knock-on effects, both checked rather than assumed:
+
+  - The homepage band order still alternates. It was black, stone, salt, black,
+    salt, stone, black; without Team it is black, stone, black, salt, stone,
+    black, so no two bands share a background and nothing had to be re-tiered.
+  - The heading moved up a level. Team.astro renders an <h1> now, and the member
+    names went h3 -> h2, because this page's only heading is the section's own
+    and h1 -> h3 would skip a level. Both are class-styled, so nothing moved
+    visually — see the note in CLAUDE.md about grepping the tag, not the class.
+
+  No extra structured data. The Restaurant graph stays on the homepage; nothing
+  in schema.org's Restaurant vocabulary describes a staff roster in a way that
+  is worth 5 more entries, and the bios are prose rather than credentials.
+*/
+const locale = defaultLocale;
+---
+
+<Base locale={locale} titleKey="meta.teamTitle" descriptionKey="meta.teamDescription">
+  <Nav locale={locale} />
+
+  {/*
+    id="main" is what the skip link targets. The footer's "back to top" uses
+    href="#top", which needs no element — HTML treats the fragment "top" as the
+    top of the document when nothing carries that id.
+  */}
+  <main id="main">
+    <Team locale={locale} />
+  </main>
+
+  <Footer locale={locale} />
+</Base>

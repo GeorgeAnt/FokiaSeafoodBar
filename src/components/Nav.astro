@@ -23,13 +23,18 @@ const { locale = defaultLocale } = Astro.props;
   by `object-fit` rather than by a second asset — see the note on `.nav__logo`
   in global.css for why that is safe and what it saves.
 
-  Section links are rooted ("/#team", not "#team") because the nav also renders
-  on /menu and /gallery, where those sections do not exist. From the homepage a
-  rooted fragment is still a same-document jump, so nothing reloads.
+  Section links are rooted ("/#goal", not "#goal") because the nav also renders
+  on /menu, /gallery and /team, where those sections do not exist. From the
+  homepage a rooted fragment is still a same-document jump, so nothing reloads.
+
+  Four of the six entries are now whole pages rather than anchors. /team joined
+  them when the section was moved off the homepage for its height; it keeps the
+  same nav.team label and the same position in the run, so the bar's width
+  budget is unchanged.
 */
 const links = [
   { href: '/#goal', key: 'nav.goal' },
-  { href: '/#team', key: 'nav.team' },
+  { href: '/team', key: 'nav.team' },
   { href: '/menu', key: 'nav.menu' },
   { href: '/gallery', key: 'nav.gallery' },
   { href: '/#contact', key: 'nav.contact' },
