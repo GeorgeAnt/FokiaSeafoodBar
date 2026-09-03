@@ -88,44 +88,6 @@ const schedule = JSON.stringify(site.hours.entries);
       <p data-i18n="contact.events">{t(locale, 'contact.events')}</p>
       <p data-i18n="contact.sourcing">{t(locale, 'contact.sourcing')}</p>
     </div>
-
-    {/*
-      The landline is rendered by the server and is what a visitor without
-      JavaScript always gets — it is the primary number and the one in the
-      JSON-LD, so the fallback is correct rather than merely safe.
-
-      The number lives in its own <span> so the swap can replace the text
-      without touching the icon beside it. Nothing here carries data-i18n: a
-      phone number is not translated, so the language switcher never contends
-      with the script for this element.
-    */}
-    <p class="contact__call" data-reveal>
-      <span class="contact__call-label" data-i18n="contact.callUs">{t(locale, 'contact.callUs')}</span>
-      <a
-        class="contact__phone"
-        id="contact-phone"
-        href={`tel:${site.phone.href}`}
-        data-hours={schedule}
-        data-after-href={`tel:${site.phoneAfterHours.href}`}
-        data-after-display={site.phoneAfterHours.display}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          width="22"
-          height="22"
-          aria-hidden="true"
-        >
-          <path
-            d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <span class="contact__phone-number">{site.phone.display}</span>
-      </a>
-    </p>
   </div>
 </section>
 

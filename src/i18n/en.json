@@ -77,13 +77,13 @@
   "findUs.viewOnMap": "View on map",
   "findUs.closed": "Closed",
 
-  "hours.short.Monday": "Mon",
-  "hours.short.Tuesday": "Tue",
-  "hours.short.Wednesday": "Wed",
-  "hours.short.Thursday": "Thu",
-  "hours.short.Friday": "Fri",
-  "hours.short.Saturday": "Sat",
-  "hours.short.Sunday": "Sun",
+  "hours.short.Monday": "Monday",
+  "hours.short.Tuesday": "Tuesday",
+  "hours.short.Wednesday": "Wednesday",
+  "hours.short.Thursday": "Thursday",
+  "hours.short.Friday": "Friday",
+  "hours.short.Saturday": "Saturday",
+  "hours.short.Sunday": "Sunday",
   "hours.rangeSeparator": "–",
 
   "footer.rights": "All rights reserved."

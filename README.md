@@ -641,7 +641,12 @@ single `--accent` token, and no rule references `--wood` directly for text:
 Both tints lighten Wood along the oxidation path — weathered rust, dusty and
 pink — rather than toward orange, which lands on terracotta.
 
-Eyebrows, field labels, team roles, menu subheadings and focus rings all read
-`--accent`, so adding a section to any tier tints them correctly with no extra
-CSS. Every text/background pair on all three tiers has been measured against
-WCAG AA.
+Team roles, menu subheadings and focus rings read `--accent`, so adding a
+section to any tier tints them correctly with no extra CSS. Every text/background
+pair has been measured against WCAG AA.
+
+Two things that used to be on that list no longer are. Section eyebrows are gone
+from the site altogether. And the labels in Where to Find Us — Address, Opening
+hours, Phone, Email — are stone rather than Wood at the client's request: they
+are the same colour as the text under them, and bold weight is what tells them
+apart.

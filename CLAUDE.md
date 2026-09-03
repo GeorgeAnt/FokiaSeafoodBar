@@ -116,6 +116,14 @@ pairing.** Hero is a split, Our Goal is a centred stack of text, From the
 kitchen is a centred head over a staggered photo row, Take away is two photo
 panels with their titles laid over them, Find Us is a text and image split.
 
+**The three band headings are one size.** `.goal__heading`, `.plates__head h2`
+and `.find__head h2` are all `--step-2`. None of them uses `.section-head`,
+which is `--step-3`: that class and a per-band override have equal specificity,
+so keeping it would have made each heading's size depend on which rule came
+later in the file. `.section-head` still owns `/menu`, `/gallery` and `/team`,
+where `--step-3` is a page title rather than a band label.
+`.section-head--inline` existed only for Find Us and went with the change.
+
 Our Goal and From the kitchen now share a composition on purpose: both are a
 centred heading at --step-2, body copy at --step-0 under it, and a centred
 .btn--primary, on the same 46rem axis. The client asked for the second to match
@@ -525,9 +533,22 @@ Node is installed but **not on the shell PATH**; prepend it first:
   `--ghost-hover-*` and `--rule` the same way `.section-dark` and `.lightbox` do.
   Painting the background black without them leaves the links at `--stone` and
   the hover at `--wood` (2.3:1 on Deep Black) — the background is the easy half.
-  Measured on the rendered bar: links and social icons are 6.55:1, and the
-  language button's stone fill is 6.55:1 against the bar with its black label at
-  6.55:1 on the fill.
+  Measured on the rendered bar: links and social icons are 6.55:1 at rest and
+  **14.77:1 hovered**, and the language button's stone fill is 6.55:1 against the
+  bar with its black label at 6.55:1 on the fill.
+
+  **Hover in the bar is white, not wood.** Nav links and social icons both go to
+  `--salt` on `:hover` and `:focus-visible`, matching the Find Us links and the
+  lift `.btn--primary` makes. On a nav link the label and the rule under it move
+  together — `--text-muted` to salt, transparent border to salt — so the target
+  reads as one lit object rather than a grey word with a bright line beneath it.
+
+  **The one wood tint left in the bar is the current-page marker**, and it is left
+  there on purpose. `[aria-current='page']` keeps a `--accent` underline while
+  hover is salt; if it went salt too, "the page you are on" and "the link under
+  your pointer" would look identical. The global focus ring is also still
+  `--accent`, which is wanted for the same reason — a focus indicator should not
+  be mistakable for a hover.
 
   **The wood tint that used to fill that pill is gone, and so is the reason for
   it.** It was a two-segment control and the fill marked *which segment was
@@ -689,7 +710,73 @@ Node is installed but **not on the shell PATH**; prepend it first:
   legally required heading on the site at default Garamond `h2` size instead of
   the small uppercase label it is written to be. Grep the tag, not just the
   class, when a rule looks like it is not doing anything.
-- **`mapUrl` addresses the place by Place ID, and that is a deliberate retreat
+- **The address in Find Us *is* the map link.** There was a "view on map" button
+under it; the client asked for it to go, and the street line took over its
+`href`. Three things about that are load-bearing:
+
+- `findUs.viewOnMap` did **not** become a dead key. It is rendered inside the
+  link as `.sr-only` text, so the accessible name is "Λάσκου 3 Ελευσίνα Δείτε
+  στον χάρτη" — verified in the a11y tree. Appending rather than using
+  `aria-label` keeps the visible words inside the accessible name, which WCAG
+  2.5.3 (Label in Name) requires: a speech-input user saying "Λάσκου 3" still
+  matches the link.
+- The `site.mapUrl` guard stays. With no URL the address renders as plain text
+  rather than as a control that goes nowhere — the same rule the button had.
+- **Nothing on screen marks it as a link.** The client asked for the underlines
+  to go from the phone, the email and the hours rows, and the address link
+  inherits that. Colour does not distinguish it either, since it is the body
+  colour. What is left is the hover and focus state in `.find__contact a,
+  .find__map`; removing those would leave four links with no affordance at all.
+  This is a recorded trade-off, not an oversight.
+
+**Find Us runs a three-step ramp, and the emphasis is inverted from where it
+started.** Heading `--step-2` salt, label `--step-1` salt bold, value
+`--step-0` `--light-stone` — measured 32.4 / 23.4 / 18.1px at 1366. Labels
+began as `--step--1` uppercase wood over `--step-1` values, i.e. small quiet
+label over large value; the client asked for the opposite, so the block reads
+label-first now.
+
+Two things inside that are worth keeping:
+
+- The strings were already sentence case in the locale files ("Ώρες
+  λειτουργίας", "Opening hours"), so dropping `text-transform` was the whole of
+  that change. The 0.16em tracking went with it — that is a caps measurement,
+  and on lowercase it reads as letters drifting apart.
+- "Stone" in this section is always `--light-stone` (5.86:1 on charcoal), never
+  `--stone`, which measures **2.6:1** there and fails outright. Same call as the
+  hero wordmark and the CTA fill. The day names took the same muted stone the
+  times already had, and the rules between rows went with the underlines.
+
+**The blocks read Address, Phone, Email, Opening hours — hours last, at the
+client's request — and the hours themselves run Monday first.** That second one
+is a sort, not a reordering of the data: every run, open and closed, is ordered
+by `dayIndex(run.from)`. It used to be the open ranges in the order the client
+listed them followed by the closed days, which put Monday last precisely because
+Monday is the closed one. Sorting by day keeps working if the closed day ever
+moves; nothing assumes which day is shut.
+
+**The text column is centred; the photograph is not.** `.find__col` carries
+`text-align: center` and the photo keeps its own grid column beside it. Making
+this a third full-width centred stack was the alternative and was not taken: Our
+Goal and From the kitchen are already that shape, and a third would leave the
+homepage running one composition in three bands out of four — the failure mode
+recorded under the layout rule above. The hours list needs its own centring
+because it is a fixed-width block of rows rather than a run of text, so the 22rem
+cap moved from the `<li>` up to the `<ul>` where auto margins can act on it.
+
+**The address, phone and email icons are inline SVG, not Font Awesome.** The
+client asked for "fa icons"; what shipped is three glyphs in the same idiom as
+`SocialLinks` — 24x24, `fill: none`, `stroke: currentColor` at 1.6 — for
+reasons that would apply to any icon set: this site self-hosts everything it
+renders and tracks its page weight, three glyphs do not justify a CDN request or
+a webfont, and Font Awesome Free is CC BY 4.0, which carries an attribution
+requirement nothing on the page currently satisfies. Inline SVG also inherits
+`currentColor`, so the icons follow each link's hover and focus states without a
+second rule. Every one is `aria-hidden` — the text beside it is already the
+link's accessible name. If real Font Awesome is ever wanted, that is a
+dependency decision, not a styling one.
+
+**`mapUrl` addresses the place by Place ID, and that is a deliberate retreat
   from the browser's own URL.** A `/maps/place/…` URL ends in a `data=` blob
   that is length-prefixed — `!4m6` declares six following tokens, `!3m5`
   declares five — so removing one that looks redundant (`!16s`, a

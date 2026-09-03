@@ -61,15 +61,27 @@ function runsOf(days: readonly string[]) {
   return runs;
 }
 
-/* Open ranges in the order the client listed them, then the closed days. A day
-   the restaurant is shut is not a working hour, but dropping it entirely leaves
-   a visitor guessing about Monday. */
+const dayIndex = (day: string) => dayOrder.indexOf(day as (typeof dayOrder)[number]);
+
+/*
+  Every run, open and closed, ordered by the day it starts on — so the list
+  reads Monday first and runs through the week.
+
+  It used to be "the client's open ranges in the order they listed them, then
+  the closed days", which put Monday last because Monday is the closed one. The
+  client asked for it to read as a week instead. Sorting by dayIndex rather than
+  by open-vs-closed is what does it, and it keeps working if the closed day ever
+  moves: nothing here assumes which day is shut.
+
+  A day the restaurant is shut is still listed. It is not a working hour, but
+  dropping it leaves a visitor guessing about Monday.
+*/
 const schedule = [
   ...site.hours.entries.flatMap((entry) =>
     runsOf(entry.days).map((run) => ({ run, opens: entry.opens, closes: entry.closes }))
   ),
   ...runsOf(site.hours.closed).map((run) => ({ run, opens: null, closes: null })),
-];
+].sort((a, b) => dayIndex(a.run.from) - dayIndex(b.run.from));
 ---
 
 <!--
@@ -87,8 +99,22 @@ const schedule = [
       than the words it belongs to.
     */}
     <div class="find__grid" data-reveal>
-      <div>
-        <header class="section-head section-head--inline">
+      {/*
+        The text column is centred, like Our Goal and From the kitchen. The
+        photograph keeps its own column beside it rather than moving below —
+        making this a third full-width centred stack would leave the homepage
+        running the same shape three bands out of four. See the layout note in
+        CLAUDE.md.
+      */}
+      <div class="find__col">
+        {/*
+          Not .section-head: that sets --step-3, and this heading is --step-2 to
+          match From the kitchen and Our Goal. Same reasoning as .plates__head —
+          the two rules have equal specificity, so overriding would have meant
+          depending on source order. .section-head--inline existed only for this
+          one header and went with it.
+        */}
+        <header class="find__head">
           <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
         </header>
         <div class="find__block">
@@ -100,30 +126,87 @@ const schedule = [
             Restaurant JSON-LD, which is what local search reads; on the page
             they were three lines telling a visitor what one line tells them.
           */}
-          <address class="find__address">
-            <span data-i18n="site.street">{t(locale, 'site.street')}</span>{' '}
-            <span data-i18n="site.city">{t(locale, 'site.city')}</span>
-          </address>
+          {/*
+            The address IS the map link now — the separate "view on map" button
+            below it is gone.
 
-          {
-            /* Rendered only once the client supplies the real link — an empty
-               href would look like a working button that goes nowhere. */
-            site.mapUrl && (
-              <p class="find__actions">
-                <a
-                  class="btn btn--primary"
-                  href={site.mapUrl}
-                  target="_blank"
-                  rel="noopener"
-                  data-i18n="findUs.viewOnMap"
-                >
+            `findUs.viewOnMap` did not go with the button: it is carried as
+            visually hidden text inside the link. That is deliberate rather than
+            tidy-minded. The link has no underline (the client asked for those
+            to go), so nothing on screen says it leads anywhere, and its
+            accessible name would otherwise be a bare street address with no
+            hint that it opens Google Maps in a new tab. Appending rather than
+            using aria-label keeps the visible words *inside* the accessible
+            name, which is what WCAG 2.5.3 (Label in Name) requires — a speech
+            user saying "Laskou 3" still matches the link.
+
+            The mapUrl guard stays: with no link the address renders as plain
+            text rather than as a control that goes nowhere. See the note in
+            CLAUDE.md about why that URL is a Place ID and must not be edited.
+          */}
+          <address class="find__address">
+            {site.mapUrl ? (
+              <a class="find__map" href={site.mapUrl} target="_blank" rel="noopener">
+                <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M12 21c4-4.2 6.5-7.4 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 13.6 8 16.8 12 21z" />
+                  <circle cx="12" cy="10.5" r="2.4" />
+                </svg>
+                <span>
+                  <span data-i18n="site.street">{t(locale, 'site.street')}</span>{' '}
+                  <span data-i18n="site.city">{t(locale, 'site.city')}</span>
+                </span>
+                <span class="sr-only" data-i18n="findUs.viewOnMap">
+                  {' '}
                   {t(locale, 'findUs.viewOnMap')}
-                </a>
-              </p>
-            )
-          }
+                </span>
+              </a>
+            ) : (
+              <Fragment>
+                <span data-i18n="site.street">{t(locale, 'site.street')}</span>{' '}
+                <span data-i18n="site.city">{t(locale, 'site.city')}</span>
+              </Fragment>
+            )}
+          </address>
         </div>
 
+
+        <div class="find__block">
+          <p class="find__label" data-i18n="contact.phoneLabel">
+            {t(locale, 'contact.phoneLabel')}
+          </p>
+          {/*
+            Icons are inline SVG in the same idiom as SocialLinks — 24x24,
+            fill none, stroke currentColor at 1.6 — rather than Font Awesome.
+            The site ships no icon library and self-hosts everything it renders;
+            three glyphs are not worth a CDN request, a webfont, or FA's CC BY
+            attribution requirement, and inline SVG inherits currentColor so the
+            icons follow the link's hover and focus states for free.
+
+            aria-hidden on every one of them: the link text beside the icon is
+            already the accessible name, and an unlabelled decorative glyph
+            inside a link would either add nothing or duplicate it.
+          */}
+          <p class="find__contact">
+            <a href={`tel:${site.phone.href}`}>
+              <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+              </svg>
+              <span>{site.phone.display}</span>
+            </a>
+          </p>
+          <p class="find__label find__label--tight" data-i18n="contact.emailLabel">
+            {t(locale, 'contact.emailLabel')}
+          </p>
+          <p class="find__contact">
+            <a href={`mailto:${site.email}`}>
+              <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3.6 6.6 8.4 5.9 8.4-5.9" />
+              </svg>
+              <span>{site.email}</span>
+            </a>
+          </p>
+        </div>
 
         <div class="find__block">
           <p class="find__label" data-i18n="findUs.hoursLabel">{t(locale, 'findUs.hoursLabel')}</p>
@@ -165,22 +248,6 @@ const schedule = [
               ))
             }
           </ul>
-        </div>
-
-
-        <div class="find__block">
-          <p class="find__label" data-i18n="contact.phoneLabel">
-            {t(locale, 'contact.phoneLabel')}
-          </p>
-          <p class="find__contact">
-            <a href={`tel:${site.phone.href}`}>{site.phone.display}</a>
-          </p>
-          <p class="find__label find__label--tight" data-i18n="contact.emailLabel">
-            {t(locale, 'contact.emailLabel')}
-          </p>
-          <p class="find__contact">
-            <a href={`mailto:${site.email}`}>{site.email}</a>
-          </p>
         </div>
       </div>
 

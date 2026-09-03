@@ -806,12 +806,32 @@ main > .section-dark:last-child {
     border-color 0.18s var(--ease);
   white-space: nowrap;
 }
-.nav__links a:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+/*
+  White on hover, not wood — the same --salt the .btn--primary fill lifts to and
+  the same one the Find Us links take. Every hover on the site now brightens
+  toward salt rather than warming toward the accent.
+
+  Both properties move together: the label lifts from --text-muted to salt and
+  the rule under it comes up with it, so the whole target reads as one lit
+  object rather than as a grey word with a bright line under it.
+
+  :focus-visible is here too so keyboard and pointer show the same thing. The
+  global focus outline still draws in --accent on top of it, which is wanted —
+  that ring is the focus indicator, and it should not look like a hover.
+*/
+.nav__links a:hover,
+.nav__links a:focus-visible {
+  color: var(--salt);
+  border-bottom-color: var(--salt);
 }
 
-/* The menu is a page of its own now, so the nav can show where you are. */
+/*
+  The nav can show where you are, and this is now the one place a wood tint
+  survives in the bar. That is deliberate rather than an oversight: hover became
+  salt, so if this marker went salt too, "the page you are on" and "the link
+  under your pointer" would be indistinguishable. Wood keeps the state marker
+  and the pointer feedback saying different things.
+*/
 .nav__links a[aria-current='page'] {
   color: var(--text);
   border-bottom-color: var(--accent);
@@ -850,8 +870,9 @@ main > .section-dark:last-child {
     color 0.18s var(--ease),
     background-color 0.18s var(--ease);
 }
-.social a:hover {
-  color: var(--accent);
+.social a:hover,
+.social a:focus-visible {
+  color: var(--salt);
 }
 .social svg {
   width: 1.5rem;
@@ -2109,56 +2130,150 @@ main > .section-dark:last-child {
 }
 
 /* The heading is inside the column here, so its trailing space is the gap to
-   the first block rather than to a whole grid below it. */
-.section-head--inline {
+   the first block rather than to a whole grid below it. --step-2 matches
+   .plates__head and .goal__heading: the three band headings are one size. */
+.find__head {
   margin-bottom: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+}
+.find__head h2 {
+  font-size: var(--step-2);
+  line-height: 1.25;
+}
+
+/*
+  The text column is centred; the photograph beside it is not affected. The
+  hours list needs its own centring because it is a fixed-width block of rows
+  rather than a run of text — text-align does nothing to it, so the 22rem cap
+  moved from the <li> up to the <ul> where auto margins can act on it.
+*/
+.find__col {
+  text-align: center;
 }
 
 .find__block + .find__block {
   margin-top: 2rem;
 }
+/*
+  Sentence case, white, bold, and larger than the value under it.
+
+  The strings are already sentence case in the locale files ("Ώρες
+  λειτουργίας", "Opening hours"), so dropping text-transform was the whole of
+  that change. The tracking went with it: 0.16em is a caps measurement, and on
+  lowercase it reads as letters drifting apart rather than as a label.
+
+  The emphasis is inverted from where it started. Labels used to be --step--1
+  wood over --step-1 values; they are --step-1 salt over --step-0 stone now, so
+  the block reads label-first. That gives the column a three-step ramp —
+  heading --step-2, label --step-1, value --step-0 — rather than two sizes
+  fighting over which is the heading.
+
+  Salt is 13.22:1 on this band's charcoal. The values below are --light-stone at
+  5.86:1; --stone itself is 2.6:1 here and fails, which is why "stone" in this
+  section always means the light one.
+*/
 .find__label {
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 0.6rem;
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--salt);
+  margin-bottom: 0.35rem;
 }
 .find__label--tight {
   margin-top: 1.1rem;
 }
 
 .find__contact {
-  font-size: var(--step-1);
   line-height: 1.5;
 }
-.find__contact a {
+/*
+  No underline at rest — the 1px rule that used to sit under the phone number
+  and the email is gone, as are the rules between the opening hours rows — but
+  a real underline on hover and focus, which is the only thing telling a visitor
+  these three are links.
+
+  It is a text-decoration rather than the old border-bottom on purpose: a border
+  sits under the whole box and skips nothing, while an underline follows the
+  text and clears descenders, which matters most on the email address. The
+  offset keeps it off the baseline of Greek and Latin alike.
+
+  These states are load-bearing, not decoration. At rest the address, the phone
+  and the email are the same colour and weight as the text around them, so there
+  is nothing else marking them as clickable. Do not remove them.
+*/
+/*
+  inline-flex so the icon and the text sit on one line with a real gap, and so
+  the pair centres as a single object in the centred column. It stays
+  inline-level, not block, or it would take the full column width and the
+  underline would run past the end of the text.
+*/
+.find__contact a,
+.find__map {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: start;
   text-decoration: none;
-  border-bottom: 1px solid var(--rule);
-  transition: border-color 0.18s var(--ease);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  transition: color 0.18s var(--ease);
 }
-.find__contact a:hover {
-  border-bottom-color: currentColor;
+/* Sized in em so it tracks the value's font-size rather than needing its own
+   number if that changes. flex: none stops it squashing when the address wraps. */
+.find__icon {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+}
+/*
+  Hover and focus go to --salt, the same white the .btn--primary fill lifts to,
+  rather than to --accent. The two hover states on this page now agree: a button
+  brightens to salt, and so does a link.
+
+  It lands on the same colour as .find__label above it, which is fine — the
+  label is 700 and a size larger, and the underline is doing the work of saying
+  "this one is a link". The icon follows for free: it is stroked in
+  currentColor.
+*/
+.find__contact a:hover,
+.find__contact a:focus-visible,
+.find__map:hover,
+.find__map:focus-visible {
+  color: var(--salt);
+  text-decoration: underline;
+}
+/* The values — address, hours, phone, email — are one size and one colour:
+   --step-0 in --light-stone, under a larger salt label. The hours list was
+   already at the inherited body size, so this brings the other three down to
+   meet it rather than moving all four. */
+.find__address,
+.find__contact,
+.find__hours {
+  font-size: var(--step-0);
+  color: var(--light-stone);
 }
 .find__address {
   font-style: normal;
-  font-size: var(--step-1);
   line-height: 1.5;
 }
 
 .find__hours {
   font-variant-numeric: tabular-nums;
 }
+/* No dividing rules between rows, and the day names take the same muted stone
+   the times already had — the row reads as one line rather than as a table with
+   a bright left column. */
+.find__hours {
+  max-width: 22rem;
+  margin-inline: auto;
+}
+/* No dividing rules between rows, and the day names take the same muted stone
+   the times already had — the row reads as one line rather than as a table with
+   a bright left column. */
 .find__hours li {
   display: flex;
   justify-content: space-between;
   gap: 1.5rem;
   padding-block: 0.4rem;
-  max-width: 22rem;
-  border-bottom: 1px solid var(--rule);
-}
-.find__hours span:last-child {
   color: var(--text-muted);
 }
 
@@ -2181,13 +2296,6 @@ main > .section-dark:last-child {
 
 /* Sits directly under the address it belongs to now, not at the end of the
    column, so it needs the spacing of a related element rather than a break. */
-.find__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
