@@ -295,7 +295,7 @@ script if the folder moves.
 **2. Build time.** Astro generates responsive AVIF and WebP variants with a JPEG
 fallback from those masters, at the widths each section actually needs. Every
 image carries explicit dimensions, so nothing shifts as the page loads. Only the
-first hero photo and the hero logo load eagerly; everything else is lazy. The
+first hero photo and the nav logo load eagerly; everything else is lazy. The
 gallery additionally builds one 1400px variant per photo, which is both what the
 lightbox shows and the link a visitor without JavaScript follows.
 
@@ -511,17 +511,20 @@ while back and nothing had rendered the field since.
   reason, so `npm run check` keeps counting it (1/5); drop the flag when the
   real photo replaces the file. The other four members are complete.
 - **Social links** — hidden while empty.
-- **A cropped or vector logo.** `logo-clean.png` has a transparent surround, so
-  it carries the hero, the nav and the footer, and the typeset wordmark it
-  replaced is gone. It is the only logo file, and the favicons are generated
-  from it. Two things would still improve it: the concrete texture is baked
-  *inside* the badge, so on the black hero it reads as a pale disc rather than a
-  mark on the ground; and the file is 1672×940 around an 888×899 badge — 47% of
-  the width is empty field, which every layout using it has to size around.
+- **A cropped or vector logo.** `logo-clean.png` carries the nav, the footer and
+  the favicons. It is the only logo file. One thing would still improve it: the
+  file is 1672×940 around an 888×899 badge — 47% of the width is empty field,
+  which every layout using it has to size around.
+
+  The other complaint that used to sit here — that the concrete texture is baked
+  *inside* the badge, so on the black hero it read as a pale disc rather than a
+  mark on the ground — no longer applies, because the hero no longer shows the
+  badge. The name is set in type there instead.
 
   Not urgent any more. The nav crops the field away with `object-fit: cover` on
   a square box rather than shipping a trimmed copy, so the empty field costs
-  layout nothing there. A tight crop or a vector would still be better, and
+  layout nothing there. It still costs bytes: the nav badge is 80px wide but has
+  to be served at 142px so the crop fills it. A tight crop or a vector would still be better, and
   would remove the one fragile assumption that trick rests on — that the badge
   stays horizontally centred in its canvas.
 

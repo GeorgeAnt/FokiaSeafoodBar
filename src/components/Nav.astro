@@ -54,7 +54,15 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
         this same logo, whose alt is what gives the page its heading. Two
         identical accessible names in one document is what that would produce.
       */}
-      <Image src={logoClean} alt="" widths={[112, 224]} sizes="56px" loading="eager" />
+      {/*
+        sizes is 142px, not the 80px the box actually measures. srcset picks a
+        candidate from the img's *layout* width, but object-fit: cover crops 47%
+        of this file away (1672x940, badge centred — see .nav__logo in
+        global.css), so a file laid out at 80px renders a 45px mark in an 80px
+        box. 80 x 1672/940 = 142 is the width that fills it, and 284 is its 2x.
+        Resize .nav__logo and both numbers move with it.
+      */}
+      <Image src={logoClean} alt="" widths={[142, 284]} sizes="142px" loading="eager" />
     </a>
 
     <ul class="nav__links" id="nav-links">

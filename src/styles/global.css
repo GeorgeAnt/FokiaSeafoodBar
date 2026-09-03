@@ -522,18 +522,53 @@ input {
      button. There is no .btn on /menu or /gallery, so nothing else moves. */
   border-radius: 999px;
   border: 1px solid transparent;
+  /*
+    Opts out of the site-wide tap highlight set on `html`, which is wrong here
+    twice over. Chrome paints that highlight against the element's border *box*
+    and ignores `border-radius`, so tapping a 999px pill flashed a hard-edged
+    rectangle around it — reported from a real device, not theorised. And the
+    wash is --wood, which stopped being this control's colour when
+    .btn--primary went stone. The :active rules below replace it with feedback
+    that follows the pill.
+
+    Scoped to .btn deliberately: the wood wash is still right for the site's
+    ordinary links, and `html` keeps it.
+  */
+  -webkit-tap-highlight-color: transparent;
   transition:
     background-color 0.2s var(--ease),
     color 0.2s var(--ease),
     border-color 0.2s var(--ease);
 }
 
+/*
+  Stone fill, black label — the hero CTA is the only .btn--primary on the site
+  (the other two buttons are .btn--ghost), so this is scoped to it.
+
+  It is --light-stone, not --stone. --stone under a --black label measures
+  2.9:1, which fails the 4.5:1 minimum for button text outright; --light-stone
+  measures 6.6:1 and the fill itself is 6.6:1 against the hero black, well over
+  the 3:1 a control's boundary needs. This is the same call as the hero
+  wordmark above it, and it makes the two one family: the mark and the one
+  thing you can press are the same stone.
+
+  Hover goes *lighter*, to --salt (14.8:1 under black), rather than darkening
+  the way the old --wood fill did. On a dark ground a lift reads as pressable;
+  mixing black into a mid stone walks the label's contrast back down toward the
+  2.9:1 that ruled --stone out in the first place.
+*/
 .btn--primary {
-  background: var(--wood);
-  color: var(--paper);
+  background: var(--light-stone);
+  color: var(--black);
 }
 .btn--primary:hover {
-  background: color-mix(in srgb, var(--wood) 84%, black);
+  background: var(--salt);
+}
+/* Pressed goes the other way from hover — down off --salt, past the resting
+   stone, so a tap that never hovers still registers as a press. 5.2:1 under the
+   black label, still over the 4.5:1 minimum. */
+.btn--primary:active {
+  background: color-mix(in srgb, var(--light-stone) 88%, var(--black));
 }
 
 /*
@@ -548,7 +583,8 @@ input {
   border-color: currentColor;
   color: inherit;
 }
-.btn--ghost:hover {
+.btn--ghost:hover,
+.btn--ghost:active {
   background: var(--ghost-hover-bg);
   border-color: var(--ghost-hover-bg);
   color: var(--ghost-hover-fg);
@@ -623,8 +659,8 @@ input {
 
   logo-clean.png is 1672x940 with the badge — 888x899, near enough square —
   centred inside it: 393px of transparent field to the left, 391px to the right.
-  Sized by height, as CLAUDE.md requires, the file would therefore spend 93px of
-  bar width to show a 52px mark, and there is not 93px to spend at 1025px.
+  Sized by height, the file would therefore spend 142px of bar width to show an
+  80px mark, and 47% of that width would be empty field.
 
   A square box with object-fit: cover shows the central 940px of the source,
   which contains the whole 888px badge with 26px to spare each side. So the
@@ -636,11 +672,31 @@ input {
   logo file arrives off-centre, re-measure before trusting the crop — the
   failure is silent and looks like a badly cropped logo.
 */
+/*
+  5rem = 80px, in a bar whose min-height is 96px: 8px of air above and below.
+  The client asked for the mark to read at the scale it does on the reference
+  site they sent (thyme-restaurant-bar-nafplio.gr), where a 180px disc sits in a
+  94px bar with 74px inside it and 106px hanging below onto the hero.
+
+  Only the size was taken, and the rest was built and reverted rather than
+  argued about — worth recording so it is not rebuilt. The overhang (11rem,
+  align-self: start, a negative margin-block-end to keep the bar at 97px) works
+  mechanically, but that reference bar is transparent over a hero and this one is
+  opaque black and sticky over three black bands: the disc covered the opening
+  words of a Team paragraph on scroll, and at the top of the homepage it stacked
+  a second fokia badge 6px above the hero logo, which is the page h1 and the
+  same mark. The reference gets away with both because it has no hero logo and
+  its badge is centred over an empty column. Centring was not taken either — that
+  is what forced the links into two balanced groups the last time (see
+  .nav__inner).
+
+  So: as large as the bar holds, in flow at the start, fully inside the bar.
+*/
 .nav__logo {
   display: block;
   flex: none;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 5rem;
+  height: 5rem;
   border-radius: 50%;
   /* Outdented past the wrap's gutter on purpose. The mark is a disc, and a
      circle set flush to the same edge as the flat-sided text below it reads as
@@ -924,14 +980,40 @@ input {
   wide transparent field, and clipping the box would cut the field, not the
   badge.
 */
-.hero__logo {
+/*
+  The typeset lockup that replaced logo-clean.png in the hero. It is the site's
+  one piece of display type: 88px at 1366, against the 47px of --step-3 that is
+  otherwise the largest thing on the site. That is deliberate and is why it is
+  not on the step scale — it stands in for a 214px logo, not for a heading, and
+  putting it on --step-4 would have dragged that token out of the ramp for one
+  use. Both colours are --light-stone: --stone measures 2.9:1 on the hero black
+  and fails even the 3:1 large-text minimum, so the stone that reads here is the
+  light one.
+*/
+.hero__wordmark {
   margin: 0;
-  width: clamp(15rem, 11rem + 15vw, 24rem);
-  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  color: var(--light-stone);
 }
-.hero__logo img {
-  width: 100%;
-  height: auto;
+.hero__wordmark-name {
+  font-size: clamp(3rem, 1.8rem + 5.5vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  /* Headings take -0.02em; a wordmark set this large needs more, or the
+     counters of a geometric sans open up and it stops reading as one word. */
+  letter-spacing: -0.04em;
+}
+.hero__wordmark-tag {
+  font-size: var(--step--1);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  /* Tracking is applied after the last letter too, so a centred line sits half
+     a space left of centre. This pulls that trailing space back off. */
+  margin-inline-start: 0.35em;
 }
 
 .hero__intro {

@@ -1,7 +1,7 @@
 ---
-import { Image, Picture } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
-import { carouselPhotos, logoClean } from '../lib/photos';
+import { carouselPhotos } from '../lib/photos';
 import site from '../data/site.json';
 
 interface Props {
@@ -14,27 +14,32 @@ const { locale = defaultLocale } = Astro.props;
   <div class="hero__grid">
     <div class="hero__copy">
       {/*
-        The logo itself, replacing the typeset "fokia / SEAFOOD BAR" lockup.
+        The wordmark is typeset, not the badge.
 
-        logo-clean.png has a transparent surround so it can sit on the black,
-        but the concrete texture is still inside the badge — it reads as a pale
-        disc rather than a wordmark floating on the ground. That is the supplied
-        artwork. A tightly cropped or vector version would sit better here.
+        logo-clean.png used to render here, and the problem was always that its
+        concrete texture is baked *inside* the disc: on the black hero it read
+        as a pale circle with a word in it rather than as a mark on the ground.
+        Setting it in type puts the name on the black directly. The badge is not
+        gone — it still carries the nav, the footer and the favicons, where a
+        disc is what is wanted.
 
-        It stays wrapped in the h1 because this is the homepage's only one, and
-        the alt text is what gives that heading its accessible name. The alt is
-        composed rather than a single key and needs no data-i18n-alt: the brand
-        name is not translated and `hero.tagline` is "seafood bar" in both
-        locales, so the string is identical either way.
+        Composition follows the badge itself: the name, then the tagline under
+        it, much smaller and widely tracked. Both are the same colour there, and
+        both are the same colour here — size and tracking do the separating, not
+        a second tone.
+
+        This is the homepage's only h1 and it is now real text, so the heading
+        has an accessible name without depending on an alt attribute.
+
+        `site.name` is not translated. `hero.tagline` is "seafood bar" in both
+        locales, but it still carries data-i18n so the language switch owns it
+        rather than it silently drifting if one locale ever changes.
       */}
-      <h1 class="hero__logo">
-        <Image
-          src={logoClean}
-          alt={`${site.name} — ${t(locale, 'hero.tagline')}`}
-          widths={[400, 800]}
-          sizes="(min-width: 60rem) 24rem, 16rem"
-          loading="eager"
-        />
+      <h1 class="hero__wordmark">
+        <span class="hero__wordmark-name">{site.name}</span>
+        <span class="hero__wordmark-tag" data-i18n="hero.tagline">
+          {t(locale, 'hero.tagline')}
+        </span>
       </h1>
 
       <p class="hero__intro" data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>

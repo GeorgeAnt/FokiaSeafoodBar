@@ -112,6 +112,11 @@ Moving the collapse to 75rem for the logo changed the answer. Re-tested at
 content decision — it is reached by scrolling and its own button goes to
 `/gallery` — not because the bar has no room.
 
+**The margin has since shrunk and that test was not re-run.** The nav logo went
+3.5rem → 5rem and took 24px of the row, so clearance at 1201px is **136px**, not
+the 150px the test started from. A 117px label would leave ~19px. Re-measure
+with the real label before believing it still fits.
+
 24px is not room to spend casually, though, and 117px is a guess at copy that
 does not exist yet. Measure with the real label before adding one. And measure
 `document.documentElement.scrollWidth`, not the gap: `.nav__utils` does not
@@ -194,6 +199,36 @@ means the class lands before first paint, so nothing shows and then hides. Keep
 that contract if you add reveal targets — never add `.has-reveal` from anywhere
 else.
 
+**The hero wordmark is the site's only display type, and it is deliberately off
+the step scale.** `.hero__wordmark-name` is `clamp(3rem, 1.8rem + 5.5vw,
+5.5rem)` — 88px at 1366, 50px at 390 — against the 47px that `--step-3` tops out
+at and that is otherwise the largest thing on the site. It stands in for the
+214px logo it replaced, not for a heading, which is why it is a literal clamp
+rather than `--step-4`: promoting that token for one use would drag it out of a
+ramp nothing else uses. Tracking is `-0.04em`, tighter than the `-0.02em`
+headings take, because a geometric sans at 88px opens up otherwise.
+
+The badge did not go anywhere — it still carries the nav, the footer and the
+favicons. What it stopped doing is standing on the black hero, where its baked-in
+concrete texture read as a pale disc with a word in it rather than as a mark on
+the ground. That was recorded as an outstanding artwork problem in README for
+months; setting the name in type is what actually resolved it, so the note there
+now describes a smaller problem than it used to.
+
+**Stone on the hero means `--light-stone`, never `--stone`.** The wordmark, its
+tagline and the `.btn--primary` fill are all `--light-stone` at 6.55:1 on the
+hero's Deep Black, measured on the rendered page. `--stone` is 2.9:1 there —
+under even the 3:1 large-text floor, so it fails as a heading colour and fails
+much harder as a button label. The CTA's hover therefore goes *lighter*, to
+`--salt` (14.8:1 under a black label), rather than darkening the way the old
+`--wood` fill did: mixing black into a mid stone walks the label back toward the
+2.9:1 that ruled `--stone` out to begin with.
+
+That fill is also the reason `.btn--primary` can be restyled freely — it is the
+hero CTA and nothing else. The other two `.btn`s on the site are `.btn--ghost`
+(From the kitchen, Find Us), and `--wood` is still a surface on `/menu`, where
+the selected menu tab uses it.
+
 **Section eyebrows were a bug, not a device.** Every section used to render one
 from its `nav.*` key, which in five of six cases was the heading verbatim — two
 identical titles stacked. Only Our Goal keeps one, because its heading is a
@@ -205,9 +240,12 @@ legal block; `/gallery` is the photographs. Nav links to homepage sections must
 stay rooted (`/#team`) so they work from the other two. The `Restaurant` JSON-LD
 lives on `/` with `hasMenu` pointing at `/menu`; the `Menu` graph is emitted
 only on `/menu` via Base's `menuSchema` prop. Each page needs exactly one `h1`
-— Gallery's heading is an `h1`, and on the homepage the `h1` is the hero *logo
-image*, so its `alt` is what gives that heading its accessible name. Do not
-strip the alt.
+— Gallery's heading is an `h1`, and on the homepage the `h1` is the hero
+wordmark, which is now **typeset, not an image**. It is two spans, the name and
+the tagline, and the accessible name comes from the text itself rather than from
+an `alt`. Verified in Chrome's a11y tree: the heading computes as "fokia seafood
+bar", with the space supplied by AccName's node separator — `textContent` alone
+runs them together, so do not "fix" that by reading the DOM.
 
 ## Commands
 
@@ -315,7 +353,7 @@ Node is installed but **not on the shell PATH**; prepend it first:
   1025px was 70px in Greek; the logo spends 48px of that plus the row's 24px gap
   — 72px against 70px — so the full bar stopped fitting at the old breakpoint
   and hands over to the toggle sooner. Measured at 1201px, the first width above
-  the new breakpoint, clearance is **160px** and `scrollWidth` equals the
+  the new breakpoint, clearance is **136px** and `scrollWidth` equals the
   viewport. Re-measure at 1201px, not at 1025px.
 
   History worth keeping, because the figure has moved three times and each move
@@ -324,10 +362,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
   Open Sans, the narrower face, which gave 27px back (Inter set those six Greek
   labels 29px wider in total, measured on a canvas at the nav's own size); 70px,
   until the logo took 72px and moved the breakpoint to 75rem instead; then 146px
-  at the new breakpoint, and 160px once `--font-body` went Open Sans → Manrope,
-  narrower again by 14px across the six. Every one of those moves except the
-  logo was a change of *face*, which is the pattern: re-measure whenever
-  `--font-body` changes. "Κλείστε τη θέση
+  at the new breakpoint, 160px once `--font-body` went Open Sans → Manrope,
+  narrower again by 14px across the six, and **136px** once the logo box itself
+  went 3.5rem → 5rem and spent 24px. Every one of those moves except the two
+  logo changes was a change of *face*, which is the pattern: re-measure whenever
+  `--font-body` changes, and whenever the logo box is resized. "Κλείστε τη θέση
   σας • Take away" is still the longest label and Greek is still the longer set,
   so Greek decides the fit, not English. The language pill was given
   `min-height` only, not padding, for exactly this reason — it buys the 44px
@@ -372,6 +411,17 @@ Node is installed but **not on the shell PATH**; prepend it first:
   whatever had focus, most visibly the square gallery tiles. The pill buttons
   are the same mechanism seen from the other side — their focus ring is a
   rounded capsule without the rule knowing anything about it.
+
+- **A rounded control needs `-webkit-tap-highlight-color: transparent` of its
+  own.** `html` sets a site-wide tap highlight — `--wood` at 20%, chosen over
+  the UA's blue-grey wash. Chrome paints that highlight against the element's
+  border *box* and ignores `border-radius`, so on the 999px `.btn` pill a tap
+  flashed a hard-edged wood rectangle around a round button. It was reported
+  from a device, not caught here: it cannot be seen with a mouse, and it does
+  not show up in a screenshot either, because the highlight is a compositor
+  effect. `.btn` opts out and defines `:active` states instead, which follow
+  the pill. The wash stays on `html` for ordinary links, where a rectangle is
+  the right shape. Any future rounded control needs the same pair.
 
 - **`.btn` is fully round (999px); `--radius` (2px) is still everything else.**
   The site's default is near-square and that is still right for rectangular
@@ -559,20 +609,39 @@ Node is installed but **not on the shell PATH**; prepend it first:
   — with 393px of transparent field to its left and 391px to its right. So it is
   horizontally centred, and 47% of the file's width is empty.
 
-  That is why anything sizing it by **height** pays for the field: at 56px tall
-  the file wants 93px of width to show a 56px mark. `prepare-favicons.mjs` deals
+  That is why anything sizing it by **height** pays for the field: at 80px tall
+  the file wants 142px of width to show an 80px mark. `prepare-favicons.mjs` deals
   with it by trimming to the badge and normalising to 512×512 before cropping —
   every box in that script is measured against the normalised square, not the
   file's own pixels.
 
   **The nav deals with it without a second asset.** `.nav__logo` is a square box
-  with `object-fit: cover`, which shows the central 940px of the source — the
-  whole 888px badge with 26px to spare each side. The field is cropped away for
+  — 5rem on the full bar, 3rem on the collapsed one — with `object-fit: cover`,
+  which shows the central 940px of the source: the whole 888px badge with 26px
+  to spare each side. The field is cropped away for
   free, the mark fills the box, and the bar reuses the asset the hero has already
   loaded instead of a trimmed copy that would need regenerating whenever the logo
   changes. This works *because* the badge is horizontally centred; a replacement
   logo that is off-centre will crop wrong, silently, and look like sloppy
   cropping rather than like a geometry change. Re-measure before trusting it.
+
+  **The crop also makes `sizes` lie, deliberately.** srcset picks a candidate
+  from the img's *layout* width, but cover throws away 47% of this file, so a
+  file served at the box's own width renders a mark 56% of that size. Nav.astro
+  passes `sizes="142px"` with `widths={[142, 284]}` — 80 × 1672/940 and its 2x —
+  which is the width that fills the box, not the width the box measures. Resize
+  `.nav__logo` and both numbers move with it.
+
+  **The disc stays inside the bar, and that was tested the hard way.** Hanging it
+  half out — the treatment on thyme-restaurant-bar-nafplio.gr, whose 180px badge
+  sits in a 94px bar with 106px below it — was built at 11rem and reverted. It is
+  mechanically fine (`align-self: start` and a negative `margin-block-end` hold
+  the bar at 97px, and .nav has no `overflow` to shear it). It fails on content:
+  this bar is opaque and sticky over three black bands, so the disc covered the
+  opening words of a Team paragraph on scroll, and at the top of the homepage it
+  put a second fokia badge 6px above the hero logo — the page h1, the same mark.
+  The reference has no hero logo and centres its badge over an empty column, so
+  it pays neither cost. Do not rebuild it without solving those two.
 - When screenshotting to verify, disable Chrome's HTTP cache, force
   `scroll-behavior: auto` before scrolling to trigger lazy images, and clear
   `localStorage['fokia:lang']` before testing the default locale. A clip whose
