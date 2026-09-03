@@ -359,13 +359,43 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - Colours on a section come from tokens the surface tier sets (`--accent`,
   `--text-muted`, `--ghost-hover-*`). Don't reference `--wood` directly for
   text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
-- The nav is logo, links, utilities — three items in flow, nothing positioned.
-  The bar once centred a logo *absolutely*, which is why the links were split
-  into two balanced groups; the logo is back but it is in flow at the start, so
-  it only costs the row its own width and the links stay a single list.
-  `.nav__inner` has no `justify-content` — with three children that would push
-  the links into the middle — and `margin-inline-start: auto` on `.nav__utils`
-  does the pushing instead.
+- The nav is logo, links, utilities — three items in flow, nothing positioned,
+  and **the links are centred on the bar**. `.nav__inner` is a `1fr auto 1fr`
+  grid: the middle track is centred against the container, so the logo (80px)
+  and the utilities (192px) can be wildly different widths without dragging the
+  links off centre, and all three stay in flow.
+
+  That is the whole reason it is grid and not something simpler. The obvious way
+  to centre one of three flex children is to position it absolutely, and this
+  bar has been there before — it used to centre the *logo* that way, which took
+  it out of flow, left nothing holding the middle, and is why the links were
+  once split into two balanced groups either side of it. Do not go back to that.
+  `justify-content` cannot do it either: it distributes all three children, so
+  the links only land in the middle when the two outer items happen to match.
+
+  `margin-inline-start: auto` stays on `.nav__utils` and does a different job in
+  each layout — end of its own track in grid, pushed to the end of the row in
+  flex. The collapsed bar sets `display: flex` back, because it wraps the links
+  onto a full-width row and orders four children, which is not a three-column
+  grid's job.
+
+  **Centring is exact above ~1230px and 14px out at 1201px.** The side tracks
+  take an automatic minimum from their content, so the split is only even while
+  each `1fr` share is wider than the item sitting in it. At 1201px the shares
+  would be 178px and the utilities need 192px, so that track grows and the
+  middle shifts left by the 14px difference. It never overflows — `scrollWidth`
+  is 1201 — and 14px is 1.2% of the bar, but it is the number that moves first
+  if anything in the utilities gets wider.
+
+  **Clearance stopped being the right measurement when the links were centred.**
+  It used to be the gap between the links and the utilities, and it worked
+  because everything was packed at the start of the row, so that gap *was* the
+  slack. With a centred middle track the leftover is split into two gaps and
+  neither is the headroom. At 1201px the tracks now pack exactly: the measured
+  links-to-utilities gap is 24px, which is the grid `gap` itself — **zero
+  slack**. The figures below are kept as history. The live test is
+  `document.documentElement.scrollWidth` against the viewport, which is what
+  this file has always said actually counts.
 
   **The bar collapses at 75rem, not 64rem, and the logo is why.** Clearance at
   1025px was 70px in Greek; the logo spends 48px of that plus the row's 24px gap
@@ -383,7 +413,8 @@ Node is installed but **not on the shell PATH**; prepend it first:
   at the new breakpoint, 160px once `--font-body` went Open Sans → Manrope,
   narrower again by 14px across the six, **136px** once the logo box itself went
   3.5rem → 5rem and spent 24px, and **121px** once the language control became
-  one button reading "English" and spent 34px more. Two of those were a change
+  one button and spent 34px more — after which the links were centred and the
+  measurement stopped meaning anything (see above). Two of those were a change
   of *face*, which is the pattern: re-measure whenever `--font-body` changes,
   whenever the logo box is resized, and now whenever the language button's copy
   changes — it is the one label in the bar that is a word rather than a code.
@@ -501,7 +532,9 @@ Node is installed but **not on the shell PATH**; prepend it first:
   and both carry `data-i18n`; the media query picks which is displayed, and
   `apply()` re-aims both keys whenever the locale changes precisely because it
   cannot know which one is visible. No target shrinks: the social icons keep
-  their 2.75rem box and the button keeps its `min-height`, so both stay 44px
+  their 2.75rem box — the *mark* inside it grew 1.2rem → 1.5rem, which is free,
+  while the box is both the touch target and the width budget and cannot — and
+  the button keeps its `min-height`, so both stay 44px
   tall, and at 36px wide the button is still over the 24px floor. The logo stays
   3rem because it is the one thing in that bar meant to be looked at.
 
