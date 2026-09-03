@@ -284,6 +284,26 @@ const dictJson = JSON.stringify(dictionaries);
 
           document.documentElement.lang = lang;
 
+          /* Re-aim the language button at the *other* locale before the passes
+             below run, so its text and its label are filled in by the same
+             dictionary lookups as everything else on the page rather than by
+             anything written here. Order matters: point it first, translate
+             second. */
+          var toggle = document.querySelector('[data-lang-target]');
+          if (toggle) {
+            var other = lang === 'el' ? 'en' : 'el';
+            toggle.setAttribute('data-lang-target', other);
+            toggle.setAttribute('lang', other);
+            toggle.setAttribute('data-i18n-label', 'a11y.lang.' + other);
+            /* Both labels are re-aimed, not just the visible one: which of the
+               two is shown is a CSS decision this script cannot see, and the
+               hidden one becomes visible on a resize with no script involved. */
+            var name = toggle.querySelector('[data-lang-name]');
+            var code = toggle.querySelector('[data-lang-code]');
+            if (name) name.setAttribute('data-i18n', 'lang.' + other);
+            if (code) code.setAttribute('data-i18n', 'lang.short.' + other);
+          }
+
           document.querySelectorAll('[data-i18n]').forEach(function (el) {
             var value = strings[el.getAttribute('data-i18n')];
             if (value != null) el.textContent = value;
@@ -303,10 +323,6 @@ const dictJson = JSON.stringify(dictionaries);
             var value = strings[el.getAttribute('data-i18n-label')];
             if (value != null) label(el, value);
           });
-
-          document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
-            btn.setAttribute('aria-pressed', String(btn.getAttribute('data-lang-btn') === lang));
-          });
         }
 
         function persist(lang) {
@@ -325,13 +341,16 @@ const dictJson = JSON.stringify(dictionaries);
         }
         if (stored && stored !== DEFAULT) apply(stored);
 
-        document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var lang = btn.getAttribute('data-lang-btn');
-            apply(lang);
-            persist(lang);
+        /* Read at click time, not captured: apply() flips the attribute, so the
+           same button switches back on the next press. */
+        var langToggle = document.querySelector('[data-lang-target]');
+        if (langToggle) {
+          langToggle.addEventListener('click', function () {
+            var next = langToggle.getAttribute('data-lang-target');
+            apply(next);
+            persist(next);
           });
-        });
+        }
 
         /*
           The small surface the section scripts need.

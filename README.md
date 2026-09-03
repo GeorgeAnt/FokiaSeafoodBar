@@ -442,7 +442,7 @@ worth knowing about before you look at the site and wonder:
   by anyone — holding it while the mouse is over the photo, which is what it did
   before, is no use on a phone. It is the one control on the hero with a dark
   circle behind it; that is deliberate, so it can be found against any slide.
-- **Tap targets are 44px.** The social icons in the nav, the language pill, the
+- **Tap targets are 44px.** The social icons in the nav, the language button, the
   menu's Food/Drinks tabs and its jump-to-category chips all grew to the size a
   finger actually needs. The icons and text inside them did not change size.
 - **The heading above the legal notices** now renders as the small uppercase

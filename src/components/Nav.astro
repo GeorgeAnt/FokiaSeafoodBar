@@ -35,6 +35,12 @@ const links = [
   { href: '/#find-us', key: 'nav.findUs' },
 ];
 
+/**
+ * The language button names the locale it switches *to*, so everything about it
+ * is derived from the other one rather than from the current one.
+ */
+const other = locale === 'el' ? 'en' : 'el';
+
 /** Marks the current page in the nav for assistive tech. */
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
@@ -84,15 +90,59 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
     <div class="nav__utils">
       <SocialLinks class="nav__social" />
 
-      <div
+      {/*
+        One button, not a pair of them. It is labelled with the language it will
+        switch *to* — "English" on the Greek page, "ΕΛ" on the English one — so
+        the label is the action rather than a state the visitor has to read off
+        a highlighted segment. There is no `aria-pressed` and no `role="group"`
+        any more: this performs an action, it does not report a setting, and
+        `a11y.languageSwitcher` went with them.
+
+        Four attributes travel together, and `apply()` in Base rewrites all four
+        to point at the other locale every time the language changes:
+
+          data-lang-target — what a click switches to, and what the click
+            handler reads. It is the button's whole state.
+          lang — the text is a language's own name, so it has to be marked as
+            that language. Without it a screen reader on the Greek page reads
+            "English" with Greek phonemes.
+          data-i18n / data-i18n-label — visible text and spoken label. Both stay
+            dictionary lookups: the script picks the key, never the string,
+            which is the same contract `setLabelKey` follows.
+
+        `lang.el` / `lang.en` are autonyms and are deliberately identical in both
+        locale files — a language names itself the same way whoever is reading,
+        like `footer.rights`. `a11y.lang.*` are sentences and do translate. Both
+        families are built at runtime from a locale code, so neither appears
+        literally anywhere and neither will grep. Deleting one breaks this button
+        silently; `npm run check` compares keys across locales and never asks
+        whether a key is used.
+      */}
+      <button
+        type="button"
         class="lang"
-        role="group"
-        aria-label={t(locale, 'a11y.languageSwitcher')}
-        data-i18n-label="a11y.languageSwitcher"
+        data-lang-target={other}
+        lang={other}
+        aria-label={t(locale, `a11y.lang.${other}`)}
+        data-i18n-label={`a11y.lang.${other}`}
       >
-        <button type="button" data-lang-btn="el" aria-pressed="true">ΕΛ</button>
-        <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
-      </div>
+        {/*
+          Two labels, one shown at a time by CSS. The word is what the client
+          asked for and is what shows everywhere it fits; the two-letter code
+          takes over on the collapsed bar at 22.5rem, where "English" costs 88px
+          against a 280px row and pushed the toggle onto a second line. The
+          swap is CSS-only — no second script path, and no measuring in JS.
+
+          Hiding one is safe for assistive tech because the button's accessible
+          name comes from aria-label, not from this text.
+        */}
+        <span class="lang__name" data-lang-name data-i18n={`lang.${other}`}>
+          {t(locale, `lang.${other}`)}
+        </span>
+        <span class="lang__code" data-lang-code data-i18n={`lang.short.${other}`}>
+          {t(locale, `lang.short.${other}`)}
+        </span>
+      </button>
     </div>
 
     <button

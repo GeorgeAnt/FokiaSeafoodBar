@@ -771,38 +771,56 @@ input {
 
 /* In the footer they sit under a heading and can afford to be a touch larger. */
 
+/*
+  One round button now, not a two-segment box.
+
+  It stopped being a segmented control when it stopped reporting a state: there
+  is no selected half left to fill, so there is no reason for the square frame
+  that used to hold two of them, and --radius (2px) — right for the site's
+  rectangular surfaces — is wrong for a lone control. It is a pill like .btn,
+  written as the same literal 999px for the same reason.
+
+  Stone, not wood. --wood-light filled the selected half at 6.4:1 on the black
+  bar and that was fine, but with the segments gone the fill is no longer
+  marking a selection, and the site's one other filled control — the hero CTA —
+  went --light-stone. Same fill, same black label, 6.55:1 both ways: against the
+  bar and under the text. Hover lifts to --salt exactly as the CTA does. --wood
+  and --wood-light are both still in use as accents elsewhere; what went is the
+  last place a wood tint was a *surface* outside /menu.
+
+  min-height, not vertical padding, still buys the 44px target — but the width
+  note that used to live here is void: "English" is not two letters, and this
+  button is ~34px wider than the old pair. See the 22.5rem block for what that
+  costs on the narrowest bar.
+*/
 .lang {
-  display: inline-flex;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-/* Height only — the pill's width is set by the two-letter labels and does not
-   change, so this buys the 44px target back without costing the bar any room. */
-.lang button {
   min-height: 2.75rem;
-  padding: 0.4rem 0.6rem;
+  /* Holds the width of the wider of the two states so the bar does not jump
+     when the language changes. "English" is 87px and "ΕΛ" is 48px, and without
+     this the social icons beside it slid 39px on every switch. It is free: the
+     Greek page is the default and already has to fit "English", so this only
+     spends slack on the English page, where the nav labels are shorter anyway. */
+  min-width: 5.5rem;
+  padding: 0.4rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--light-stone);
+  color: var(--black);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
+  text-transform: uppercase;
   transition:
     background-color 0.18s var(--ease),
     color 0.18s var(--ease);
 }
-/*
-  The one place a --wood tint is used as a surface rather than as text, and the
-  bar going black moved which tint is correct. Wood filled the pill at 6.6:1
-  against the old salt bar; against Deep Black it is 2.2:1 and the selected
-  language stops reading as selected at all. The dark tier's own tint is 6.4:1
-  there and takes a dark label instead of a pale one.
-
-  aria-pressed already carries the state for assistive tech — this is the visual
-  half of it, and it is the only thing a sighted visitor has.
-*/
-.lang button[aria-pressed='true'] {
-  background: var(--wood-light);
-  color: var(--black);
+.lang:hover,
+.lang:active {
+  background: var(--salt);
+}
+/* The word by default; the collapsed block at 22.5rem swaps in the code. */
+.lang__code {
+  display: none;
 }
 
 .nav__toggle {
@@ -904,14 +922,17 @@ input {
   stacked rows of ~44px still fit inside the 6rem min-height, so the only
   symptom was the toggle sitting under the logo instead of beside it.
 
-  The 17px comes out of spacing, not out of targets. Every touch target in here
-  is 44px and stays 44px: the social icons keep their 2.75rem box and the
-  language buttons keep their min-height. What shrinks is the gaps between them
-  and the language pill's horizontal padding, which was never what bought the
-  44px — see the note on .lang button. The logo is untouched at 3rem, since it
-  is the one thing in the bar that is there to be looked at.
+  It comes out of spacing and out of *copy*, not out of targets. Every touch
+  target in here is 44px and stays 44px: the social icons keep their 2.75rem box
+  and the language button keeps its min-height, which was never what bought the
+  width — see the note on .lang. What shrinks is the gaps between them, the
+  button's horizontal padding, and the button's label, which drops from the word
+  to its two-letter code. The logo is untouched at 3rem, since it is the one
+  thing in the bar that is there to be looked at.
 
-  Budget at 320px after this: 48 + 44 + 40 + gaps = 264px against 280px.
+  Budget at 320px after this: 48 + 132 + 40 + gaps = 244px against 280px. It was
+  292px with "English" spelled out, which is 12px over and put the toggle on a
+  second row.
 */
 @media (max-width: 22.5rem) {
   .nav__inner {
@@ -920,8 +941,23 @@ input {
   .nav__utils {
     gap: 0.5rem;
   }
-  .lang button {
-    padding-inline: 0.4rem;
+  /*
+    "English" is 88px of a 280px row and the bar needs 292px with it — 12px
+    over, which put the toggle on a second line. Trimming padding recovers 13px
+    and would leave 1px of margin, so the label drops to its two-letter code
+    here instead: 40px, and the row lands at 244px with real room. min-width
+    goes with it — there is no width to reserve once both states are two
+    characters wide, and nothing to jump.
+  */
+  .lang {
+    min-width: 0;
+    padding-inline: 0.55rem;
+  }
+  .lang__name {
+    display: none;
+  }
+  .lang__code {
+    display: inline;
   }
 }
 

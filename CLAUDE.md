@@ -113,9 +113,11 @@ content decision — it is reached by scrolling and its own button goes to
 `/gallery` — not because the bar has no room.
 
 **The margin has since shrunk and that test was not re-run.** The nav logo went
-3.5rem → 5rem and took 24px of the row, so clearance at 1201px is **136px**, not
-the 150px the test started from. A 117px label would leave ~19px. Re-measure
-with the real label before believing it still fits.
+3.5rem → 5rem and took 24px of the row, and the language control went from a
+two-letter pair to the word "English" and took 34px more, so clearance at 1201px
+is **121px**, not the 150px the test started from. A 117px label would leave 4px.
+Re-measure with the real label before believing it still fits — on this figure
+it very nearly does not.
 
 24px is not room to spend casually, though, and 117px is a guess at copy that
 does not exist yet. Measure with the real label before adding one. And measure
@@ -353,7 +355,7 @@ Node is installed but **not on the shell PATH**; prepend it first:
   1025px was 70px in Greek; the logo spends 48px of that plus the row's 24px gap
   — 72px against 70px — so the full bar stopped fitting at the old breakpoint
   and hands over to the toggle sooner. Measured at 1201px, the first width above
-  the new breakpoint, clearance is **136px** and `scrollWidth` equals the
+  the new breakpoint, clearance is **121px** and `scrollWidth` equals the
   viewport. Re-measure at 1201px, not at 1025px.
 
   History worth keeping, because the figure has moved three times and each move
@@ -363,28 +365,38 @@ Node is installed but **not on the shell PATH**; prepend it first:
   labels 29px wider in total, measured on a canvas at the nav's own size); 70px,
   until the logo took 72px and moved the breakpoint to 75rem instead; then 146px
   at the new breakpoint, 160px once `--font-body` went Open Sans → Manrope,
-  narrower again by 14px across the six, and **136px** once the logo box itself
-  went 3.5rem → 5rem and spent 24px. Every one of those moves except the two
-  logo changes was a change of *face*, which is the pattern: re-measure whenever
-  `--font-body` changes, and whenever the logo box is resized. "Κλείστε τη θέση
-  σας • Take away" is still the longest label and Greek is still the longer set,
-  so Greek decides the fit, not English. The language pill was given
-  `min-height` only, not padding, for exactly this reason — it buys the 44px
-  without costing the row any width.
+  narrower again by 14px across the six, **136px** once the logo box itself went
+  3.5rem → 5rem and spent 24px, and **121px** once the language control became
+  one button reading "English" and spent 34px more. Two of those were a change
+  of *face*, which is the pattern: re-measure whenever `--font-body` changes,
+  whenever the logo box is resized, and now whenever the language button's copy
+  changes — it is the one label in the bar that is a word rather than a code.
+  "Κλείστε τη θέση σας • Take away" is still the longest nav label and Greek is
+  still the longer set, so Greek decides the fit, not English.
+
+  The language button still takes its 44px from `min-height` rather than from
+  vertical padding, which is why the height costs the row nothing. Its *width*
+  is no longer free, though — that note used to say the two-letter labels never
+  changed the pill's width, and one of them is now a word.
 
 - **The nav is a dark surface inside the light tier, so it carries the dark
   tier's tokens itself.** `.nav` sets `--text`, `--text-muted`, `--accent`,
   `--ghost-hover-*` and `--rule` the same way `.section-dark` and `.lightbox` do.
   Painting the background black without them leaves the links at `--stone` and
   the hover at `--wood` (2.3:1 on Deep Black) — the background is the easy half.
-  Measured on the rendered bar: links, social icons and the inactive language
-  button are all 6.55:1, the active pill's fill is 6.42:1 against the bar.
+  Measured on the rendered bar: links and social icons are 6.55:1, and the
+  language button's stone fill is 6.55:1 against the bar with its black label at
+  6.55:1 on the fill.
 
-  That pill is the one place a Wood tint is used as a *surface* rather than as
-  text, and the bar going black moved which tint is correct: `--wood` filled it
-  at 6.6:1 against the old salt bar and at **2.2:1** against Deep Black, where
-  the selected language stopped reading as selected. It is `--wood-light` with a
-  `--black` label now. If the bar ever goes light again, that goes back too.
+  **The wood tint that used to fill that pill is gone, and so is the reason for
+  it.** It was a two-segment control and the fill marked *which segment was
+  selected* — `--wood` at 6.6:1 on the old salt bar, then `--wood-light` at
+  6.4:1 once the bar went black, because `--wood` there is 2.2:1 and the
+  selection stopped reading as a selection. There is one button now and it
+  reports no state, so the fill is not marking anything; it is simply the site's
+  second filled control, and it matches the first (the hero CTA) at
+  `--light-stone` under a `--black` label. That leaves `/menu`'s selected tab as
+  the only place a wood tint is still a *surface* rather than text.
 - Anything drawn over a photo needs its own backing, not a tint on the image.
   The hero photos are mid-grey exactly where the controls sit, so the carousel
   dashes measure 1.7-2.3:1 against them — under the 3:1 WCAG minimum for a
@@ -425,10 +437,15 @@ Node is installed but **not on the shell PATH**; prepend it first:
 
 - **`.btn` is fully round (999px); `--radius` (2px) is still everything else.**
   The site's default is near-square and that is still right for rectangular
-  surfaces — inputs, the language switch, image frames. The pill is scoped to
-  `.btn`, which exists in exactly three places and all three are on the
-  homepage: the hero CTA, the From the kitchen CTA, the Find Us map button.
-  Nothing on /menu or /gallery uses `.btn`, so the change could not leak.
+  surfaces — inputs, image frames. **The language switch is no longer one of
+  them:** it stopped being a two-segment box that needed a frame around it and
+  became a lone control, so it is a pill too, written as the same literal 999px.
+  It is not a `.btn` and does not want to be — it carries its own smaller type
+  and its own `min-height`.
+
+  `.btn` itself is three places and all three are on the homepage: the hero CTA,
+  the From the kitchen CTA, the Find Us map button. Nothing on /menu or /gallery
+  uses `.btn`, so that change could not leak.
 
   Written as a literal `999px` to match every other pill already in the file
   (the menu tab group, the jump chips, the tags) rather than adding a second
@@ -447,13 +464,28 @@ Node is installed but **not on the shell PATH**; prepend it first:
   which is easy to miss and was shipped once. Measure the toggle's `top` against
   the logo's `bottom`; neither the bar's height nor `scrollWidth` will tell you.
 
-  The `max-width: 22.5rem` block buys the 17px back out of spacing only: the
-  row's column gap, `.nav__utils`'s gap, and the language pill's horizontal
-  padding. Budget after it is 264px against 280px. No target shrinks — the
-  social icons keep their 2.75rem box and the language buttons keep their
-  `min-height`, so both stay 44px tall (the pill narrows from 35px to 28px wide,
-  still over the 24px floor and still a contiguous row). The logo stays 3rem
-  because it is the one thing in that bar meant to be looked at.
+  The `max-width: 22.5rem` block buys the room back out of spacing and out of
+  *copy*, not out of targets. Spacing gives up the row's column gap,
+  `.nav__utils`'s gap and the language button's horizontal padding; copy gives
+  up the word.
+
+  **The word is the expensive part, and it is why this block grew a label
+  swap.** "English" makes the button 88px, which puts the row at 292px against
+  the 280px a 320px screen leaves — 12px over, and the toggle went onto a second
+  line exactly as it did the first time this bar was got wrong. Trimming padding
+  alone recovers 13px and leaves 1px of margin, which is not a margin. So below
+  22.5rem the button shows its two-letter code instead: 36px, and the row lands
+  at **244px against 280px**. `min-width` is dropped there too — it exists to
+  stop the bar jumping between an 88px word and a 48px code, and once both
+  states are two characters there is nothing to reserve.
+
+  The swap is CSS-only. `.lang__name` and `.lang__code` are both in the markup
+  and both carry `data-i18n`; the media query picks which is displayed, and
+  `apply()` re-aims both keys whenever the locale changes precisely because it
+  cannot know which one is visible. No target shrinks: the social icons keep
+  their 2.75rem box and the button keeps its `min-height`, so both stay 44px
+  tall, and at 36px wide the button is still over the 24px floor. The logo stays
+  3rem because it is the one thing in that bar meant to be looked at.
 
   **It still wraps below ~305px** (a 280px Galaxy Fold cover screen, say). The
   remaining 24px can only come out of the two 44px social targets, which is a
@@ -479,10 +511,18 @@ Node is installed but **not on the shell PATH**; prepend it first:
   codebase, so anything removed has to be checked by hand first:
 
   - Keys are **built at runtime** from data — `team.${id}.name`,
-    `gallery.${id}.alt`, `legal.${id}`, `hours.short.${day}`. None of those
-    appear literally anywhere, and deleting one breaks a page silently, because
-    `npm run check` compares el.json against en.json and never asks whether a
-    key is *used*.
+    `gallery.${id}.alt`, `legal.${id}`, `hours.short.${day}` — and, since the
+    language switcher became one button, from a *locale code*: `lang.${other}`,
+    `lang.short.${other}` and `a11y.lang.${other}`, built in both Nav.astro and
+    Base's inline script. That is six more keys, none of which appear literally
+    anywhere. Deleting one breaks a page silently, because `npm run check`
+    compares el.json against en.json and never asks whether a key is *used*.
+
+    `lang.el` / `lang.en` and `lang.short.*` are **identical in both locale
+    files** and are meant to be: they are autonyms, and a language names itself
+    the same way whoever is reading — the same deliberate exception
+    `footer.rights` gets. `a11y.lang.*` are sentences and do differ.
+    `a11y.languageSwitcher` went with the `role="group"` wrapper it labelled.
   - Classes are built the same way: `.menu__panel--food` and
     `.menu__panel--drinks` exist only as `menu__panel--${view.id}`.
   - A mention inside a comment is not a use. The first pass of the sweep counted
