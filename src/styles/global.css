@@ -626,21 +626,37 @@ input {
 }
 
 /*
-  Logo, links, utilities — three items in flow, nothing positioned. The bar used
-  to centre a logo absolutely, which is why the links were split into two
-  balanced groups; in flow the logo only costs the row its own width, so the
-  links stay one list.
+  Logo, links, utilities — three items, nothing positioned, and the links are
+  centred on the bar rather than sitting next to the logo.
 
-  `justify-content` is gone: with three children it would push the links into
-  the middle of the bar and leave a gap on both sides. `margin-inline-start:
-  auto` on .nav__utils does the same job for the one item that needs it, and
-  keeps the logo and the links together at the start.
+  It is a three-track grid, `1fr auto 1fr`, and the choice of mechanism is the
+  point. The obvious way to centre one of three flex children is to position it
+  absolutely, and this bar has been there: it used to centre the *logo* that
+  way, which took it out of flow, left nothing holding the middle, and is why
+  the links were once split into two balanced groups either side of it. Grid
+  centres the middle track against the container, not against its neighbours, so
+  the logo (80px) and the utilities (~132px) can stay wildly different widths and
+  the links are still centred on the bar — and all three stay in flow, so the
+  links remain one list.
+
+  The side tracks take their automatic minimum from their content, so this holds
+  only while each 1fr share is wider than the item in it. At 1201px, the
+  narrowest width the full bar is used at, the shares are 213px against a 132px
+  utilities block — see the clearance note in CLAUDE.md, and re-measure there if
+  a nav label is ever added.
+
+  Collapsed, this goes back to flex: that layout wraps the links onto their own
+  full-width row and orders four children, which is flex's job, not a
+  three-column grid's. `margin-inline-start: auto` on .nav__utils is deliberately
+  left in the base rule because it does the right thing in both — end of its
+  track in grid, pushed to the end of the row in flex.
 
   6rem = 96px, +1px of border. Raising this means raising scroll-padding-top on
   <html> in the same edit or every anchor jump lands under the bar.
 */
 .nav__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1.5rem;
   min-height: 6rem;
@@ -746,10 +762,22 @@ input {
   align-items: center;
   gap: 0.25rem;
 }
-/* 2.75rem is the box, 1.2rem is the mark. The icon does not grow — the target
-   around it does, to the 44px these were short of at 2.15rem. Costs the nav
-   ~19px of horizontal room across the two icons; see the clearance note in
-   CLAUDE.md, which was re-measured after this change. */
+/*
+  2.75rem is the box, 1.5rem is the mark, and only the second of those is free
+  to change.
+
+  The box is the 44px touch target and it is also the nav's width budget: the
+  two icons already cost the bar ~19px when they went 2.15rem → 2.75rem, and
+  since the links were centred the bar has **no slack left at 1201px** — the
+  tracks pack exactly, so widening these boxes would squeeze the centre track
+  and start wrapping the links. The mark inside is free: it grew 1.2rem →
+  1.5rem (19px → 24px) and cost the row nothing, which is the only reason it
+  could grow at all.
+
+  If these ever need to be genuinely bigger rather than just to look bigger,
+  the width has to come from somewhere else first — see the clearance note in
+  CLAUDE.md.
+*/
 .social a {
   display: grid;
   place-items: center;
@@ -765,11 +793,9 @@ input {
   color: var(--accent);
 }
 .social svg {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
-
-/* In the footer they sit under a heading and can afford to be a touch larger. */
 
 /*
   One round button now, not a two-segment box.
@@ -852,9 +878,13 @@ input {
   }
 
   .nav__inner {
+    /* Back to flex — the centring grid is a wide-bar layout only. Here the row
+       wraps, the links become a full-width panel below it, and four children are
+       placed by `order`. */
+    display: flex;
     flex-wrap: wrap;
-    /* No row gap: the two link groups have to read as one continuous list once
-       they stack, not as two separate menus. */
+    /* No row gap: the links have to read as one continuous list once they
+       stack, not as a second menu below the bar. */
     row-gap: 0;
     column-gap: 1rem;
   }

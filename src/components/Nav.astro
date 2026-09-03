@@ -12,11 +12,12 @@ const { locale = defaultLocale } = Astro.props;
 /*
   Logo, then one list in reading order, with the utilities after it.
 
-  The logo is at the start of the row, not centred. The bar used to centre one
-  absolutely, which is what forced the links into two balanced groups; in flow
-  at the left it costs the row its own width and nothing else, so the links stay
-  a single run and the social icons and the language switch sit at the end
-  because that is where you go looking for them.
+  Source order is left-to-right and matches the tab order; the *visual* centring
+  of the links is done by the grid in .nav__inner and moves nothing here. The
+  logo is at the start, not centred — the bar used to centre one absolutely,
+  which is what forced the links into two balanced groups, and it stays in flow
+  so the links can remain a single run. The social icons and the language button
+  sit at the end because that is where you go looking for them.
 
   It renders logo-clean.png, the same file the hero and the footer use, cropped
   by `object-fit` rather than by a second asset — see the note on `.nav__logo`
