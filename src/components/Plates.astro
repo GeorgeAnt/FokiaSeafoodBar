@@ -37,27 +37,36 @@ const plates = PLATE_IDS.map((id) => {
 ---
 
 {/*
-  Dark tier. The bands step light / mid / dark and no two in a row share a
-  background: Hero black, Our Goal stone, Team salt, this black, Take away salt,
-  Find Us stone, footer black. Black is simply the right ground for food
-  photography, which is why this band keeps it and Take away — text only, and
-  the only other candidate for dark — moved to the light tier when this section
-  landed above it.
+  .section-dark, which is --charcoal now rather than Deep Black, and so is every
+  other band below the hero. The light / mid / dark alternation this comment
+  used to describe is gone: bands are told apart by the 1px hairline
+  .section-dark draws on top of itself. Black was the right ground for food
+  photography and charcoal still is — this band lost the least in that change.
 
-  Deliberately NOT in the nav. Measured clearance at 1025px in Greek is 43px,
-  and a seventh label does not fit — see the nav note in CLAUDE.md. The band is
-  reached by scrolling, and its own link goes to the gallery.
+  Deliberately NOT in the nav, and the old reason given here (43px of clearance
+  at 1025px) is three changes out of date — the bar collapses at 75rem now, not
+  64rem. It is a content decision: the band is reached by scrolling and its own
+  button goes to /gallery. See the nav note in CLAUDE.md for the current figure.
 */}
 <section class="section section-dark plates" id="plates">
   <div class="wrap">
-    <header class="section-head plates__head" data-reveal>
-      <div>
-        <h2 data-i18n="plates.heading">{t(locale, 'plates.heading')}</h2>
-        <p data-i18n="plates.intro">{t(locale, 'plates.intro')}</p>
-      </div>
-      <a class="btn btn--primary plates__cta" href="/gallery" data-i18n="plates.cta">
-        {t(locale, 'plates.cta')}
-      </a>
+    {/*
+      Centred, and deliberately NOT .section-head any more.
+
+      That class sets --step-3 for the heading and --step-1 for the paragraph
+      under it, and the client asked for this band to match Our Goal instead:
+      --step-2 for the heading, plain body size for the line beneath. Rather
+      than out-specifying .section-head from a later rule — same specificity,
+      so it would have been winning on source order alone — the class is gone
+      and .plates__head carries the whole thing. .section-head still styles
+      /menu, /gallery, /team and Find Us, which are unchanged.
+
+      The button used to live in here, on the right of a two-column header row.
+      It is below the photographs now.
+    */}
+    <header class="plates__head" data-reveal>
+      <h2 data-i18n="plates.heading">{t(locale, 'plates.heading')}</h2>
+      <p data-i18n="plates.intro">{t(locale, 'plates.intro')}</p>
     </header>
 
     {/*
@@ -73,19 +82,42 @@ const plates = PLATE_IDS.map((id) => {
       {
         plates.map((plate) => (
           <li class="plates__item">
-            <Picture
-              src={plate.src}
-              formats={['avif', 'webp']}
-              widths={[300, 500, 700]}
-              sizes="(min-width: 60rem) 24vw, 70vw"
-              alt={t(locale, plate.altKey)}
-              data-i18n-alt={plate.altKey}
-              loading="lazy"
-              decoding="async"
-            />
+            {/*
+              Each plate links to /gallery, which is where the rest of them are.
+
+              The link takes its accessible name from the photo's own alt — the
+              gallery's real per-image text — so four links to the same place
+              are still told apart when read out, rather than four repetitions
+              of "see the gallery". That is also why the alt stays non-empty
+              here: emptying it would leave the link unnamed.
+
+              The box styling moved to .plates__link with it. .plates__item kept
+              overflow: hidden while it was the only element, and an ancestor
+              with overflow: hidden clips a descendant's focus ring — see the
+              note in global.css.
+            */}
+            <a class="plates__link" href="/gallery">
+              <Picture
+                src={plate.src}
+                formats={['avif', 'webp']}
+                widths={[300, 500, 700]}
+                sizes="(min-width: 60rem) 24vw, 70vw"
+                alt={t(locale, plate.altKey)}
+                data-i18n-alt={plate.altKey}
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
           </li>
         ))
       }
     </ul>
+
+    {/* Below the photographs now, and centred under them. */}
+    <p class="plates__actions" data-reveal>
+      <a class="btn btn--primary plates__cta" href="/gallery" data-i18n="plates.cta">
+        {t(locale, 'plates.cta')}
+      </a>
+    </p>
   </div>
 </section>

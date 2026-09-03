@@ -111,10 +111,20 @@ tier — which is the same logic that put Our Goal and Find Us on stone. So Take
 away is now a light band. Work the sequence out in full before changing an
 order; there are only three tiers and both ends are pinned black.
 
-**Each section on the homepage uses a different layout.** Hero is a split, Our
-Goal is two columns of text, From the kitchen is a staggered photo row, Take
-away is two photo panels with their titles laid over them, Find Us is a text and
-image split.
+**Each section on the homepage uses a different layout — with one deliberate
+pairing.** Hero is a split, Our Goal is a centred stack of text, From the
+kitchen is a centred head over a staggered photo row, Take away is two photo
+panels with their titles laid over them, Find Us is a text and image split.
+
+Our Goal and From the kitchen now share a composition on purpose: both are a
+centred heading at --step-2, body copy at --step-0 under it, and a centred
+.btn--primary, on the same 46rem axis. The client asked for the second to match
+the first. What still tells them apart is what sits between the head and the
+button — nothing in Our Goal, four photographs in From the kitchen — so the
+repetition is a *rhyme* between neighbours rather than the Team-and-Find-Us
+problem below, where two bands were the same shape doing the same job. Worth
+watching, though: it is the same failure mode one step earlier, and a third
+centred stack would be too many.
 
 **That rule was being broken by Team, and moving Team to `/team` is what fixed
 it** — worth recording, because the repetition problem was live for a long time
@@ -308,27 +318,29 @@ dead-key sweep removed it for never being rendered, so rather than re-adding a
 second key holding the same two words, the nav label and the section title share
 one string deliberately.
 
-**Our Goal is also the only band with a link out of it.** `.goal__cta` is a
-"Meet the team" button at the end of the second column, pointing at `/team` —
-added when Team moved off the homepage, so the section that talks about how the
-place works still leads somewhere. The second column is a `<div>` wrapping the
-paragraph and the button; `.goal__grid p` is a descendant selector, so the
-paragraph keeps its muted colour and measure through the wrapper, and the grid
-still has two children and so still two columns.
+**Our Goal is one centred column, and it is the only band with a link out of
+it.** Heading, first paragraph, second paragraph, `.goal__cta` — a
+"Meet the team" button pointing at `/team`, added when Team moved off the
+homepage so the section describing how the place works still leads somewhere.
 
-Above 48rem it is pushed to the end of its column so it lands on the same
-vertical line as From the kitchen's `.plates__cta` in the band below.
-Neither hard-codes a position: both sections share one `.wrap`, and that
-button is already pinned to the wrap's right edge because its grid track is
-auto-sized to it, so ending this one at the same edge lines the two up at every
-width. Verified at 768 / 1201 / 1366 / 1600 / 1920 — right edges identical,
-delta 0px. It squares off against its own paragraph too, which fills the column
-and so ends on that edge as well.
+The measure sits on `.goal__body`, not on each paragraph, which is the
+opposite of what the two-column grid did and is what centring requires: centred
+lines are read by their middles, so both paragraphs have to share one axis or
+the block comes apart. 46rem is deliberately narrower than `--measure` (62ch),
+because centred text wants a shorter line — there is no fixed left edge for the
+eye to return to.
 
-`margin-inline-start: auto` only moves a *block-level* box and `.btn` is
-inline-flex, so `display` and `width` travel with it. It is deliberately
-not applied below the breakpoint: on a single narrow column a right-shoved
-button reads as a mistake, not as alignment.
+**Two things were given up for this, both on purpose.** The section was a
+two-column grid, and the button was pinned to the end of the second column so
+it sat on the same vertical line as `.plates__cta` in the band below — that
+alignment is gone, because a centred section puts its button in the middle of
+the page. Do not reinstate the old `margin-inline-start: auto` media query
+without moving the section back off centre; the two cannot both be true.
+
+And the first paragraph is ~60 words, which is long for centred setting. The
+client asked for it with that pointed out. If it ever reads badly the fix is to
+range the paragraphs left inside the same centred column — drop `text-align`
+from the `p` rule — rather than to widen the column.
 
 **Four pages.** `/` is the scrolling homepage; `/menu` is the menu and its
 legal block; `/gallery` is the photographs; `/team` is the five member rows,

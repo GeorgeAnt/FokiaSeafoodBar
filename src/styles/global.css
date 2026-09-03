@@ -1272,54 +1272,51 @@ main > .section-dark:last-child {
   measure went with the sentence too — it existed to stop a long line, and this
   is two words.
 */
+/* Centred with the block below it. The heading is two words, so it takes no
+   measure of its own — .goal__body carries that for the paragraphs. */
 .goal__heading {
   font-family: var(--font-display);
   font-size: var(--step-2);
   line-height: 1.25;
   margin-bottom: 1.75rem;
+  text-align: center;
 }
 
-.goal__grid {
-  display: grid;
-  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
-}
-@media (min-width: 48rem) {
-  .goal__grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.goal__grid p {
-  color: var(--text-muted);
-  max-width: var(--measure);
-}
-/* Sits under the second column's paragraph, not beside it. .btn is
-   inline-flex, so it needs the block context and the space above spelled out. */
-.goal__cta {
-  margin-top: 1.75rem;
-}
 /*
-  Above the two-column breakpoint this button is pushed to the end of its
-  column, which puts it on the same vertical line as From the kitchen's
-  "see the gallery" button in the band below.
+  One centred column, replacing the two-column .goal__grid.
 
-  Both sections are inside the same .wrap, and that button is already pinned to
-  the wrap's right edge (its grid track is auto-sized to the button, so the
-  track's end *is* the wrap's end). Ending this one at the same edge lines the
-  two up at every width above the breakpoint without either of them hard-coding
-  a position — and it also squares the button off against its own paragraph,
-  which fills the column and so ends on that edge too.
+  The measure is on this container rather than on each paragraph, which is the
+  opposite of what the grid did and is what centring requires: centred lines are
+  read by their middles, so both paragraphs have to share one axis or the block
+  comes apart. 46rem is narrower than --measure (62ch, ~44rem at this size) by
+  design — centred text wants a shorter line than ranged-left text, because
+  there is no fixed left edge for the eye to return to.
 
-  margin-inline-start: auto only pushes a *block-level* box, and .btn is
-  inline-flex, so the display and the width go with it. Below 48rem the grid is
-  one column and this is deliberately not applied: a button shoved to the right
-  of a narrow single column reads as a mistake rather than as alignment.
+  KNOWN COST, accepted by the client when they asked for this: the first
+  paragraph is ~60 words, and that is long for centred setting. If it ever reads
+  badly, the fix is to range the paragraphs left inside this same centred column
+  (drop text-align on the p rule) rather than to widen it.
+
+  This also gave up an alignment. The button used to be pinned to the end of the
+  second column so it sat on the same vertical line as .plates__cta in the band
+  below; centred, it is in the middle of the page instead. That was the trade,
+  made deliberately — do not "restore" the old media query without moving the
+  section back off centre.
 */
-@media (min-width: 48rem) {
-  .goal__cta {
-    display: flex;
-    width: fit-content;
-    margin-inline-start: auto;
-  }
+.goal__body {
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.goal__body p {
+  color: var(--text-muted);
+  margin-block: 0 clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+/* .btn is inline-flex, so it sits on the text baseline and is centred by the
+   container's text-align. No block context is wanted here — giving it one
+   would need its own auto margins to stay centred. */
+.goal__cta {
+  margin-top: 0.5rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -1581,21 +1578,37 @@ main > .section-dark:last-child {
    layout: Team is a straight grid and Find Us is a split, so the variance is
    spent in one place rather than smeared across all three.
    -------------------------------------------------------------------------- */
+/*
+  Centred, and sized to match Our Goal rather than to match .section-head.
+
+  --step-2 on the heading and plain body size on the line under it are the sizes
+  .goal__heading and .goal__body p render at; the client asked for the two bands
+  to agree. 46rem is .goal__body's measure for the same reason — the two centred
+  blocks share an axis and a width, so they read as one system down the page.
+
+  This band does not use .section-head at all, deliberately: that class sets
+  --step-3 and --step-1 at the same specificity these rules have, so keeping it
+  would have made the sizes depend on which rule came later in the file.
+*/
 .plates__head {
-  display: grid;
-  gap: 1.5rem;
+  max-width: 46rem;
+  margin-inline: auto;
+  margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+  text-align: center;
 }
-/* Hugs its label rather than stretching to the column. As a grid item it would
-   otherwise go full width on a phone, which no other button on the site does. */
-.plates__cta {
-  justify-self: start;
+.plates__head h2 {
+  font-size: var(--step-2);
+  line-height: 1.25;
 }
-@media (min-width: 48rem) {
-  .plates__head {
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: clamp(2rem, 1rem + 4vw, 4rem);
-  }
+.plates__head p {
+  margin-top: 0.9rem;
+  color: var(--text-muted);
+}
+/* Under the photographs, centred with the head above them. */
+.plates__actions {
+  margin-top: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+  margin-bottom: 0;
+  text-align: center;
 }
 
 /* 2x2 on a phone rather than a scroll strip: four photos in a row that scrolls
@@ -1619,9 +1632,20 @@ main > .section-dark:last-child {
 }
 
 .plates__item {
-  overflow: hidden;
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--light-stone) 20%, transparent);
+}
+/*
+  The tile is the link now, and `overflow: hidden` moved onto it from
+  .plates__item. That is not tidying: an outline is painted outside the border
+  box and is clipped by an *ancestor* that hides overflow, so leaving it on the
+  <li> would have cut the focus ring off the photo inside it. An element's own
+  overflow never clips its own outline, so it is safe here.
+*/
+.plates__link {
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
 }
 .plates__item img {
   width: 100%;

@@ -18,9 +18,9 @@ const { locale = defaultLocale } = Astro.props;
   from --black besides, so the two are not the same value either.
 */}
 <section class="section section-dark" id="goal">
-  {/* One reveal for the whole band: the heading and the two columns are a
-      single thought, and staggering them made the heading arrive on its own
-      above nothing. */}
+  {/* One reveal for the whole band: the heading, the two paragraphs and the
+      button are a single thought, and staggering them made the heading arrive
+      on its own above nothing. */}
   <div class="wrap" data-reveal>
     {/*
       The heading names the section, which it did not use to.
@@ -42,20 +42,22 @@ const { locale = defaultLocale } = Astro.props;
     */}
     <h2 class="goal__heading" data-i18n="nav.goal">{t(locale, 'nav.goal')}</h2>
 
-    <div class="goal__grid">
+    {/*
+      One centred column, stacked: heading, first paragraph, second, button.
+
+      This was a two-column grid with the button pinned to the end of the second
+      column so it lined up with From the kitchen's button in the band below.
+      The client asked for the section to be centred instead, which puts the
+      button in the middle of the page — that alignment is deliberately given
+      up, not lost by accident, and the media query that produced it is gone
+      from global.css.
+    */}
+    <div class="goal__body">
       <p data-i18n="goal.body">{t(locale, 'goal.body')}</p>
-      {/*
-        The second column is a <div> so the button can sit under its paragraph
-        rather than beside it. `.goal__grid p` is a descendant selector, so the
-        paragraph keeps its muted colour and its measure through the wrapper,
-        and the grid still has exactly two children and so still two columns.
-      */}
-      <div>
-        <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
-        <a class="btn btn--primary goal__cta" href="/team" data-i18n="goal.cta">
-          {t(locale, 'goal.cta')}
-        </a>
-      </div>
+      <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
+      <a class="btn btn--primary goal__cta" href="/team" data-i18n="goal.cta">
+        {t(locale, 'goal.cta')}
+      </a>
     </div>
   </div>
 </section>
