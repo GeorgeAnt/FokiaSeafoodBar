@@ -30,7 +30,7 @@ const YESTERDAY: Record<string, string> = {
   Sunday: 'Saturday',
 };
 
-export const toMinutes = (hhmm: string): number => {
+const toMinutes = (hhmm: string): number => {
   const [h, m] = hhmm.split(':').map(Number);
   return h * 60 + m;
 };

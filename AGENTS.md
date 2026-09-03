@@ -245,8 +245,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
   Headings are 700 against the 600 that labels and buttons use — with a single
   family the weight is the only thing separating a heading from the text under
   it, where the old serif could sit at 600 and still read as another voice.
-  Headings also carry `letter-spacing: -0.02em`: a geometric sans at `--step-4`
-  (up to 70px) reads loose at default tracking. Body copy deliberately does not.
+  Headings also carry `letter-spacing: -0.02em`: a geometric sans reads loose at
+  default tracking once it is set large. The largest heading on the site is 47px
+  — `--step-3` at its ceiling, measured on the rendered page. `--step-4` exists
+  in the scale but nothing uses it, so it is not the number to quote. Body copy
+  deliberately keeps the default tracking.
 
 - **Manrope ships no italic, in any weight, so `font-synthesis` is off for style
   too.** Left on, the browser shears an upright into a fake oblique, and
@@ -421,6 +424,29 @@ Node is installed but **not on the shell PATH**; prepend it first:
   document are black (bar above, footer below), so the gutter agrees at both.
   The rule is "match what the chrome actually butts against", not "match
   `body`" — and what it butts against is the sticky bar.
+- **Dead code has been swept once; here is what the sweep could not see.** A
+  grep for a class or a key gives false answers in both directions in this
+  codebase, so anything removed has to be checked by hand first:
+
+  - Keys are **built at runtime** from data — `team.${id}.name`,
+    `gallery.${id}.alt`, `legal.${id}`, `hours.short.${day}`. None of those
+    appear literally anywhere, and deleting one breaks a page silently, because
+    `npm run check` compares el.json against en.json and never asks whether a
+    key is *used*.
+  - Classes are built the same way: `.menu__panel--food` and
+    `.menu__panel--drinks` exist only as `menu__panel--${view.id}`.
+  - A mention inside a comment is not a use. The first pass of the sweep counted
+    prose and reported three dead classes where there was one.
+
+  What actually went: `goal.heading` (Our Goal's eyebrow is `nav.goal`; the
+  heading key was never rendered), the seven long-form `hours.<Day>` names (only
+  `hours.short.*` reaches the page), `.wrap--narrow`, and three lib functions
+  nothing imported — `missingKeys()`, `flattenItems()`, `unpricedItems()`.
+
+  The last two are the interesting ones: both carried doc comments saying they
+  were used by `npm run check`, and the checker had its own copy of each walk.
+  A docstring is not evidence that a function is called.
+
 - Selectors drift away from the markup silently. `.menu__legal h3` matched
   nothing for as long as the block has rendered an `<h2>`, which left the one
   legally required heading on the site at default Garamond `h2` size instead of

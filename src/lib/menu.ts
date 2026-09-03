@@ -51,32 +51,8 @@ export function formatPrice(price: number): string {
   return `${text} €`;
 }
 
-/** Every item in a group, including items nested in subcategories. */
-export function flattenItems(groups: MenuGroup[]): MenuItem[] {
-  return groups.flatMap((g) => [
-    ...(g.items ?? []),
-    ...(g.subcategories ? flattenItems(g.subcategories) : []),
-  ]);
-}
-
 /** Wine producer / label / grape / style, joined for its own line under the name. */
 export function wineLine(wine: Wine): string {
   return [wine.producer, wine.label, wine.style, wine.grape].filter(Boolean).join(' · ');
 }
 
-/** Reported at build time so the client can be chased for the missing prices. */
-export function unpricedItems(): { category: string; name: string }[] {
-  const out: { category: string; name: string }[] = [];
-  const walk = (groups: MenuGroup[], trail: string[]) => {
-    for (const g of groups) {
-      const path = [...trail, g.name];
-      for (const item of g.items ?? []) {
-        if (item.price === null) out.push({ category: path.join(' / '), name: item.name });
-      }
-      if (g.subcategories) walk(g.subcategories, path);
-    }
-  };
-  walk(foodCategories, []);
-  walk(drinkCategories, []);
-  return out;
-}

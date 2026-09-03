@@ -87,12 +87,3 @@ export function t(locale: Locale, key: string, vars?: Record<string, string | nu
   }
   return value;
 }
-
-/** Keys present in one locale but not the other — surfaced by `npm run check`. */
-export function missingKeys(): { locale: Locale; keys: string[] }[] {
-  const all = new Set(locales.flatMap((l) => Object.keys(dictionaries[l])));
-  return locales.map((locale) => ({
-    locale,
-    keys: [...all].filter((k) => !(k in dictionaries[locale])),
-  }));
-}

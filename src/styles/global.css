@@ -163,6 +163,9 @@
   --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.5rem);
   --step-2: clamp(1.5rem, 1.34rem + 0.8vw, 2.1rem);
   --step-3: clamp(1.9rem, 1.6rem + 1.5vw, 3rem);
+  /* The top of the scale, and currently unused — the largest thing on the site
+     is --step-3. Kept so the ramp has no gap, but do not cite it as evidence of
+     how big the type gets: measure the rendered heading instead. */
   --step-4: clamp(2.4rem, 1.85rem + 2.7vw, 4.4rem);
 
   --gutter: clamp(1.25rem, 0.9rem + 1.7vw, 3rem);
@@ -244,8 +247,9 @@ h4 {
      read as a different voice. */
   font-weight: 700;
   line-height: 1.12;
-  /* Geometric sans set large needs the tracking pulled in; at --step-4 (up to
-     70px) the default spacing reads loose and the word stops holding together.
+  /* Geometric sans set large needs the tracking pulled in: the biggest heading
+     on the site renders at 47px (--step-3 at its ceiling), where the default
+     spacing already reads loose and the word stops holding together.
      Deliberately not applied to body copy, which needs the room. */
   letter-spacing: -0.02em;
   margin: 0;
@@ -381,10 +385,6 @@ input {
 .wrap {
   width: min(100% - var(--gutter) * 2, 78rem);
   margin-inline: auto;
-}
-
-.wrap--narrow {
-  width: min(100% - var(--gutter) * 2, 52rem);
 }
 
 /* No scroll-margin-top here. `scroll-padding-top` on <html> already insets the
