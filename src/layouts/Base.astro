@@ -366,6 +366,13 @@ const dictJson = JSON.stringify(dictionaries);
           nav toggle, the hero pause button). The script picks the *key*; the
           string still comes from the dictionary, so the language switch keeps
           working on it afterwards.
+
+          There was briefly a `setTextKey` alongside it, the same idea for
+          visible text, added for the after-hours phone swap and removed with it
+          when both numbers went on the page at once. If visible text ever has to
+          change with state again, it is four lines — but it must still take a
+          *key*, because `dict` is private to this closure and a caller writing
+          the words itself would hard-code both locales.
         */
         window.fokiaI18n = {
           refresh: function () {

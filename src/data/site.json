@@ -8,8 +8,8 @@
     "href": "+302130991571"
   },
   "phoneAfterHours": {
-    "display": "698 298 0367",
-    "href": "+306982980367"
+    "display": "698 298 0267",
+    "href": "+306982980267"
   },
   "email": "fokiaseafoodbar@gmail.com",
   "address": {
@@ -28,7 +28,7 @@
   },
   "$comment-mapUrl": "Google's documented Maps URLs form (https://developers.google.com/maps/documentation/urls/get-started#map-action), addressing the listing by its Place ID. Deliberately NOT the long /maps/place/... URL the browser produces: everything after data= in one of those is length-prefixed — !4m6 declares 'six tokens follow', !3m5 declares 'five' — so dropping a token that looks redundant leaves the counts short and Google silently degrades the link to a name search on the wrong pin, with nothing erroring anywhere. That shipped once. This form has no such structure and nothing safe-looking to delete. The placeId below is the same listing: its base64 decodes to the two 64-bit ids 0x14a1af007ee38927 and 0x9619f033941949e, which are exactly the pair in the !1s field of the client's original share URL. Feeds both the button in FindUs and `hasMap` in the Restaurant JSON-LD.",
   "$comment-mapUrl-provenance": "The Place ID inside mapUrl came from the client via Google's Place ID finder, alongside their share link https://maps.app.goo.gl/yBC9YH1GG524MJPWA for the same listing. Neither is stored as a field of its own — the Place ID is already in mapUrl and the share link is not rendered anywhere, and an unused key here is how directionsUrl came to sit in this file unnoticed for months.",
-  "mapUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJ4njfgCvoRQRnpRBOQOfYQk",
+  "mapUrl": "https://www.google.com/maps/search/?api=1&query=Fokia%20Seafood%20Bar%2C%20Athens&query_place_id=ChIJJ4njfgCvoRQRnpRBOQOfYQk",
   "hours": {
     "$comment": "Confirmed by the client. `days` uses schema.org day names for the JSON-LD. List EVERY day an entry covers, not just the first and last: FindUs.astro computes contiguous runs from this, so a gap in the list correctly becomes two rows instead of one range claiming a day the restaurant is shut. `closed` is empty because the restaurant now opens seven days — keep the key rather than deleting it: FindUs.astro and the JSON-LD both read it, and a closed day may come back.",
     "entries": [

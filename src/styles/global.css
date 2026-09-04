@@ -131,16 +131,16 @@
   --salt: #e2e8eb;
   --salt-deep: #d5dee2;
 
-  /* Derived accents. Wood is only legible on light ground: it is 2.3:1 on Deep
-     Black and 1.3:1 on Stone, so each surface tier gets its own tint of it.
-     Both tints follow the oxidation path — rust weathered in salt air, dusty
-     and pink — rather than lightening Wood toward orange, which lands on
-     terracotta and reads as a different brand.
-       --wood-light  6.4:1 on Deep Black
-       --wood-pale   5.0:1 on Stone
+  /* Derived accent. Wood is only legible on light ground — 2.3:1 on Deep Black —
+     so the dark surfaces get a tint of it instead. It follows the oxidation
+     path, rust weathered in salt air, dusty and pink, rather than lightening
+     Wood toward orange, which lands on terracotta and reads as a different
+     brand. 6.4:1 on Deep Black.
+
+     There was a second tint, --wood-pale, for the Stone tier. Both went when the
+     homepage became one charcoal ground and .section-stone stopped being used.
      Sections set --accent; nothing should reference --wood directly. */
   --wood-light: #c98a76;
-  --wood-pale: #f0e0d8;
   --paper: #f5f9fa;
 
   --text: var(--black);
@@ -149,8 +149,6 @@
   --bg: var(--salt);
 
   /* Ghost-button hover fill: inverts against whichever surface it sits on. */
-  --ghost-hover-bg: var(--black);
-  --ghost-hover-fg: var(--salt);
   /* Light-tier rules are tinted with Wood, not grey. It is the one tier Wood is
      legible on (see above), and a warm hairline across a cold ground is what
      ties the brick red to the salt. Dark and Stone override this with a neutral
@@ -424,8 +422,6 @@ input {
   color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--salt);
-  --ghost-hover-fg: var(--black);
   --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
 }
 /* The last band sits against the footer, which is --black and one step darker.
@@ -435,42 +431,6 @@ main > .section-dark:last-child {
   border-bottom: 1px solid var(--rule);
 }
 
-/*
-  CURRENTLY UNUSED, and kept deliberately — do not delete it as dead CSS
-  without reading this first.
-
-  Nothing carries .section-stone since the homepage went to a single charcoal
-  ground; Our Goal and Where to Find Us were the last two. It stays because it
-  is the documented mid tier and because --wood-pale exists only to serve it, so
-  the two would have to be reinvented together if a light or mid band ever
-  returns. The two .btn--primary rules that used to sit under it did go: they
-  matched nothing even before this change, since the only .btn--primary on the
-  site is the hero CTA and that is inside .hero.
-
-  The description below is of the tier as it was used.
-
-  The third surface tier. Stone otherwise only ever appears as secondary text,
-  so the page would step straight from salt to black; this gives it bands of its
-  own and a rhythm of light / mid / dark.
-
-  It carries Our Goal and Where to Find Us — the two text-only sections, which
-  is what suits a mid grey: there are no photographs on either to sit against
-  it. Both also sit next to a black band (the hero above one, the footer below
-  the other), which is the point. No two bands in a row share a background.
-
-  Everything on it has to be re-tinted: Light Stone drops to 2.3:1 here and Wood
-  to 1.3:1, so the muted tone lightens and the accent becomes --wood-pale.
-*/
-.section-stone {
-  background: var(--stone);
-  color: var(--salt);
-  --text: var(--salt);
-  --text-muted: var(--salt-deep);
-  --accent: var(--wood-pale);
-  --ghost-hover-bg: var(--salt);
-  --ghost-hover-fg: var(--black);
-  --rule: color-mix(in srgb, var(--salt) 32%, transparent);
-}
 
 .sr-only {
   position: absolute;
@@ -626,31 +586,6 @@ main > .section-dark:last-child {
   it made the fill, the text and the border all Deep Black on the Deep Black
   hero, so hovering the button made it disappear entirely.
 */
-/*
-  CURRENTLY UNUSED, kept deliberately — like .section-stone above, and for a
-  similar reason. Nothing carries .btn--ghost since the two outlined CTAs were
-  made to match the hero's, and it is the only consumer of the
-  --ghost-hover-bg / --ghost-hover-fg pair, which is declared on eight surfaces
-  (:root, .hero, .nav, .footer, .section-dark, .section-stone, .lightbox and the
-  menu). Deleting the rule without those tokens leaves them orphaned across the
-  file; deleting the tokens without the rule breaks any ghost button brought
-  back. They go together or not at all.
-
-  Keeping it also keeps the note that earned it: the hover pair is explicit
-  precisely because "background: currentColor" in a block that also sets "color"
-  resolves both to the same value and makes the control vanish.
-*/
-.btn--ghost {
-  border-color: currentColor;
-  color: inherit;
-}
-.btn--ghost:hover,
-.btn--ghost:active {
-  background: var(--ghost-hover-bg);
-  border-color: var(--ghost-hover-bg);
-  color: var(--ghost-hover-fg);
-}
-
 /* --------------------------------------------------------------------------
    Navigation
    -------------------------------------------------------------------------- */
@@ -680,8 +615,6 @@ main > .section-dark:last-child {
   --text: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--salt);
-  --ghost-hover-fg: var(--black);
   --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
   border-bottom: 1px solid var(--rule);
 }
@@ -1082,8 +1015,6 @@ main > .section-dark:last-child {
   color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--salt);
-  --ghost-hover-fg: var(--black);
 }
 
 .hero__grid {
@@ -2020,6 +1951,26 @@ main > .section-dark:last-child {
   border-radius: var(--radius);
   background: var(--salt-deep);
 }
+/*
+  Square while the panels are stacked one per row.
+
+  The text block is a fixed height and the scrim under it is too (see below), so
+  on a short panel they eat a fixed number of pixels out of a smaller picture: at
+  390px a 4:3 panel is 261px tall and the block plus its scrim covered about
+  two-thirds of it, which left the table setting barely visible. A square is
+  350px at the same width and gives that back. It applies below 48rem only —
+  above it the panels are side by side and 4:3 is the wider, better frame.
+
+  Both panels move together. The 4:3 compromise exists because one source is
+  landscape (2560x1706) and the other portrait (1707x2560), and the reason it was
+  a compromise rather than a per-photo crop still holds here: side by side or
+  stacked, unequal frames read as a mistake.
+*/
+@media (max-width: 47.999rem) {
+  .contact__panel {
+    aspect-ratio: 1 / 1;
+  }
+}
 .contact__panel img {
   width: 100%;
   height: 100%;
@@ -2035,6 +1986,31 @@ main > .section-dark:last-child {
   third of the frame, so the title cannot rely on the picture being dark under
   it; the bottom of the ramp is opaque enough to carry white text on its own,
   and the photo underneath only ever improves the reading.
+
+  **The stops are lengths, not percentages, and that is the whole of what makes
+  this survive a narrow panel.** They were percentages while the panel carried a
+  single line of title. It now carries a title over one or two labelled numbers,
+  and that block is a fixed number of pixels tall whatever the panel is — while a
+  percentage ramp scales with the panel, so a short panel pushes the same text
+  further up a thinner part of it. The panels are shortest not on a phone but
+  just above the 48rem breakpoint, where two columns share a 768px viewport and
+  each is ~255px tall against ~458px at 1366. Measured on the percentage version,
+  the small label fell to 3.49:1 at 390px — a fail — while reading 5.05:1 at
+  1366px.
+
+  In lengths, the dense end covers the text block and nothing else has to be
+  guessed: 11rem clears the tallest case (the reservations panel's two rows, with
+  the label wrapped above the digits) and the ramp is finished by 21rem. A taller
+  panel therefore shows *more* photograph than the percentage version did, not
+  less; a short one is scrimmed further up, which is exactly right, because on a
+  short panel the text really does cover more of the picture.
+
+  Both panels take the same scrim even though take away's block is one row
+  shorter. Matching the two matters more, for the reason the shared 4:3 exists:
+  side by side, unequal treatments read as a mistake.
+
+  Re-measured by pixel sampling at both widths after the change, not by eye. The
+  figures are in CLAUDE.md.
 */
 .contact__panel::before {
   content: '';
@@ -2042,22 +2018,40 @@ main > .section-dark:last-child {
   inset: 0;
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--black) 88%, transparent) 0%,
-    color-mix(in srgb, var(--black) 72%, transparent) 22%,
-    color-mix(in srgb, var(--black) 30%, transparent) 52%,
-    transparent 78%
+    color-mix(in srgb, var(--black) 94%, transparent) 0,
+    color-mix(in srgb, var(--black) 90%, transparent) 11rem,
+    color-mix(in srgb, var(--black) 55%, transparent) 14rem,
+    color-mix(in srgb, var(--black) 20%, transparent) 17.5rem,
+    transparent 21rem
   );
 }
 
-.contact__panel-title {
+/* The three lines sit in one block rather than being positioned individually:
+   they have to stay a fixed distance apart as the panel scales, and only the
+   block's distance from the bottom edge is a design decision. */
+.contact__panel-body {
   position: absolute;
   left: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem);
   right: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem);
-  bottom: clamp(1.1rem, 0.7rem + 1.4vw, 1.9rem);
+  bottom: clamp(0.75rem, 0.45rem + 1.1vw, 1.4rem);
+}
+
+.contact__panel-title {
   margin: 0;
   color: var(--salt);
   font-size: var(--step-2);
   text-wrap: balance;
+}
+
+/* One row per number — two on reservations, one on take away. `start` rather
+   than a full-width list: the rows are as wide as their content so the
+   photograph is covered by as little as possible. */
+.contact__phones {
+  list-style: none;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  display: grid;
+  justify-items: start;
 }
 
 /*
@@ -2084,35 +2078,87 @@ main > .section-dark:last-child {
   max-width: var(--measure);
 }
 
-/* The number is the last thing in the section, so it carries no trailing
-   margin of its own. */
-.contact__call {
-  margin: 0;
-  text-align: center;
-}
-.contact__call-label {
-  display: block;
-  font-size: var(--step--1);
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
-}
+/*
+  A number and the window it answers in, as one link.
 
+  It used to be a single centred `.contact__call` block at the foot of the
+  section at --step-3, with a `.contact__call-label` above it. Both went with the
+  markup: the client asked for the numbers to sit on the panels, which puts each
+  next to the service it belongs to and removes the question of which of the two
+  a single number was for.
+
+  **The label wraps above the digits rather than sitting beside them**, and that
+  is `flex-wrap` doing it rather than a decision per breakpoint. "Εντός ωραρίου"
+  fits alongside on a wide panel; "Outside opening hours" does not fit on a
+  390px one. Wrapping is why `.contact__phone-call` exists — it keeps the icon,
+  the digits and the arrow together as one unbreakable group, so the row can only
+  ever break between the label and the number and never mid-number.
+
+  min-height carries the 44px touch target on its own — a single-line row is only
+  ~24px of icon and digits, and vertical padding would push the visible text off
+  the bottom of the block rather than growing the target around it.
+*/
 .contact__phone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.6rem;
+  min-height: 44px;
+  color: var(--salt);
+  font-size: var(--step-0);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+.contact__phone-call {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  text-decoration: none;
-  color: var(--accent);
-  letter-spacing: 0.01em;
+  gap: 0.45rem;
 }
-.contact__phone:hover {
+/*
+  The label is the one warm note in a block that is otherwise salt. It is inside
+  the link, so it has to opt out of everything the link does to the digits —
+  weight, size, tracking — or it stops reading as a label and starts reading as
+  part of the number.
+*/
+.contact__phone-when {
+  font-size: var(--step--1);
+  font-weight: 500;
+  font-variant-numeric: normal;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+.contact__phone-icon,
+.contact__phone-arrow {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* The arrow is the affordance. Nothing else marks this as a link — it is salt
+   on a scrim like the title above it — so it moves on hover and focus, and the
+   digits take an underline at the same time for anyone who cannot see the
+   motion. */
+.contact__phone-arrow {
+  width: 0.95em;
+  height: 0.95em;
+  transition: transform 0.18s ease;
+}
+.contact__phone:hover .contact__phone-number,
+.contact__phone:focus-visible .contact__phone-number {
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+.contact__phone:hover .contact__phone-arrow,
+.contact__phone:focus-visible .contact__phone-arrow {
+  transform: translateX(0.2rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact__phone-arrow {
+    transition: none;
+  }
 }
 
 
@@ -2304,8 +2350,6 @@ main > .section-dark:last-child {
   color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  --ghost-hover-bg: var(--salt);
-  --ghost-hover-fg: var(--black);
   padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
 }
 

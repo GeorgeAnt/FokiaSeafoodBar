@@ -114,7 +114,8 @@ order; there are only three tiers and both ends are pinned black.
 **Each section on the homepage uses a different layout — with one deliberate
 pairing.** Hero is a split, Our Goal is a centred stack of text, From the
 kitchen is a centred head over a staggered photo row, Take away is two photo
-panels with their titles laid over them, Find Us is a text and image split.
+panels each carrying a title over its phone numbers laid over the picture, Find
+Us is a text and image split.
 
 **The three band headings are one size.** `.goal__heading`, `.plates__head h2`
 and `.find__head h2` are all `--step-2`. None of them uses `.section-head`,
@@ -195,8 +196,8 @@ switcher's `document.querySelectorAll` pass never sees inside it — and that pa
 has already run by the time an ES-module section script clones anything. For
 about as long as the templates have existed, a visitor on English got Greek
 labels on all four hero dots and every lightbox control. Base's inline script now
-exposes two methods, and both section scripts call the first one immediately
-after putting the clone in the page:
+exposes two methods, and both template-cloning section scripts call the first
+one immediately after putting the clone in the page:
 
 - `refresh()` — re-apply the current locale over the whole document, clones
   included. Call it right after `append`.
@@ -205,6 +206,17 @@ after putting the clone in the page:
   API stays because it is the only sanctioned way for a script to change an
   `aria-label`. The script picks the key; the string still comes from the
   dictionary, so the switch keeps working on it afterwards.
+**Both take a key, never a string, and `dict` being private to the closure is
+what enforces it.** A script that wrote the words itself would have to hard-code
+both locales, and would go stale the moment the copy moved. Re-aiming the
+attribute is also what keeps the language switch working afterwards: `apply()`
+re-reads `data-i18n` off the DOM.
+
+There was briefly a third, `setTextKey`, the same idea for *visible* text. It was
+added for the after-hours phone swap and removed with it when both numbers went
+onto the panels. Recorded because the shape is the reusable part: if visible text
+ever has to change with state again it is four lines, and it must still take a
+key, for the reason above.
 
 Both are called with `?.` — the section scripts are modules and run after the
 inline one, but a control still has to work if it never loaded. The type lives in
@@ -307,17 +319,28 @@ block, after `.section-stone`; both are labelled, neither is an oversight.
 
 `--wood` is still a surface on `/menu`, where the selected menu tab uses it.
 
-**Section eyebrows were a bug, not a device, and there are none left.** Every
-section used to render one from its `nav.*` key, which in five of six cases was
-the heading verbatim — two identical titles stacked. Our Goal was the last
-holdout, kept because its heading was a *sentence* ("To serve fish with the
-respect it deserves") and the eyebrow was the only thing naming the section.
+**Section eyebrows were a bug, not a device. There are no section eyebrows, and
+the one eyebrow on the site earned its place by passing the test that killed the
+rest.** Every section used to render one from its `nav.*` key, which in five of
+six cases was the heading verbatim — two identical titles stacked. Our Goal was
+the last holdout, kept because its heading was a *sentence* ("To serve fish with
+the respect it deserves") and the eyebrow was the only thing naming the section.
 That stopped being true when the client asked for one title instead of two: the
 eyebrow's words were promoted to the heading at the sentence's size, the
 sentence was cut, and `goal.lead` was deleted with it. Do not add eyebrows back
 per-section without new copy that says something the heading does not.
 
-Two consequences worth knowing. `.eyebrow` now matches no markup — it is kept
+`.contact__phone-when` is the near miss worth knowing about, because it started
+as an eyebrow and stopped being one. The first draft put "Κράτηση" above
+"Κλείστε τη θέση σας" — the two-titles-stacked failure exactly — and it was
+rejected for that before shipping. The second put a single "Εντός ωραρίου" above
+the title, which passed the test (it said *when the number answers*, which the
+title cannot) but only worked while a panel had one number. It has two now, so
+the label moved down beside the number it describes, and there is nothing above
+any title on this site. It is deliberately not `.eyebrow`: that class belongs to
+`.section-head`, and this is a label inside a link.
+
+Two consequences worth knowing. `.eyebrow` still matches no markup — it is kept
 because `.section-head p:not(.eyebrow)` still names it, and that guard should
 stay defensive whether or not an eyebrow exists today (see the specificity note
 further down for what happens without it). And Our Goal's heading reads
@@ -701,6 +724,14 @@ Node is installed but **not on the shell PATH**; prepend it first:
   `hours.short.*` reaches the page), `.wrap--narrow`, and three lib functions
   nothing imported — `missingKeys()`, `flattenItems()`, `unpricedItems()`.
 
+  Later, and by the same rule: `contact.callUs`, and the `.contact__call` /
+  `.contact__call-label` pair, when the numbers moved onto the two panels and the
+  single centred block beneath them went. Worth noting because the *script*
+  pointed at that same removed markup and nothing failed — see the phone-numbers
+  entry below. `src/lib/hours.ts` went the same way when the clock-driven swap
+  was dropped: `isOpenAt` was its only export and Contact.astro its only caller,
+  so the file had no reader left.
+
   The last two are the interesting ones: both carried doc comments saying they
   were used by `npm run check`, and the checker had its own copy of each walk.
   A docstring is not evidence that a function is called.
@@ -847,37 +878,94 @@ dependency decision, not a styling one.
   `.menu__legal h3` entry below for how that goes unnoticed), it went. If a
   short text-only band appears again, it is three lines of CSS to reinstate.
 
-- **The contact number changes with the clock, and the fallback is the point.**
-  `site.json` holds two: `phone` (the landline) and `phoneAfterHours` (the
-  mobile). The server renders the landline, the JSON-LD advertises the landline,
-  and a visitor with no JavaScript keeps the landline — so the default is the
-  *correct* number during service rather than merely a safe one. Contact.astro's
-  script swaps in the mobile only when the restaurant is shut.
+- **Both phone numbers are on the page at once, and the clock-driven swap that
+  used to choose between them is gone.** `site.json` still holds two — `phone`
+  (the landline) and `phoneAfterHours` (the mobile) — and both are rendered by
+  the server, each under the window it answers in: `contact.duringHours` /
+  `contact.afterHours`. The JSON-LD still advertises the landline only, which is
+  right: it is the number for the hours the listing publishes.
 
-  Two things about it are easy to get wrong. It is evaluated in
-  **Europe/Athens**, not the visitor's timezone — someone calling from London at
-  22:00 is calling a restaurant where it is already midnight — which `Intl`
-  handles, so no offset is hard-coded and DST needs no thought. And the schedule
-  is passed to the client from `site.hours.entries` rather than restated, so
-  editing the hours moves the swap with them and the two cannot disagree.
+  **Reservations shows both, take away shows the landline.** The landline answers
+  reservations *and* take away during service; the mobile is for reservations
+  made after the restaurant has shut. Take away is not something you can do
+  outside service, so a second number on that panel would be a promise the
+  restaurant cannot keep. That asymmetry is the whole of what `numbers` in
+  `PANELS` expresses, and it is why the two panels come out of one loop without
+  being identical.
 
-  The decision itself is `isOpenAt` in `src/lib/hours.ts`, not inline in the
-  component, so the shipped logic is the logic that gets tested. `closes:
-  "00:00"` means the *end* of the day, not the start of one: 16:00–00:00 covers
-  16:00 up to but not including midnight, which is why 00:00 Wednesday is shut
-  even though Tuesday ran "until midnight". A genuinely overnight range
-  (20:00–02:00) is handled too, though nothing uses one yet.
+  **What the swap was, and why it is not coming back.** It rendered the landline
+  and let a script replace it with the mobile when `isOpenAt` said the restaurant
+  was shut, evaluated in Europe/Athens from `site.hours.entries`. With both
+  numbers visible there is no longer a slot whose contents depend on the hour, so
+  the machinery had nothing left to decide, and the label now does the same job
+  at 3am with JavaScript off — which the swap never could. Removed with it:
+  `src/lib/hours.ts` (`isOpenAt` had no other caller), the `setTextKey` addition
+  to `window.fokiaI18n`, and the `contact.callUs` key.
+
+  If someone ever asks to mark *which* number is live right now, that is a new
+  feature on top of this, not a revert — both numbers stay visible either way,
+  and `isOpenAt` is in git history rather than gone.
+
+  **The bug it left behind is the part worth keeping.** For as long as the number
+  was not in this section, the script selected `#contact-phone`, an id that had
+  stopped being rendered when the old centred `.contact__call` block was removed.
+  `getElementById` returned null, the whole block was skipped, and
+  `phoneAfterHours` never reached a visitor. Nothing catches that: `astro check`
+  passes, `npm run check` compares i18n keys and never looks at markup, and the
+  page renders perfectly. A script that reaches into markup by a hand-typed id is
+  a silent dependency between two files — prefer a marker the renderer emits.
 
 - **Text over the Take away photos is safe because of the scrim, not the
   photos.** Both images have blown highlights in every third of the frame —
   brightest channel 255 in all of them — so an average reading of the source
   proves nothing. `.contact__panel::before` is a bottom-weighted gradient that
-  is opaque enough to carry the title on its own. Verified the way it has to be
-  verified: hide the title, screenshot the rendered panel, and sample every
-  pixel of the box the text occupies. Worst *single* pixel is 11.2:1 under
-  "Κλείστε τη θέση σας" and 9.0:1 under "Take away". Re-measure that way if the
-  photos are ever swapped — the means were 14.1 and 12.4, which would have
-  hidden a bad corner.
+  is opaque enough to carry the block on its own. Verified the way it has to be
+  verified: hide `.contact__panel-body`, screenshot the rendered panel, and
+  sample every pixel of the box each line occupies. Re-measure that way if the
+  photos are ever swapped — worst *single* pixel, never the mean, which ran 6.0
+  to 14.6 here and would have hidden every failure below.
+
+  Worst pixel over both panels, both locales, at 320, 390, 768, 1024 and 1366px —
+  five widths because the block's height changes with the wrap and the panel's
+  height changes with the column count, and the worst case is not at either end:
+
+  | line | colour | owes | worst |
+  |---|---|---|---|
+  | label (`.contact__phone-when`) | `--wood-light` | 4.5:1 | **5.19:1** |
+  | title (`.contact__panel-title`) | `--salt` | 3:1 | 11.46:1 |
+  | number (`.contact__phone-number`) | `--salt` | 3:1 | 12.09:1 |
+
+  The label is the number that matters and the only one with any margin left: it
+  is `--step--1`, so it is small text and owes 4.5:1, while the other two are
+  large or bold, owe 3:1, and clear it four times over. Anything that makes that
+  line smaller, lighter, or higher up the panel has to be re-sampled.
+
+  **The gradient stops are lengths (`rem`), not percentages, and that is what
+  makes the figures above hold at every width.** They were percentages when the
+  panel carried a single title. The block is now a title over one or two labelled
+  numbers — a fixed number of pixels tall *whatever the panel is* — while a
+  percentage ramp scales with the panel, so a short panel pushes the same text
+  further up a thinner part of the scrim. Measured on the percentage version, the
+  label read 5.05:1 at 1366px and **3.49:1 at 390px**, a fail that only appeared
+  at one width. In lengths the dense end simply covers the text block (11rem
+  clears the tallest case: two rows with the label wrapped above the digits) and
+  the ramp finishes at 21rem, so a tall panel shows *more* photograph than the
+  percentage version did and a short one is scrimmed further up — which is
+  correct, because on a short panel the text really does cover more of the
+  picture.
+
+  **Both panels take the same scrim even though take away's block is one row
+  shorter**, for the same reason they share a crop: side by side, unequal
+  treatments read as a mistake.
+
+  **The stacked layout is square, and that is a consequence of the fixed-height
+  scrim rather than a separate design choice.** Below 48rem `.contact__panel`
+  goes `4/3` → `1/1`. A 4:3 panel at 390px is 261px tall, and a fixed ~150px
+  block plus its scrim took about two-thirds of it — the table setting was barely
+  there. A square is 350px at the same width and gives that back. Above 48rem the
+  panels are side by side and 4:3 is the wider, better frame, so the switch is
+  where the column count changes. Both panels move together; see the note on the
+  4:3 compromise for why they must.
 - `Plates.astro` picks its four photos **by id**, not by taking the first four in
   `gallery.json`. The gallery is ordered for the gallery — room, sign, drinks and
   plates interleaved — so position is not a stable way to ask for "the food", and

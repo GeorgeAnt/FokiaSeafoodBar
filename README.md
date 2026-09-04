@@ -128,15 +128,21 @@ and Inside-outs work). Categories appear in the order they are listed, and the
 
 ### The two phone numbers — `src/data/site.json`
 
-`phone` is the landline and `phoneAfterHours` is the mobile. The site shows the
-landline while the restaurant is open and the mobile when it is shut, working
-that out from `hours.entries` in the same file — so if you change the opening
-hours, the switch follows automatically and there is nothing else to update.
+`phone` is the landline and `phoneAfterHours` is the mobile. Both are shown on
+the homepage, on the two "Κλείστε τη θέση σας • Take away" panels, each with a
+small line next to it saying when that number answers.
 
-The times are read on the restaurant's clock (Athens), not the visitor's, so a
-customer abroad still sees the number that will actually be answered. If a
-visitor has JavaScript turned off they see the landline, which is also the
-number given to Google in the page's structured data.
+- **Κλείστε τη θέση σας** shows both: the landline for **Εντός ωραρίου**, the
+  mobile for **Εκτός ωραρίου**.
+- **Take away** shows the landline only, because take away only runs during
+  service and the mobile would be a promise you can't keep.
+
+Both are always visible — nothing is hidden and nothing depends on the visitor's
+browser or clock, so the panel reads the same at 3am as at 8pm. Editing either
+number in `site.json` changes it everywhere it appears.
+
+The landline is also the number given to Google in the page's structured data,
+since that is the number for the hours the listing publishes.
 
 ### The team — `src/data/team.json`
 
@@ -623,6 +629,13 @@ full-bleed.
 
 Text was re-measured on the new ground: headings and buttons 13.2:1, body and
 muted text 5.9:1, eyebrows and the phone number 5.8:1.
+
+The text on the two Take away panels sits over photographs rather than over the
+band, so it is measured against the rendered pixels instead: worst single pixel
+5.2:1 on the small "when it answers" line and 11.5:1 on the titles and numbers,
+checked at 320, 390, 768, 1024 and 1366px wide in both languages. If those two
+photos are ever swapped, that measurement has to be redone — see CLAUDE.md for
+how.
 
 `.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
 on purpose — it and the `--wood-pale` accent only make sense together — and is

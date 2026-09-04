@@ -16,12 +16,36 @@ const { locale = defaultLocale } = Astro.props;
   it must not quietly change what the homepage shows. The alt text comes from
   that entry too, so it stays written in one place and in both locales.
 */
+/*
+  Both numbers are on the page at once, each labelled with the window it
+  answers in. Reservations takes both; take away takes the landline only.
+
+  This replaced a clock-driven swap that showed one number at a time — the
+  landline during service, the mobile after it, decided in Europe/Athens from
+  `site.hours.entries`. The client asked for both to be visible, which leaves
+  that machinery with nothing to decide: there is no longer a single slot whose
+  contents depend on the hour. The label is what tells a visitor which to ring,
+  and it does so at 3am with JavaScript off, which the swap never could.
+
+  Take away keeps one number because it can only be done during service. A
+  second number there would be a promise the restaurant cannot keep, so the
+  asymmetry is the point and not an oversight.
+*/
+const NUMBERS = {
+  landline: { whenKey: 'contact.duringHours', ...site.phone },
+  mobile: { whenKey: 'contact.afterHours', ...site.phoneAfterHours },
+} as const;
+
 const PANELS = [
-  { id: 'table-setting', titleKey: 'contact.reserveTitle' },
-  { id: 'takeaway-box', titleKey: 'contact.takeawayTitle' },
+  {
+    id: 'table-setting',
+    titleKey: 'contact.reserveTitle',
+    numbers: [NUMBERS.landline, NUMBERS.mobile],
+  },
+  { id: 'takeaway-box', titleKey: 'contact.takeawayTitle', numbers: [NUMBERS.landline] },
 ];
 
-const panels = PANELS.map(({ id, titleKey }) => {
+const panels = PANELS.map(({ id, titleKey, numbers }) => {
   const image = gallery.images.find((candidate) => candidate.id === id);
   if (!image) {
     throw new Error(
@@ -30,12 +54,14 @@ const panels = PANELS.map(({ id, titleKey }) => {
         `PANELS in Contact.astro at an id that exists.`
     );
   }
-  return { ...image, titleKey, src: galleryPhoto(image.file), altKey: `gallery.${image.id}.alt` };
+  return {
+    ...image,
+    titleKey,
+    numbers,
+    src: galleryPhoto(image.file),
+    altKey: `gallery.${image.id}.alt`,
+  };
 });
-
-/* The schedule is handed to the client as-is rather than re-stated, so the
-   after-hours swap can never disagree with the hours the section renders. */
-const schedule = JSON.stringify(site.hours.entries);
 ---
 
 {/*
@@ -76,9 +102,56 @@ const schedule = JSON.stringify(site.hours.entries);
               loading="lazy"
               decoding="async"
             />
-            <h3 class="contact__panel-title" data-i18n={panel.titleKey}>
-              {t(locale, panel.titleKey)}
-            </h3>
+            <div class="contact__panel-body">
+              <h3 class="contact__panel-title" data-i18n={panel.titleKey}>
+                {t(locale, panel.titleKey)}
+              </h3>
+              {/*
+                A list because it is one: on reservations it is two numbers, and
+                a screen reader announcing "list of 2" before them is the whole
+                point being made visually by putting them one above the other.
+
+                The "when" label is *inside* the link, not beside it. Outside, a
+                screen reader would read it once as loose text and again inside
+                the link's name; inside, it is said once and the whole row —
+                label, icon, digits, arrow — is a single 44px target.
+
+                Three links on the page would otherwise all read as bare digits
+                with nothing to tell them apart (WCAG 2.4.4). The panel title is
+                added as .sr-only text, so each name is distinct: "Κλείστε τη
+                θέση σας Εντός ωραρίου 21 3099 1571". Appended rather than an
+                aria-label, so the visible digits stay inside the accessible name
+                and 2.5.3 (Label in Name) still holds.
+
+                Icons are inline SVG in the SocialLinks / FindUs idiom — 24x24,
+                fill none, stroke currentColor at 1.6 — and aria-hidden, since
+                the text beside them is already the name.
+              */}
+              <ul class="contact__phones">
+                {panel.numbers.map((number) => (
+                  <li>
+                    <a class="contact__phone" href={`tel:${number.href}`}>
+                      <span class="sr-only" data-i18n={panel.titleKey}>
+                        {t(locale, panel.titleKey)}
+                      </span>
+                      <span class="contact__phone-when" data-i18n={number.whenKey}>
+                        {t(locale, number.whenKey)}
+                      </span>
+                      <span class="contact__phone-call">
+                        <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                          <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+                        </svg>
+                        <span class="contact__phone-number">{number.display}</span>
+                        <svg class="contact__phone-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                          <path d="M4 12h14" />
+                          <path d="m12.5 6 6 6-6 6" />
+                        </svg>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </article>
         ))
       }
@@ -90,50 +163,3 @@ const schedule = JSON.stringify(site.hours.entries);
     </div>
   </div>
 </section>
-
-<script>
-  // Outside opening hours the mobile answers instead of the landline.
-  //
-  // Evaluated in Europe/Athens, never in the visitor's own timezone: someone
-  // calling from London at 22:00 is calling a restaurant where it is already
-  // midnight, and the number they need is the one that rings after service.
-  // Intl does the conversion, so no offset is hard-coded and DST is handled.
-  //
-  // The decision itself lives in lib/hours.ts so it can be tested directly;
-  // this script only supplies the clock and swaps the two attributes.
-  import { isOpenAt, type HoursEntry } from '../lib/hours';
-
-  const link = document.getElementById('contact-phone');
-  const numberEl = link?.querySelector('.contact__phone-number');
-
-  if (link && numberEl) {
-    const athensNow = () => {
-      const parts = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Europe/Athens',
-        weekday: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-        hourCycle: 'h23',
-      }).formatToParts(new Date());
-      const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
-      return { day: get('weekday'), minutes: Number(get('hour')) * 60 + Number(get('minute')) };
-    };
-
-    try {
-      const entries: HoursEntry[] = JSON.parse(link.dataset.hours || '[]');
-      const { day, minutes } = athensNow();
-
-      if (!isOpenAt(entries, day, minutes)) {
-        const href = link.dataset.afterHref;
-        const display = link.dataset.afterDisplay;
-        if (href && display) {
-          link.setAttribute('href', href);
-          numberEl.textContent = display;
-        }
-      }
-    } catch {
-      // Any failure leaves the landline in place, which is the correct number
-      // during service and a working number outside it.
-    }
-  }
-</script>
