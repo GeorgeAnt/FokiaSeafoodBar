@@ -638,6 +638,20 @@ Node is installed but **not on the shell PATH**; prepend it first:
   the pill. The wash stays on `html` for ordinary links, where a rectangle is
   the right shape. Any future rounded control needs the same pair.
 
+  **`.lang` is the case that sentence predicted, and it took a year to arrive.**
+  The language switch became a 999px pill when the two-segment control collapsed
+  into one button — and the opt-out did not come with the radius, so a tap
+  flashed the wood rectangle exactly as `.btn` once did. Reported from a device,
+  again. It now carries `-webkit-tap-highlight-color: transparent` and keeps its
+  `:active` fill.
+
+  **Two rounded controls still have the gap**, both on `/menu` and both
+  tappable: `.menu__tab` and `.menu__jump a`. Neither has an `:active` state
+  either, so fixing them is the *pair* — opting out of the highlight on its own
+  would leave a tap with no feedback at all, which is worse than a wrong-shaped
+  one. `.menu__tablist`, `.menu__tag` and `.lightbox__counter` are also 999px and
+  do not need it: none of them is interactive.
+
 - **A `:hover` state on a control a touch user will tap must be gated behind
   `@media (hover: hover) and (pointer: fine)`.** A touch browser fakes `:hover`
   on tap and then leaves it applied — there is no pointer to move away, so
@@ -657,6 +671,26 @@ Node is installed but **not on the shell PATH**; prepend it first:
   tap. Gate the hover, duplicate the declarations onto `:focus-visible`, and let
   `:active` be the whole of the touch feedback — it lasts exactly as long as the
   finger is down and leaves no state behind.
+
+  **`.lang` hit this next, and it is the clearest case on the site.** Tapping the
+  language button does not navigate anywhere — the language switches in place and
+  the button stays under the finger — so it sat lit at `--salt` until something
+  else was tapped, and was reported as the button "remaining white instead of the
+  stone colour". Its `:hover` is gated now; `:active` still fills salt.
+
+  Note what the gate does and does not do. On an emulated phone the button still
+  reports `matches(':hover') === true` after a tap — the browser's emulation is
+  not something CSS can switch off. What the media query removes is any *styling*
+  hung off it, which is the whole of the visible symptom.
+
+  **Still ungated, all with the same latent bug**, listed so the next person does
+  not have to re-derive the set: `.nav__links a`, `.social a`, `.menu__tab`,
+  `.menu__jump a`, `.gallery__item`, `.btn--primary`, `.find__contact a`,
+  `.find__map`, `.lightbox__arrow`, `.lightbox__close`. They vary in how visible
+  it is — a nav link that navigates away takes its stuck state with it, while a
+  `tel:` link in Find Us or a `/menu` tab leaves the visitor looking at it. Each
+  needs an `:active` state as part of the fix, which is why they were not swept
+  in one pass.
 
 - **A `transform` on a child silently reorders painting, and it took out the
   scrim.** `.contact__panel:hover img` scales the photograph, and a transformed

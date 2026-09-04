@@ -845,6 +845,23 @@ main > .section-dark:last-child {
   padding: 0.4rem 0.95rem;
   border: 1px solid transparent;
   border-radius: 999px;
+  /*
+    The pair that every rounded control on this site needs, and this one was
+    missing it. `html` sets a site-wide tap highlight — `--wood` at 20% — and
+    Chrome paints that against the element's border *box*, ignoring
+    `border-radius`, so a tap on this 999px pill flashed a hard-edged wood
+    rectangle around a round button. Reported from a device: it cannot be seen
+    with a mouse and does not appear in a screenshot, because the highlight is a
+    compositor effect.
+
+    This is the bug `.btn` already had a note about, arriving exactly where that
+    note said it would. The button became a pill when the two-segment language
+    switch collapsed into one control, and the opt-out did not come with the
+    radius. The `:active` state below is the other half of the pair — opting out
+    of the highlight without giving a press state back leaves a tap with no
+    feedback at all.
+  */
+  -webkit-tap-highlight-color: transparent;
   background: var(--light-stone);
   color: var(--black);
   font-size: 0.72rem;
@@ -855,7 +872,30 @@ main > .section-dark:last-child {
     background-color 0.18s var(--ease),
     color 0.18s var(--ease);
 }
-.lang:hover,
+/*
+  Hover gated, press not — and on this control the gate is the whole fix.
+
+  A touch browser fakes `:hover` on tap and leaves it applied, because there is
+  no pointer to move away. Tapping this button does not navigate anywhere: the
+  language switches in place and the button stays under the finger, lit at
+  `--salt`, until something else is tapped. Reported as the button "remaining
+  white instead of the stone colour", and reproduced on an emulated phone —
+  after the tap, `matches(':hover')` is true on a `hover: none` device and the
+  background computes to rgb(226,232,235).
+
+  `:active` stays ungated and stays salt: it is the press acknowledgement, it
+  lasts exactly as long as the finger is down, and it leaves nothing behind.
+
+  The same latent bug is in every other `:hover` on a control that keeps the
+  visitor on the page — the menu tabs, the jump chips, the gallery tiles, the
+  Find Us tel:/mailto: links, the social icons. They are not gated yet; see the
+  note in CLAUDE.md.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .lang:hover {
+    background: var(--salt);
+  }
+}
 .lang:active {
   background: var(--salt);
 }
