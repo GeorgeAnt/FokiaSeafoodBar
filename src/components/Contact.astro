@@ -30,19 +30,32 @@ const { locale = defaultLocale } = Astro.props;
   Take away keeps one number because it can only be done during service. A
   second number there would be a promise the restaurant cannot keep, so the
   asymmetry is the point and not an oversight.
-*/
-const NUMBERS = {
-  landline: { whenKey: 'contact.duringHours', ...site.phone },
-  mobile: { whenKey: 'contact.afterHours', ...site.phoneAfterHours },
-} as const;
 
+  **And that one number carries no label**, which is the same rule as the
+  asymmetry above rather than an inconsistency with it. A label here says *which
+  of these to ring* — it only means something where there is a choice. On
+  reservations there are two numbers and the labels are the entire way of telling
+  them apart; on take away there is one, and it can only ever be rung during
+  service, so "Εντός ωραρίου" would be answering a question nobody asked. That is
+  the eyebrow rule from CLAUDE.md applied one more time: a label earns its place
+  by saying something not already implied.
+
+  `whenKey` is therefore optional, and its absence is the instruction.
+*/
 const PANELS = [
   {
     id: 'table-setting',
     titleKey: 'contact.reserveTitle',
-    numbers: [NUMBERS.landline, NUMBERS.mobile],
+    numbers: [
+      { ...site.phone, whenKey: 'contact.duringHours' },
+      { ...site.phoneAfterHours, whenKey: 'contact.afterHours' },
+    ],
   },
-  { id: 'takeaway-box', titleKey: 'contact.takeawayTitle', numbers: [NUMBERS.landline] },
+  {
+    id: 'takeaway-box',
+    titleKey: 'contact.takeawayTitle',
+    numbers: [{ ...site.phone, whenKey: undefined as string | undefined }],
+  },
 ];
 
 const panels = PANELS.map(({ id, titleKey, numbers }) => {
@@ -111,17 +124,21 @@ const panels = PANELS.map(({ id, titleKey, numbers }) => {
                 a screen reader announcing "list of 2" before them is the whole
                 point being made visually by putting them one above the other.
 
-                The "when" label is *inside* the link, not beside it. Outside, a
-                screen reader would read it once as loose text and again inside
-                the link's name; inside, it is said once and the whole row —
-                label, icon, digits, arrow — is a single 44px target.
+                The "when" label, where there is one, is *inside* the link rather
+                than beside it. Outside, a screen reader would read it once as
+                loose text and again inside the link's name; inside, it is said
+                once and the whole row — label, icon, digits, arrow — is a single
+                44px target.
 
                 Three links on the page would otherwise all read as bare digits
-                with nothing to tell them apart (WCAG 2.4.4). The panel title is
-                added as .sr-only text, so each name is distinct: "Κλείστε τη
-                θέση σας Εντός ωραρίου 21 3099 1571". Appended rather than an
-                aria-label, so the visible digits stay inside the accessible name
-                and 2.5.3 (Label in Name) still holds.
+                with nothing to tell them apart (WCAG 2.4.4), and the take away
+                one is the *same* number as the reservations landline, so it is
+                not enough for the digits to differ. The panel title is added as
+                .sr-only text, which is what makes every name distinct: "Κλείστε
+                τη θέση σας Εντός ωραρίου 21 3099 1571" against "Take away 21
+                3099 1571". Appended rather than an aria-label, so the visible
+                digits stay inside the accessible name and 2.5.3 (Label in Name)
+                still holds.
 
                 Icons are inline SVG in the SocialLinks / FindUs idiom — 24x24,
                 fill none, stroke currentColor at 1.6 — and aria-hidden, since
@@ -134,9 +151,11 @@ const panels = PANELS.map(({ id, titleKey, numbers }) => {
                       <span class="sr-only" data-i18n={panel.titleKey}>
                         {t(locale, panel.titleKey)}
                       </span>
-                      <span class="contact__phone-when" data-i18n={number.whenKey}>
-                        {t(locale, number.whenKey)}
-                      </span>
+                      {number.whenKey ? (
+                        <span class="contact__phone-when" data-i18n={number.whenKey}>
+                          {t(locale, number.whenKey)}
+                        </span>
+                      ) : null}
                       <span class="contact__phone-call">
                         <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
                           <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />

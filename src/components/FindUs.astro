@@ -220,8 +220,8 @@ const schedule = [
                     would wipe the day names nested inside it.
                   */}
                   <span>
-                    <span data-i18n={`hours.short.${run.from}`}>
-                      {t(locale, `hours.short.${run.from}`)}
+                    <span data-i18n={`hours.${run.from}`}>
+                      {t(locale, `hours.${run.from}`)}
                     </span>
                     {run.to !== run.from && (
                       <Fragment>
@@ -229,8 +229,8 @@ const schedule = [
                         <span data-i18n="hours.rangeSeparator">
                           {t(locale, 'hours.rangeSeparator')}
                         </span>{' '}
-                        <span data-i18n={`hours.short.${run.to}`}>
-                          {t(locale, `hours.short.${run.to}`)}
+                        <span data-i18n={`hours.${run.to}`}>
+                          {t(locale, `hours.${run.to}`)}
                         </span>
                       </Fragment>
                     )}

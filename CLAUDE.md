@@ -335,10 +335,15 @@ as an eyebrow and stopped being one. The first draft put "Κράτηση" above
 "Κλείστε τη θέση σας" — the two-titles-stacked failure exactly — and it was
 rejected for that before shipping. The second put a single "Εντός ωραρίου" above
 the title, which passed the test (it said *when the number answers*, which the
-title cannot) but only worked while a panel had one number. It has two now, so
-the label moved down beside the number it describes, and there is nothing above
-any title on this site. It is deliberately not `.eyebrow`: that class belongs to
-`.section-head`, and this is a label inside a link.
+title cannot) but only worked while a panel had one number. Reservations has two
+now, so the label moved down beside the number it describes, and there is nothing
+above any title on this site. It is deliberately not `.eyebrow`: that class
+belongs to `.section-head`, and this is a label inside a link.
+
+The same test then took it off take away, which has one number and no choice to
+describe — so the label now appears exactly where it distinguishes something and
+nowhere else. Worth noticing that this rule has now removed a label three times
+and kept it twice, always on the same question.
 
 Two consequences worth knowing. `.eyebrow` still matches no markup — it is kept
 because `.section-head p:not(.eyebrow)` still names it, and that guard should
@@ -702,7 +707,7 @@ Node is installed but **not on the shell PATH**; prepend it first:
   codebase, so anything removed has to be checked by hand first:
 
   - Keys are **built at runtime** from data — `team.${id}.name`,
-    `gallery.${id}.alt`, `legal.${id}`, `hours.short.${day}` — and, since the
+    `gallery.${id}.alt`, `legal.${id}`, `hours.${day}` — and, since the
     language switcher became one button, from a *locale code*: `lang.${other}`,
     `lang.short.${other}` and `a11y.lang.${other}`, built in both Nav.astro and
     Base's inline script. That is six more keys, none of which appear literally
@@ -721,7 +726,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
 
   What actually went: `goal.heading` (Our Goal's eyebrow is `nav.goal`; the
   heading key was never rendered), the seven long-form `hours.<Day>` names (only
-  `hours.short.*` reaches the page), `.wrap--narrow`, and three lib functions
+  `hours.short.*` reached the page *at the time* — the client has since asked for
+  full day names, so `hours.short.*` was renamed back to `hours.<Day>` and the
+  Greek values written out in full; there is no short set now, which is why that
+  sweep's reasoning is worth reading rather than its conclusion),
+  `.wrap--narrow`, and three lib functions
   nothing imported — `missingKeys()`, `flattenItems()`, `unpricedItems()`.
 
   Later, and by the same rule: `contact.callUs`, and the `.contact__call` /
@@ -786,6 +795,18 @@ listed them followed by the closed days, which put Monday last precisely because
 Monday was the closed one. **It no longer is — the restaurant opens seven days —
 and the sort is why that change needed no code**: nothing here assumes which day
 is shut, or that any day is.
+
+**Day names are written out in full, and there is no abbreviated set any more.**
+The keys are `hours.<Day>` — "Δευτέρα", "Παρασκευή" — read as
+`` t(locale, `hours.${run.from}`) ``. They were `hours.short.*` and the Greek
+values were three-letter clips ("Δευ", "Παρ") while English was already spelled
+out, so the two locales disagreed about what "short" meant; the client asked for
+full names and the key lost the word with the abbreviation. Do not reintroduce a
+parallel short set for one narrow layout — the measure is the thing to check
+first. Measured at 1366px after the change: the longest row is "Δευτέρα –
+Σάββατο" at 163px against 110px of times inside the 352px (22rem) cap, and 145 +
+98 within 348px at 390px. Both stay on one line with room to spare, which is why
+this was a rename and not a layout change.
 
 **The text column is centred; the photograph is not.** `.find__col` carries
 `text-align: center` and the photo keeps its own grid column beside it. Making
@@ -885,13 +906,22 @@ dependency decision, not a styling one.
   `contact.afterHours`. The JSON-LD still advertises the landline only, which is
   right: it is the number for the hours the listing publishes.
 
-  **Reservations shows both, take away shows the landline.** The landline answers
-  reservations *and* take away during service; the mobile is for reservations
-  made after the restaurant has shut. Take away is not something you can do
-  outside service, so a second number on that panel would be a promise the
-  restaurant cannot keep. That asymmetry is the whole of what `numbers` in
-  `PANELS` expresses, and it is why the two panels come out of one loop without
-  being identical.
+  **Reservations shows both, take away shows the landline — and take away's
+  carries no label.** The landline answers reservations *and* take away during
+  service; the mobile is for reservations made after the restaurant has shut.
+  Take away is not something you can do outside service, so a second number on
+  that panel would be a promise the restaurant cannot keep.
+
+  The missing label is the same rule, not an inconsistency with it. A label here
+  says *which of these to ring*, so it only means anything where there is a
+  choice: two numbers on reservations, where the labels are the entire way of
+  telling them apart, and one on take away, which can only ever be rung during
+  service. "Εντός ωραρίου" there would answer a question nobody asked — the
+  eyebrow rule again, a label earning its place by saying something not already
+  implied. `whenKey` is optional in `PANELS` and its absence is the instruction.
+
+  Both facts live in `numbers`, which is why the two panels come out of one loop
+  without being identical.
 
   **What the swap was, and why it is not coming back.** It rendered the landline
   and let a script replace it with the mobile when `isOpenAt` said the restaurant
@@ -933,7 +963,7 @@ dependency decision, not a styling one.
   |---|---|---|---|
   | label (`.contact__phone-when`) | `--wood-light` | 4.5:1 | **5.19:1** |
   | title (`.contact__panel-title`) | `--salt` | 3:1 | 11.46:1 |
-  | number (`.contact__phone-number`) | `--salt` | 3:1 | 12.09:1 |
+  | number (`.contact__phone-number`) | `--salt` | 3:1 | 11.95:1 |
 
   The label is the number that matters and the only one with any margin left: it
   is `--step--1`, so it is small text and owes 4.5:1, while the other two are

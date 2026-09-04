@@ -134,8 +134,9 @@ small line next to it saying when that number answers.
 
 - **Κλείστε τη θέση σας** shows both: the landline for **Εντός ωραρίου**, the
   mobile for **Εκτός ωραρίου**.
-- **Take away** shows the landline only, because take away only runs during
-  service and the mobile would be a promise you can't keep.
+- **Take away** shows the landline only, with no "Εντός ωραρίου" line — take away
+  only runs during service, so there is no other number it could be and nothing
+  for the label to tell apart.
 
 Both are always visible — nothing is hidden and nothing depends on the visitor's
 browser or clock, so the panel reads the same at 3am as at 8pm. Editing either
@@ -222,8 +223,8 @@ out the ranges itself and only joins days that actually run consecutively, so
 entirely just leaves a visitor guessing. That list is empty at the moment,
 because the restaurant opens every day; leave the key in place rather than
 deleting it. Day names are the English schema.org
-spellings in the file whatever the page language; the Greek abbreviations come
-from `hours.short.*` in `src/i18n/`.
+spellings in the file whatever the page language; the Greek day names come
+from `hours.<Day>` in `src/i18n/`.
 
 `street` and `city` are locale-keyed so the Greek page shows `Λάσκου 3
 Ελευσίνα` rather than a Latin transliteration. Where to Find Us shows the street
@@ -634,8 +635,8 @@ The text on the two Take away panels sits over photographs rather than over the
 band, so it is measured against the rendered pixels instead: worst single pixel
 5.2:1 on the small "when it answers" line and 11.5:1 on the titles and numbers,
 checked at 320, 390, 768, 1024 and 1366px wide in both languages. If those two
-photos are ever swapped, that measurement has to be redone — see CLAUDE.md for
-how.
+photos are ever swapped, or the panels gain another line, that measurement has to
+be redone — see CLAUDE.md for how.
 
 `.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
 on purpose — it and the `--wood-pale` accent only make sense together — and is

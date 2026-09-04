@@ -2302,15 +2302,20 @@ main > .section-dark:last-child {
   line-height: 1.5;
 }
 
-.find__hours {
-  font-variant-numeric: tabular-nums;
-}
-/* No dividing rules between rows, and the day names take the same muted stone
-   the times already had — the row reads as one line rather than as a table with
-   a bright left column. */
+/*
+  The 22rem cap and the auto margins are on the <ul>, not the <li>: this is a
+  fixed-width block of rows sitting in a centred column, so the auto margins need
+  something with a width to act on.
+
+  The day names are written out in full — Δευτέρα, not Δευ — at the client's
+  request, so this measure now has to hold a range like "Δευτέρα – Σάββατο"
+  beside its times rather than "Δευ – Σάβ". Measured after the change; see
+  CLAUDE.md.
+*/
 .find__hours {
   max-width: 22rem;
   margin-inline: auto;
+  font-variant-numeric: tabular-nums;
 }
 /* No dividing rules between rows, and the day names take the same muted stone
    the times already had — the row reads as one line rather than as a table with
