@@ -128,22 +128,27 @@ and Inside-outs work). Categories appear in the order they are listed, and the
 
 ### The two phone numbers — `src/data/site.json`
 
-`phone` is the landline and `phoneAfterHours` is the mobile. Both are shown on
-the homepage, on the two "Κλείστε τη θέση σας • Take away" panels, each with a
-small line next to it saying when that number answers.
+`phone` is the landline and `phoneAfterHours` is the mobile.
 
-- **Κλείστε τη θέση σας** shows both: the landline for **Εντός ωραρίου**, the
-  mobile for **Εκτός ωραρίου**.
-- **Take away** shows the landline only, with no "Εντός ωραρίου" line — take away
-  only runs during service, so there is no other number it could be and nothing
-  for the label to tell apart.
+On the homepage the two "Κλείστε τη θέση σας • Take away" cards **are** buttons:
+tapping one places the call. Each shows the number it will dial, so there is
+something to check first.
 
-Both are always visible — nothing is hidden and nothing depends on the visitor's
-browser or clock, so the panel reads the same at 3am as at 8pm. Editing either
-number in `site.json` changes it everywhere it appears.
+- **Κλείστε τη θέση σας** dials the landline while the restaurant is open and the
+  mobile once it has shut, working that out from `hours.entries` in the same
+  file — so if you change the opening hours, the switch follows automatically and
+  there is nothing else to update.
+- **Take away** always dials the landline, because take away only runs during
+  service.
+
+The time is read on the restaurant's clock (Athens), not the visitor's, so a
+customer abroad still gets the number that will actually be answered. If a
+visitor has JavaScript turned off, both cards show and dial the landline — which
+is the right number during service and a working number outside it.
 
 The landline is also the number given to Google in the page's structured data,
-since that is the number for the hours the listing publishes.
+since that is the number for the hours the listing publishes. Editing either
+number in `site.json` changes it everywhere it appears.
 
 ### The team — `src/data/team.json`
 
@@ -631,12 +636,12 @@ full-bleed.
 Text was re-measured on the new ground: headings and buttons 13.2:1, body and
 muted text 5.9:1, eyebrows and the phone number 5.8:1.
 
-The text on the two Take away panels sits over photographs rather than over the
+The text on the two Take away cards sits over photographs rather than over the
 band, so it is measured against the rendered pixels instead: worst single pixel
-5.2:1 on the small "when it answers" line and 11.5:1 on the titles and numbers,
-checked at 320, 390, 768, 1024 and 1366px wide in both languages. If those two
-photos are ever swapped, or the panels gain another line, that measurement has to
-be redone — see CLAUDE.md for how.
+11.8:1 on the titles and 12.8:1 on the numbers, checked at 320, 390, 768, 1024
+and 1366px wide in both languages. If those two photos are ever swapped, or the
+cards gain another line, that measurement has to be redone — see CLAUDE.md for
+how.
 
 `.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
 on purpose — it and the `--wood-pale` accent only make sense together — and is

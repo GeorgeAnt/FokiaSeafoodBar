@@ -13,52 +13,33 @@ const { locale = defaultLocale } = Astro.props;
 /*
   Photos are chosen by gallery id, not by filename or position, for the same
   reason Plates does it: gallery.json is ordered for the gallery, and reordering
-  it must not quietly change what the homepage shows. The alt text comes from
-  that entry too, so it stays written in one place and in both locales.
+  it must not quietly change what the homepage shows.
+
+  Their alt text is NOT taken from that entry any more — see the note on the
+  markup for why these images are now decorative.
 */
+
 /*
-  Both numbers are on the page at once, each labelled with the window it
-  answers in. Reservations takes both; take away takes the landline only.
+  Each card is one control that places one call.
 
-  This replaced a clock-driven swap that showed one number at a time — the
-  landline during service, the mobile after it, decided in Europe/Athens from
-  `site.hours.entries`. The client asked for both to be visible, which leaves
-  that machinery with nothing to decide: there is no longer a single slot whose
-  contents depend on the hour. The label is what tells a visitor which to ring,
-  and it does so at 3am with JavaScript off, which the swap never could.
+  The client asked for the panels to behave as buttons, so the whole card is an
+  <a href="tel:…"> rather than a photo with a link somewhere inside it. That
+  forces the question the previous version dodged by showing both numbers at
+  once: a control that dials has to know *which* number, and it has to decide
+  before the visitor taps.
 
-  Take away keeps one number because it can only be done during service. A
-  second number there would be a promise the restaurant cannot keep, so the
-  asymmetry is the point and not an oversight.
-
-  **And that one number carries no label**, which is the same rule as the
-  asymmetry above rather than an inconsistency with it. A label here says *which
-  of these to ring* — it only means something where there is a choice. On
-  reservations there are two numbers and the labels are the entire way of telling
-  them apart; on take away there is one, and it can only ever be rung during
-  service, so "Εντός ωραρίου" would be answering a question nobody asked. That is
-  the eyebrow rule from CLAUDE.md applied one more time: a label earns its place
-  by saying something not already implied.
-
-  `whenKey` is therefore optional, and its absence is the instruction.
+  `swaps: true` is that decision. The server renders the landline — correct
+  during service, and a number that is answered outside it — and the script
+  below replaces it with the mobile when the restaurant is shut, evaluated on the
+  restaurant's clock. Take away does not swap: it can only be done during
+  service, so the landline is the only number it could ever want.
 */
 const PANELS = [
-  {
-    id: 'table-setting',
-    titleKey: 'contact.reserveTitle',
-    numbers: [
-      { ...site.phone, whenKey: 'contact.duringHours' },
-      { ...site.phoneAfterHours, whenKey: 'contact.afterHours' },
-    ],
-  },
-  {
-    id: 'takeaway-box',
-    titleKey: 'contact.takeawayTitle',
-    numbers: [{ ...site.phone, whenKey: undefined as string | undefined }],
-  },
+  { id: 'table-setting', titleKey: 'contact.reserveTitle', swaps: true },
+  { id: 'takeaway-box', titleKey: 'contact.takeawayTitle', swaps: false },
 ];
 
-const panels = PANELS.map(({ id, titleKey, numbers }) => {
+const panels = PANELS.map(({ id, titleKey, swaps }) => {
   const image = gallery.images.find((candidate) => candidate.id === id);
   if (!image) {
     throw new Error(
@@ -67,14 +48,12 @@ const panels = PANELS.map(({ id, titleKey, numbers }) => {
         `PANELS in Contact.astro at an id that exists.`
     );
   }
-  return {
-    ...image,
-    titleKey,
-    numbers,
-    src: galleryPhoto(image.file),
-    altKey: `gallery.${image.id}.alt`,
-  };
+  return { ...image, titleKey, swaps, src: galleryPhoto(image.file) };
 });
+
+/* The schedule is handed to the client as-is rather than restated, so the
+   after-hours swap can never disagree with the hours Find Us renders. */
+const schedule = JSON.stringify(site.hours.entries);
 ---
 
 {/*
@@ -86,15 +65,13 @@ const panels = PANELS.map(({ id, titleKey, numbers }) => {
   of light around these two inset panels was the boundary between the two photo
   groups. That strip is gone. What separates them now is the 1px hairline
   .section-dark puts on top of this section, which is a thinner boundary than a
-  whole tier change — a deliberate trade, not an oversight. The panels stay
+  whole tier change — a deliberate trade, not an oversight. The cards stay
   inset rather than full-bleed, which is what keeps the two groups from reading
-  as one continuous run of photographs.
-
-  The panel titles are unaffected: they were never carried by the band, only by
-  .contact__panel::before, the gradient scrim over each photo.
+  as one continuous run of photographs — and now that they are small and heavily
+  rounded, they read as controls rather than as photography at all.
 
   The section heading is .sr-only: it carries the combined nav label so the
-  outline and the /#contact anchor still have a heading, while the two panel
+  outline and the /#contact anchor still have a heading, while the two card
   titles say each half once.
 */}
 <section class="section section-dark" id="contact">
@@ -104,74 +81,56 @@ const panels = PANELS.map(({ id, titleKey, numbers }) => {
     <div class="contact__panels" data-reveal>
       {
         panels.map((panel) => (
-          <article class="contact__panel">
+          <a
+            class="contact__panel"
+            href={`tel:${site.phone.href}`}
+            data-phone-swap={panel.swaps ? '' : undefined}
+            data-hours={panel.swaps ? schedule : undefined}
+            data-after-href={panel.swaps ? `tel:${site.phoneAfterHours.href}` : undefined}
+            data-after-display={panel.swaps ? site.phoneAfterHours.display : undefined}
+          >
+            {/*
+              alt="" on purpose, and it is the whole card being a link that makes
+              it right. Everything inside an <a> is concatenated into the link's
+              accessible name, so the gallery's descriptive alt would prepend a
+              sentence about a table setting to "Κλείστε τη θέση σας 21 3099
+              1571" — the name a screen-reader user hears before deciding whether
+              to place a call. The picture illustrates the title; it does not
+              identify the control. On /gallery the same photograph keeps its
+              real alt, because there it is the content.
+            */}
             <Picture
               src={panel.src}
               formats={['avif', 'webp']}
-              widths={[500, 800, 1200]}
-              sizes="(min-width: 48rem) 45vw, 100vw"
-              alt={t(locale, panel.altKey)}
-              data-i18n-alt={panel.altKey}
+              widths={[400, 600, 900]}
+              sizes="(min-width: 48rem) 26rem, 100vw"
+              alt=""
               loading="lazy"
               decoding="async"
             />
-            <div class="contact__panel-body">
-              <h3 class="contact__panel-title" data-i18n={panel.titleKey}>
+            <span class="contact__panel-body">
+              <span class="contact__panel-title" data-i18n={panel.titleKey}>
                 {t(locale, panel.titleKey)}
-              </h3>
+              </span>
               {/*
-                A list because it is one: on reservations it is two numbers, and
-                a screen reader announcing "list of 2" before them is the whole
-                point being made visually by putting them one above the other.
+                The number is shown, not just dialled. A control whose target is
+                invisible gives a visitor nothing to check before tapping, and a
+                visitor whose JavaScript never ran would otherwise have no way to
+                notice that the card is offering the landline outside service.
 
-                The "when" label, where there is one, is *inside* the link rather
-                than beside it. Outside, a screen reader would read it once as
-                loose text and again inside the link's name; inside, it is said
-                once and the whole row — label, icon, digits, arrow — is a single
-                44px target.
-
-                Three links on the page would otherwise all read as bare digits
-                with nothing to tell them apart (WCAG 2.4.4), and the take away
-                one is the *same* number as the reservations landline, so it is
-                not enough for the digits to differ. The panel title is added as
-                .sr-only text, which is what makes every name distinct: "Κλείστε
-                τη θέση σας Εντός ωραρίου 21 3099 1571" against "Take away 21
-                3099 1571". Appended rather than an aria-label, so the visible
-                digits stay inside the accessible name and 2.5.3 (Label in Name)
-                still holds.
-
-                Icons are inline SVG in the SocialLinks / FindUs idiom — 24x24,
-                fill none, stroke currentColor at 1.6 — and aria-hidden, since
-                the text beside them is already the name.
+                Icon in the SocialLinks / FindUs idiom — 24x24, fill none, stroke
+                currentColor at 1.6 — and aria-hidden, since the text beside it
+                is already part of the name. There is no arrow any more: an arrow
+                says "goes somewhere", and this places a call.
               */}
-              <ul class="contact__phones">
-                {panel.numbers.map((number) => (
-                  <li>
-                    <a class="contact__phone" href={`tel:${number.href}`}>
-                      <span class="sr-only" data-i18n={panel.titleKey}>
-                        {t(locale, panel.titleKey)}
-                      </span>
-                      {number.whenKey ? (
-                        <span class="contact__phone-when" data-i18n={number.whenKey}>
-                          {t(locale, number.whenKey)}
-                        </span>
-                      ) : null}
-                      <span class="contact__phone-call">
-                        <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                          <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
-                        </svg>
-                        <span class="contact__phone-number">{number.display}</span>
-                        <svg class="contact__phone-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                          <path d="M4 12h14" />
-                          <path d="m12.5 6 6 6-6 6" />
-                        </svg>
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </article>
+              <span class="contact__panel-call">
+                <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+                </svg>
+                <span class="contact__phone-number">{site.phone.display}</span>
+              </span>
+            </span>
+          </a>
         ))
       }
     </div>
@@ -182,3 +141,60 @@ const panels = PANELS.map(({ id, titleKey, numbers }) => {
     </div>
   </div>
 </section>
+
+<script>
+  // Outside opening hours the reservations card dials the mobile instead of the
+  // landline, and shows the number it will dial.
+  //
+  // Evaluated in Europe/Athens, never in the visitor's own timezone: someone
+  // calling from London at 22:00 is calling a restaurant where it is already
+  // midnight, and the number they need is the one that rings after service.
+  // Intl does the conversion, so no offset is hard-coded and DST is handled.
+  //
+  // The decision itself lives in lib/hours.ts so the shipped logic is the logic
+  // that can be tested; this script only supplies the clock and rewrites the
+  // href and the digits together — they must never disagree, since the digits
+  // are the only thing a visitor can check before tapping.
+  //
+  // It selects on [data-phone-swap], written by the same loop that decides which
+  // cards swap. An earlier version looked for a hand-typed id that had stopped
+  // being rendered, so the swap silently did nothing for weeks and neither
+  // `astro check` nor `npm run check` had anything to catch.
+  import { isOpenAt, type HoursEntry } from '../lib/hours';
+
+  const cards = document.querySelectorAll<HTMLAnchorElement>('[data-phone-swap]');
+
+  if (cards.length) {
+    const athensNow = () => {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Athens',
+        weekday: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).formatToParts(new Date());
+      const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+      return { day: get('weekday'), minutes: Number(get('hour')) * 60 + Number(get('minute')) };
+    };
+
+    const { day, minutes } = athensNow();
+
+    cards.forEach((card) => {
+      try {
+        const entries: HoursEntry[] = JSON.parse(card.dataset.hours || '[]');
+        if (isOpenAt(entries, day, minutes)) return;
+
+        const href = card.dataset.afterHref;
+        const display = card.dataset.afterDisplay;
+        const numberEl = card.querySelector('.contact__phone-number');
+        if (!href || !display || !numberEl) return;
+
+        card.setAttribute('href', href);
+        numberEl.textContent = display;
+      } catch {
+        // Any failure leaves this card on the landline, which is the correct
+        // number during service and a working number outside it.
+      }
+    });
+  }
+</script>

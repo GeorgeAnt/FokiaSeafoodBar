@@ -113,9 +113,16 @@ order; there are only three tiers and both ends are pinned black.
 
 **Each section on the homepage uses a different layout — with one deliberate
 pairing.** Hero is a split, Our Goal is a centred stack of text, From the
-kitchen is a centred head over a staggered photo row, Take away is two photo
-panels each carrying a title over its phone numbers laid over the picture, Find
-Us is a text and image split.
+kitchen is a centred head over a staggered photo row, Take away is two small
+rounded photo cards that are themselves the call buttons, over a centred stack of
+two paragraphs, Find Us is a text and image split.
+
+Take away's own notes are centred and stacked at the client's request, on the
+same 46rem axis as Our Goal and with the measure on the container rather than on
+each paragraph — see the note on `.contact__notes`. That makes three centred
+compositions on a four-band page, which is the failure mode recorded under the
+Team history below; what still separates them is that this one is a pair of
+*controls* over its text rather than a heading and a button.
 
 **The three band headings are one size.** `.goal__heading`, `.plates__head h2`
 and `.find__head h2` are all `--step-2`. None of them uses `.section-head`,
@@ -330,20 +337,24 @@ eyebrow's words were promoted to the heading at the sentence's size, the
 sentence was cut, and `goal.lead` was deleted with it. Do not add eyebrows back
 per-section without new copy that says something the heading does not.
 
-`.contact__phone-when` is the near miss worth knowing about, because it started
-as an eyebrow and stopped being one. The first draft put "Κράτηση" above
-"Κλείστε τη θέση σας" — the two-titles-stacked failure exactly — and it was
-rejected for that before shipping. The second put a single "Εντός ωραρίου" above
-the title, which passed the test (it said *when the number answers*, which the
-title cannot) but only worked while a panel had one number. Reservations has two
-now, so the label moved down beside the number it describes, and there is nothing
-above any title on this site. It is deliberately not `.eyebrow`: that class
-belongs to `.section-head`, and this is a label inside a link.
+The Take away cards are the case history, and there is no eyebrow left on them
+either. Four passes, all decided by the same question — *does this label
+distinguish anything?*
 
-The same test then took it off take away, which has one number and no choice to
-describe — so the label now appears exactly where it distinguishes something and
-nowhere else. Worth noticing that this rule has now removed a label three times
-and kept it twice, always on the same question.
+1. "Κράτηση" above "Κλείστε τη θέση σας" — the two-titles-stacked failure
+   exactly. Rejected before shipping.
+2. A single "Εντός ωραρίου" above the title. It passed: it said *when the number
+   answers*, which the title cannot. But it only worked while a card had one
+   number.
+3. Two numbers per card, so the label moved down beside the number it described —
+   and came off take away entirely, which had one number and no choice to
+   describe.
+4. The cards became buttons, the clock reduced each to one number again, and the
+   label went with the choice it existed to explain.
+
+So the rule has removed a label three times and kept it twice, always on the same
+question, and the answer changed every time the *layout* changed rather than the
+copy. Before adding one back, ask what on screen it tells apart.
 
 Two consequences worth knowing. `.eyebrow` still matches no markup — it is kept
 because `.section-head p:not(.eyebrow)` still names it, and that guard should
@@ -739,7 +750,13 @@ Node is installed but **not on the shell PATH**; prepend it first:
   pointed at that same removed markup and nothing failed — see the phone-numbers
   entry below. `src/lib/hours.ts` went the same way when the clock-driven swap
   was dropped: `isOpenAt` was its only export and Contact.astro its only caller,
-  so the file had no reader left.
+  so the file had no reader left — **and it came back one change later**, when
+  the cards became buttons and something had to choose the number again. It was
+  restored from git rather than rewritten, which is the point: a correct, tested
+  module with no caller is dead code and should go, but the sweep is cheap to
+  undo and guessing the logic a second time would not have been. The keys
+  `contact.duringHours` / `contact.afterHours` were deleted twice for the same
+  reason and are not expected back.
 
   The last two are the interesting ones: both carried doc comments saying they
   were used by `npm run check`, and the checker had its own copy of each walk.
@@ -899,51 +916,75 @@ dependency decision, not a styling one.
   `.menu__legal h3` entry below for how that goes unnoticed), it went. If a
   short text-only band appears again, it is three lines of CSS to reinstate.
 
-- **Both phone numbers are on the page at once, and the clock-driven swap that
-  used to choose between them is gone.** `site.json` still holds two — `phone`
-  (the landline) and `phoneAfterHours` (the mobile) — and both are rendered by
-  the server, each under the window it answers in: `contact.duringHours` /
-  `contact.afterHours`. The JSON-LD still advertises the landline only, which is
-  right: it is the number for the hours the listing publishes.
+- **Each Take away card is one control that places one call, and the clock picks
+  the number.** The whole card is an `<a href="tel:…">`, at the client's request
+  that the panels behave as buttons. That is what forces the clock logic: a
+  control that dials has to commit to one number *before* the tap, so it cannot
+  simply show both and let the visitor choose.
 
-  **Reservations shows both, take away shows the landline — and take away's
-  carries no label.** The landline answers reservations *and* take away during
-  service; the mobile is for reservations made after the restaurant has shut.
-  Take away is not something you can do outside service, so a second number on
-  that panel would be a promise the restaurant cannot keep.
+  `site.json` holds two — `phone` (the landline) and `phoneAfterHours` (the
+  mobile). The server renders the landline on both cards, the JSON-LD advertises
+  the landline, and a visitor with no JavaScript keeps the landline, so the
+  default is the *correct* number during service rather than merely a safe one.
+  The script then rewrites the reservations card when the restaurant is shut.
+  Take away never swaps: it can only be done during service.
 
-  The missing label is the same rule, not an inconsistency with it. A label here
-  says *which of these to ring*, so it only means anything where there is a
-  choice: two numbers on reservations, where the labels are the entire way of
-  telling them apart, and one on take away, which can only ever be rung during
-  service. "Εντός ωραρίου" there would answer a question nobody asked — the
-  eyebrow rule again, a label earning its place by saying something not already
-  implied. `whenKey` is optional in `PANELS` and its absence is the instruction.
+  **The href and the visible digits are rewritten together and must never
+  disagree.** The number is on the card precisely so there is something to check
+  before tapping — a control that dials an invisible target gives a visitor
+  nothing to verify, and someone whose JavaScript never ran would have no way to
+  notice they are being offered the landline at 2am. Changing one without the
+  other is the worst failure this section can have, because it looks fine.
 
-  Both facts live in `numbers`, which is why the two panels come out of one loop
-  without being identical.
+  It is evaluated in **Europe/Athens**, not the visitor's timezone — someone
+  calling from London at 22:00 is calling a restaurant where it is already
+  midnight — which `Intl` handles, so no offset is hard-coded and DST needs no
+  thought. The schedule is passed to the client from `site.hours.entries` rather
+  than restated, so editing the hours moves the swap with them.
 
-  **What the swap was, and why it is not coming back.** It rendered the landline
-  and let a script replace it with the mobile when `isOpenAt` said the restaurant
-  was shut, evaluated in Europe/Athens from `site.hours.entries`. With both
-  numbers visible there is no longer a slot whose contents depend on the hour, so
-  the machinery had nothing left to decide, and the label now does the same job
-  at 3am with JavaScript off — which the swap never could. Removed with it:
-  `src/lib/hours.ts` (`isOpenAt` had no other caller), the `setTextKey` addition
-  to `window.fokiaI18n`, and the `contact.callUs` key.
+  The decision itself is `isOpenAt` in `src/lib/hours.ts`, not inline in the
+  component, so the shipped logic is the logic that gets tested. `closes:
+  "00:00"` means the *end* of the day, not the start of one: 16:00–00:00 covers
+  16:00 up to but not including midnight, which is why 00:00 Wednesday is shut
+  even though Tuesday ran "until midnight". A genuinely overnight range
+  (20:00–02:00) is handled too, though nothing uses one yet.
 
-  If someone ever asks to mark *which* number is live right now, that is a new
-  feature on top of this, not a revert — both numbers stay visible either way,
-  and `isOpenAt` is in git history rather than gone.
+  **This is the second time this feature has been built, and it was deleted in
+  between.** For one revision both numbers were shown at once, each under a
+  "Εντός / Εκτός ωραρίου" label, and `hours.ts` was removed as dead code with
+  `isOpenAt` having no caller. Making the cards into buttons brought it straight
+  back. Worth knowing before deleting it again: the labels
+  (`contact.duringHours` / `contact.afterHours`) and `.contact__phone-when` went
+  with that revision and are not coming back either — with one number on screen
+  there is nothing for a label to distinguish.
 
-  **The bug it left behind is the part worth keeping.** For as long as the number
-  was not in this section, the script selected `#contact-phone`, an id that had
-  stopped being rendered when the old centred `.contact__call` block was removed.
-  `getElementById` returned null, the whole block was skipped, and
-  `phoneAfterHours` never reached a visitor. Nothing catches that: `astro check`
-  passes, `npm run check` compares i18n keys and never looks at markup, and the
-  page renders perfectly. A script that reaches into markup by a hand-typed id is
-  a silent dependency between two files — prefer a marker the renderer emits.
+  **Verify the open path by editing the schedule, not by waiting.** The shut path
+  is whatever the clock happens to give you. The open path was confirmed by
+  temporarily widening `hours.entries` to include the current minute, rebuilding,
+  and checking both cards read the landline in both the `href` and the digits —
+  then reverting. That exercises `isOpenAt` through the real script.
+
+  **The selector is `[data-phone-swap]`, written by the same loop that decides
+  which cards swap — never a hand-typed id.** An earlier version selected
+  `#contact-phone`, which had stopped being rendered when the markup moved;
+  `getElementById` returned null, the swap silently did nothing, and nothing
+  caught it. `astro check` passes on that, `npm run check` compares i18n keys and
+  never looks at markup, and the page renders perfectly.
+
+- **The card photographs carry `alt=""`, and it is the card being a link that
+  makes that correct.** Everything inside an `<a>` is concatenated into the
+  link's accessible name, so the gallery's descriptive alt would prepend a
+  sentence about a table setting to "Κλείστε τη θέση σας 21 3099 1571" — the name
+  a screen-reader user hears before deciding whether to place a call. The picture
+  illustrates the title; it does not identify the control. The same photograph
+  keeps its real alt on `/gallery`, where it *is* the content. Verified in the
+  a11y tree: the two names are "Κλείστε τη θέση σας 698 298 0267" and "Take away
+  21 3099 1571".
+
+  The card title is a `<span>`, not an `<h3>`, for the neighbouring reason: a
+  heading inside a link is legal but makes the document outline claim a section
+  where there is a control. The band's `.sr-only` `<h2>` is its heading, and the
+  two card titles are the links' names.
 
 - **Text over the Take away photos is safe because of the scrim, not the
   photos.** Both images have blown highlights in every third of the frame —
@@ -961,32 +1002,35 @@ dependency decision, not a styling one.
 
   | line | colour | owes | worst |
   |---|---|---|---|
-  | label (`.contact__phone-when`) | `--wood-light` | 4.5:1 | **5.19:1** |
-  | title (`.contact__panel-title`) | `--salt` | 3:1 | 11.46:1 |
-  | number (`.contact__phone-number`) | `--salt` | 3:1 | 11.95:1 |
+  | title (`.contact__panel-title`) | `--salt` | 3:1 | 11.78:1 |
+  | number (`.contact__panel-call`) | `--salt` | 3:1 | 12.75:1 |
 
-  The label is the number that matters and the only one with any margin left: it
-  is `--step--1`, so it is small text and owes 4.5:1, while the other two are
-  large or bold, owe 3:1, and clear it four times over. Anything that makes that
-  line smaller, lighter, or higher up the panel has to be re-sampled.
+  Both are bold at `--step-1` / `--step-0`, so both owe 3:1 and clear it four
+  times over. There used to be a third line here — a `--step--1` "Εντός ωραρίου"
+  label in `--wood-light`, the only small text on the cards, which owed 4.5:1 and
+  measured 5.19:1 at its worst. It is gone with the two-number layout, and its
+  figure is worth keeping only as a warning: it is the one that came within
+  0.7 of failing, and any small or tinted text put back on these cards inherits
+  that margin, not the comfortable one the salt lines have.
 
   **The gradient stops are lengths (`rem`), not percentages, and that is what
   makes the figures above hold at every width.** They were percentages when the
-  panel carried a single title. The block is now a title over one or two labelled
-  numbers — a fixed number of pixels tall *whatever the panel is* — while a
-  percentage ramp scales with the panel, so a short panel pushes the same text
-  further up a thinner part of the scrim. Measured on the percentage version, the
-  label read 5.05:1 at 1366px and **3.49:1 at 390px**, a fail that only appeared
-  at one width. In lengths the dense end simply covers the text block (11rem
-  clears the tallest case: two rows with the label wrapped above the digits) and
-  the ramp finishes at 21rem, so a tall panel shows *more* photograph than the
-  percentage version did and a short one is scrimmed further up — which is
-  correct, because on a short panel the text really does cover more of the
-  picture.
+  card carried a single title. The block is a title over a number — a fixed
+  number of pixels tall *whatever the card is* — while a percentage ramp scales
+  with the card, so a short card pushes the same text further up a thinner part
+  of the scrim. Measured on the percentage version, the small label read 5.05:1
+  at 1366px and **3.49:1 at 390px**, a fail that only appeared at one width. In
+  lengths the dense end simply covers the text block (8rem clears it on every
+  card size) and the ramp finishes at 16rem, so a tall card shows *more*
+  photograph than the percentage version did and a short one is scrimmed further
+  up — which is correct, because on a short card the text really does cover more
+  of the picture.
 
-  **Both panels take the same scrim even though take away's block is one row
-  shorter**, for the same reason they share a crop: side by side, unequal
-  treatments read as a mistake.
+  **The ramp came down from 11rem/21rem when the cards became controls**, and
+  that is the maintenance rule rather than a one-off: the block lost a row when
+  the two numbers collapsed into one, and the cards got smaller, so the old ramp
+  was greying picture that no longer had any text over it. Re-measure the block
+  and move the first two stops with it whenever a line is added or removed.
 
   **The stacked layout is square, and that is a consequence of the fixed-height
   scrim rather than a separate design choice.** Below 48rem `.contact__panel`
