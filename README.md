@@ -638,10 +638,11 @@ muted text 5.9:1, eyebrows and the phone number 5.8:1.
 
 The text on the two Take away cards sits over photographs rather than over the
 band, so it is measured against the rendered pixels instead: worst single pixel
-11.8:1 on the titles and 12.8:1 on the numbers, checked at 320, 390, 768, 1024
-and 1366px wide in both languages. If those two photos are ever swapped, or the
-cards gain another line, that measurement has to be redone — see CLAUDE.md for
-how.
+11.8:1 on the titles and 12.7:1 on the numbers, checked at 320, 390, 768, 1024
+and 1366px wide, in both languages, and **with the mouse on the card as well as
+off it** — the picture brightens on hover, so that is the harder case. If those
+two photos are ever swapped, or the cards gain another line, that measurement has
+to be redone — see CLAUDE.md for how.
 
 `.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
 on purpose — it and the `--wood-pale` accent only make sense together — and is

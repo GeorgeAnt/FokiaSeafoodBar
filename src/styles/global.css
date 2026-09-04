@@ -1966,7 +1966,21 @@ main > .section-dark:last-child {
     button at a glance rather than as a photo with a link in it.
   */
   border-radius: 1.75rem;
-  background: var(--salt-deep);
+  /*
+    Dark, not `--salt-deep` like the site's other image frames, and this is a
+    fix rather than a preference. The card's own background paints in the
+    anti-aliased fringe of the rounded clip, outside where the photograph
+    reaches, so a light value shows as a pale hairline tracing the corner —
+    faint at rest and much clearer on hover, because the wash that was dimming
+    it has faded out. Measured on the bottom-left curve, hovered: the brightest
+    fringe pixel went from luminance **72 to 44** once this went dark, against a
+    card interior of 27 and a band of 31 — 44 is ordinary edge anti-aliasing,
+    72 was a visible hairline.
+
+    It also makes a better placeholder: this sits on `--charcoal` and the image
+    is lazy-loaded, so a light block would flash before the photo arrives.
+  */
+  background: var(--black);
   color: var(--salt);
   text-decoration: none;
   /*
@@ -1977,9 +1991,17 @@ main > .section-dark:last-child {
     press state below.
   */
   -webkit-tap-highlight-color: transparent;
+  /*
+    Slower than the site's small controls, and deliberately so: this is a
+    300-450px card, and a lift that crosses that much area in 0.2s reads as a
+    snap rather than as a movement. The `ease` keyword made it worse — it is
+    front-loaded, so most of the travel happened in the first third and the
+    settle was invisible. The curve here is a decelerate: quick to commit, long
+    to arrive.
+  */
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 /*
   Square while the cards are stacked one per row.
@@ -2005,33 +2027,73 @@ main > .section-dark:last-child {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  /* Slower than the card it sits in. The lift is the response to the pointer;
+     the photograph drifting behind it is the depth, and depth should lag. */
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /*
   Control states. The card has no border and no fill of its own — the photograph
   is the surface — so it cannot signal hover the way a filled button does. It
-  lifts, gains a ring, and pushes the picture in slightly behind the fixed scrim,
-  which reads as depth rather than as a colour change.
+  lifts, gains a shadow, and pushes the picture in slightly behind the fixed
+  scrim, which reads as depth rather than as a colour change.
 
-  :active is a real press, not a hover: on a phone there is no hover at all, and
-  a card this large wants to acknowledge the tap that is about to dial.
+  **The hover half is gated behind `(hover: hover)`, and that gate is a bug fix,
+  not a nicety.** A touch browser fakes `:hover` on tap and then leaves it
+  applied — there is no pointer to move away, so nothing clears it. Tapping a
+  card here opens the dialer, and on coming back the card was still sitting in
+  its hover state, lifted and zoomed, until something else was tapped; the client
+  reported it as the effect "going away" on return, which is exactly what a stuck
+  state looks like when it finally clears. It cannot be reproduced with a mouse.
+
+  `pointer: fine` is in the query as well as `hover: hover` because a device can
+  report both — a laptop with a touchscreen, or a phone with a mouse attached —
+  and the pair asks the narrower question: is there a pointer that can hover
+  *and* aim precisely. Anything else gets the press state instead.
+
+  So on touch the feedback is `:active` alone: it lasts exactly as long as the
+  finger is down, which is the whole point — a momentary acknowledgement of a tap
+  that is about to dial, with no state left behind to get stuck. `:focus-visible`
+  stays outside the gate, because it is the keyboard's affordance and a keyboard
+  is not a pointer; it does not fire on a tap.
 */
-.contact__panel:hover,
+@media (hover: hover) and (pointer: fine) {
+  .contact__panel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--black) 45%, transparent);
+  }
+  .contact__panel:hover img {
+    transform: scale(1.04);
+  }
+  /* Shorter than the 1.2s return on the base rule: quick enough to feel like a
+     response to the pointer, slow enough to read as the picture lighting rather
+     than as a state flipping. */
+  .contact__panel:hover::after {
+    opacity: 0;
+    transition-duration: 0.8s;
+  }
+}
 .contact__panel:focus-visible {
   transform: translateY(-3px);
   box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--black) 45%, transparent);
 }
-.contact__panel:hover img,
 .contact__panel:focus-visible img {
   transform: scale(1.04);
 }
+.contact__panel:focus-visible::after {
+  opacity: 0;
+  transition-duration: 0.8s;
+}
+/* The press is the one state that should feel immediate — it has to land under
+   the finger, not 0.45s after it — so it overrides the card's own timing. */
 .contact__panel:active {
-  transform: translateY(-1px) scale(0.995);
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 0.1s;
 }
 @media (prefers-reduced-motion: reduce) {
   .contact__panel,
-  .contact__panel img {
+  .contact__panel img,
+  .contact__panel::after {
     transition: none;
   }
   .contact__panel:hover,
@@ -2043,6 +2105,9 @@ main > .section-dark:last-child {
   .contact__panel:focus-visible img {
     transform: none;
   }
+  /* The wash still clears on hover — it is a brightness change, not motion, and
+     removing it would leave a hover with no feedback at all. Only the crossfade
+     goes. */
 }
 
 /*
@@ -2080,10 +2145,60 @@ main > .section-dark:last-child {
   Re-measured by pixel sampling at every width after the change, not by eye. The
   figures are in CLAUDE.md.
 */
+/*
+  **Every layer in this card carries an explicit z-index, and that is a bug fix
+  rather than defensive habit.** The stack is img 0, scrim 1, wash 2, text 3.
+
+  Painting order here is not what the DOM suggests. `.contact__panel:hover img`
+  sets a `transform`, and a transformed element creates a stacking context and is
+  painted in the same pass as positioned descendants with `z-index: auto` — in
+  DOM order. The `<img>` comes after `::before` in that order, so the moment the
+  card was hovered the photograph painted *over* the scrim and the text
+  protection vanished for exactly as long as the pointer was on the card.
+
+  It survived a full contrast sweep because every measurement was taken at rest.
+  Sample the hovered state too; that is where this hid.
+*/
+/*
+  The scrim also carries a 1px dark ring on the inside of the rounded edge, and
+  it is there for the photograph rather than as a border.
+
+  Both images have bright areas running right to the card's boundary — the
+  concrete at the top and down the left of the table setting — and where a
+  near-white pixel is anti-aliased against a `--charcoal` band you get a light
+  hairline tracing the card. It is not a rendering bug and it is not
+  device-specific: it is the picture meeting the edge. Hover makes it obvious,
+  because the wash that had been dimming it fades out.
+
+  **It has to live here, not on `.contact__panel`.** An inset shadow paints
+  immediately after the element's own background and *before* its content, so on
+  the card itself the `<img>` covered it completely — applied, computed, and
+  doing nothing, which is exactly how it was first written. `::before` is above
+  the image in the stack and has no content of its own to hide it.
+
+  An inset shadow rather than a border: it follows `border-radius` for free,
+  costs no layout, and is invisible everywhere the photograph is already dark,
+  which is most of the perimeter.
+
+  **2px, not 1px, and the reason is fractional device pixels.** At a display
+  scale of 125% the card's edges land on half-device-pixel boundaries, so a 1px
+  ring only partly covers the outermost row and a bright photograph still showed
+  through it. Measured hovered at dpr 1.25, brightest edge pixel per side —
+  top / bottom / left / right:
+
+    no ring   145 / 55 / 157 / 74
+    1px       126 / 34 /  52 / 49
+    2px        56 / 35 /  59 / 35   (band behind the card: 31)
+
+  1px fixed the left edge and left the top almost untouched. 2px brings all four
+  to within ~25 of the band, which is what stops it reading as a line.
+*/
 .contact__panel::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 1;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--black) 72%, transparent);
   background: linear-gradient(
     to top,
     color-mix(in srgb, var(--black) 94%, transparent) 0,
@@ -2092,6 +2207,58 @@ main > .section-dark:last-child {
     color-mix(in srgb, var(--black) 20%, transparent) 13.5rem,
     transparent 16rem
   );
+}
+
+/*
+  The wash — the second darkening layer, and the *only* one that moves.
+
+  The card lightens on hover: the picture comes up as the wash fades out, and
+  comes back down slowly when the pointer leaves. It is a separate pseudo-element
+  from the scrim above rather than an opacity on that one, and the split is the
+  whole reason this is safe to animate at all.
+
+  **The scrim is load-bearing and must never fade.** It is what carries the
+  title and the number over photographs with blown highlights in every third of
+  the frame, at ratios that were measured pixel by pixel. Animating *it* would
+  walk that contrast down to nothing every time someone hovered, and the failure
+  would be invisible in a screenshot of either end state.
+
+  So the two layers do different jobs. `::before` protects the text and is
+  static. `::after` is atmosphere over the whole card and is the thing that
+  lifts. Because the wash only ever *adds* darkness, the hovered state — wash
+  fully gone — is the contrast floor, and it is exactly the state the recorded
+  figures were measured in. At rest the text is darker-backed than measured, and
+  mid-transition it is somewhere between the two. There is no state in the
+  animation that is worse than the numbers in CLAUDE.md.
+
+  Flat rather than a gradient on purpose: the bottom of the card is already at
+  90-94% black from the scrim, so a flat 30% adds almost nothing there and
+  almost all of its effect where the picture is clean. The card lights up from
+  the top down without the text area appearing to flicker.
+*/
+.contact__panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: color-mix(in srgb, var(--black) 30%, transparent);
+  /*
+    This duration is the *return*: a transition belongs to the state being
+    entered, and leaving hover re-enters this rule. Deliberately longer than the
+    fade-out below — the picture should come up promptly under the pointer and
+    settle back at its own pace.
+  */
+  transition: opacity 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/*
+  Text above both layers. `::after` is generated as the last child, so without
+  this it is a positioned sibling painted after .contact__panel-body and the
+  wash would sit on top of the title rather than under it — which looks like the
+  text dimming on hover rather than the picture brightening.
+*/
+.contact__panel-body {
+  z-index: 3;
 }
 
 /* Title and number sit in one block rather than being positioned individually:

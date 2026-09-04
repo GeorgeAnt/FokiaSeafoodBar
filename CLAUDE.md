@@ -638,6 +638,114 @@ Node is installed but **not on the shell PATH**; prepend it first:
   the pill. The wash stays on `html` for ordinary links, where a rectangle is
   the right shape. Any future rounded control needs the same pair.
 
+- **A `:hover` state on a control a touch user will tap must be gated behind
+  `@media (hover: hover) and (pointer: fine)`.** A touch browser fakes `:hover`
+  on tap and then leaves it applied — there is no pointer to move away, so
+  nothing clears it. The Take away cards are `tel:` links, so a tap opens the
+  dialer, and on returning the card was still sitting in its hover state, lifted
+  and zoomed, until something else was tapped. It was reported from a device as
+  the effect "going away" when you come back, which is what a stuck state looks
+  like at the moment it finally clears — the same shape of bug as the tap
+  highlight above, and equally impossible to see with a mouse.
+
+  Two things about the fix are worth copying rather than rederiving. `pointer:
+  fine` is in the query as well as `hover: hover` because a device can report
+  both — a laptop with a touchscreen, a phone with a mouse attached — and the
+  pair asks the narrower question: is there a pointer that can hover *and* aim
+  precisely. And `:focus-visible` stays **outside** the gate: it is the
+  keyboard's affordance, a keyboard is not a pointer, and it does not fire on a
+  tap. Gate the hover, duplicate the declarations onto `:focus-visible`, and let
+  `:active` be the whole of the touch feedback — it lasts exactly as long as the
+  finger is down and leaves no state behind.
+
+- **A `transform` on a child silently reorders painting, and it took out the
+  scrim.** `.contact__panel:hover img` scales the photograph, and a transformed
+  element creates a stacking context painted in the same pass as positioned
+  descendants with `z-index: auto`, in DOM order. The `<img>` comes after
+  `::before` in that order, so hovering painted the photograph *over* the scrim
+  and the text protection disappeared for exactly as long as the pointer was on
+  the card — title contrast measured **1.00:1** in that state, against 11.78:1 at
+  rest.
+
+  It shipped because every contrast sweep had been taken at rest. Two rules out
+  of it: give every layer in a card like this an explicit `z-index` rather than
+  relying on DOM order (img 0, scrim 1, wash 2, text 3), and **sample the hovered
+  state as well as the resting one** whenever a hover changes anything behind
+  text. A screenshot of either end state on its own looks perfectly fine.
+
+- **An image frame's own `background` paints in the anti-aliased fringe of a
+  rounded clip, so on dark ground it must be dark.** `.contact__panel` used
+  `--salt-deep` like the site's other image frames, and it showed as a pale
+  hairline tracing the card's 1.75rem corner — reported from a device as "a white
+  line below the card on hover". Hover is where it becomes obvious rather than
+  where it starts: the wash that had been dimming the fringe fades out, so the
+  same artifact roughly doubles in brightness. Measured on the bottom-left curve,
+  hovered: brightest fringe pixel **72 → 44** once the background went `--black`,
+  against a card interior of 27 and a band of 31.
+
+  It needed all three of a large radius, a transform, and a light background, so
+  `.team__photo` and `.find__media` are not affected — both are `--radius` (2px)
+  and neither is transformed. They do still flash a light block while their lazy
+  image loads on a dark band, which is the same choice made worse in a different
+  direction, and is worth fixing if anyone notices.
+
+  Measuring this needs a pixel scan, not a screenshot: it is one or two pixels on
+  a curve, and it is only there while the pointer is on the card.
+
+  **Fixing the background was not the whole of it.** A second, larger source of
+  the same hairline is the photograph itself: both images run bright right up to
+  the card's boundary — concrete along the top and left of the table setting —
+  and a near-white pixel anti-aliased against `--charcoal` is a light line. That
+  one is not a bug and not device-specific; hover simply makes it obvious,
+  because the wash that had been dimming it fades out. `.contact__panel::before`
+  carries a 2px inset dark ring for it.
+
+  Three things about that ring cost time and are worth not rediscovering:
+
+  - **It must be on `::before`, not on `.contact__panel`.** An inset shadow is
+    painted immediately after the element's own background and *before* its
+    content, so on the card the `<img>` covered it completely — applied,
+    computed, and doing nothing. `::before` is above the image in the stack and
+    has no content of its own to hide it.
+  - **2px, not 1px**, because at a 125% display scale the card's edges land on
+    half-device-pixel boundaries and a 1px ring only partly covers the outermost
+    row. 1px fixed the left edge (157 → 52) and barely touched the top (145 →
+    126); 2px brought all four sides to 35-59 against a band of 31.
+  - **Reproduce at the right device scale.** None of this is visible at dpr 1.
+    Launch a dedicated Chrome with `--force-device-scale-factor=1.25`, its own
+    `--remote-debugging-port` and `--user-data-dir`, then
+    `npx playwright-cli attach --cdp=http://localhost:<port>` — and stop only
+    that pid afterwards, never by image name.
+
+- **The darkening on these cards is two layers, and only one of them may move.**
+  `::before` is the scrim: it carries the title and number over blown highlights,
+  it is what the measured ratios describe, and it is static. `::after` is the
+  wash — a flat 30% black over the whole card that fades to 0 on hover and comes
+  back over 1.2s when the pointer leaves. Animating the scrim itself would walk
+  the text contrast to nothing on every hover.
+
+  Because the wash only ever *adds* darkness, hovered — wash fully gone — is the
+  contrast floor, and no state in the animation is worse than the table above.
+  Flat rather than a gradient on purpose: the bottom of the card is already at
+  90-94% black from the scrim, so a flat wash adds almost nothing there and
+  almost all of its effect where the picture is clean, which is why the card
+  reads as lighting up from the top down rather than the text flickering.
+
+  The two durations are asymmetric and that is deliberate: a transition belongs
+  to the state being *entered*, so the 0.8s lives on `:hover::after` (the fade
+  out) and the 1.2s on the base rule (the return). The picture comes up promptly
+  under the pointer and settles back at its own pace.
+
+- **A big surface needs a slower transition than a small one, and `ease` is the
+  wrong curve for it.** The cards moved on 0.2s `ease` and read as a snap: `ease`
+  is front-loaded, so most of the travel happened in the first third and the
+  settle was invisible. They are 0.45s on `cubic-bezier(0.22, 0.61, 0.36, 1)`, a
+  decelerate — quick to commit, long to arrive — with the photograph inside them
+  at 0.8s, deliberately lagging the card, because the lift is the response and
+  the drift behind it is the depth. The one exception is `:active`, which
+  overrides to 0.1s: a press has to land under the finger, not half a second
+  after it.
+
 - **`.btn` is fully round (999px); `--radius` (2px) is still everything else.**
   The site's default is near-square and that is still right for rectangular
   surfaces — inputs, image frames. **The language switch is no longer one of
@@ -996,14 +1104,21 @@ dependency decision, not a styling one.
   photos are ever swapped — worst *single* pixel, never the mean, which ran 6.0
   to 14.6 here and would have hidden every failure below.
 
-  Worst pixel over both panels, both locales, at 320, 390, 768, 1024 and 1366px —
-  five widths because the block's height changes with the wrap and the panel's
-  height changes with the column count, and the worst case is not at either end:
+  **Sample the hovered state, not just the resting one.** The cards lighten on
+  hover — a second layer, `.contact__panel::after`, fades out — so the resting
+  state is the *best* case and hovered is the floor. Measuring only at rest is
+  how a total failure of the scrim went unnoticed for a whole revision; see the
+  stacking-order note below.
 
-  | line | colour | owes | worst |
+  Worst pixel over both cards, both locales, at rest and hovered, at 320, 390,
+  768, 1024 and 1366px — five widths because the block's height changes with the
+  wrap and the card's height changes with the column count, and the worst case is
+  not at either end:
+
+  | line | colour | owes | worst (hovered) |
   |---|---|---|---|
   | title (`.contact__panel-title`) | `--salt` | 3:1 | 11.78:1 |
-  | number (`.contact__panel-call`) | `--salt` | 3:1 | 12.75:1 |
+  | number (`.contact__panel-call`) | `--salt` | 3:1 | 12.71:1 |
 
   Both are bold at `--step-1` / `--step-0`, so both owe 3:1 and clear it four
   times over. There used to be a third line here — a `--step--1` "Εντός ωραρίου"
