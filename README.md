@@ -256,6 +256,27 @@ from `hours.<Day>` in `src/i18n/`.
 and city only; the postcode and country stay in the structured data, which is
 what local search reads.
 
+**How the band is laid out:** a centred heading, then one text column — address,
+opening hours, phone, email, in that order — beside the restaurant photo. On a
+phone the photo moves below the text instead of beside it, but the order of the
+text itself does not change. There is no separate map button; the address
+itself is the map link. Nothing here is edited in a component: all four values
+come from `src/data/site.json`, every label from `src/i18n/`, and the photo
+from `src/data/gallery.json` (id `interior`) — swap the photo there, the same
+way any other gallery image is edited.
+
+**The address, phone number and email are underlined**, which is what marks them
+as clickable — tapping the address opens Google Maps at `mapUrl`, the phone
+dials, and the email opens a mail app. The opening-hours rows are not underlined
+because they are not links.
+
+**The phone numbers now carry the country code** — `+30 213 099 1571` and
+`+30 698 298 0267` — so an international visitor can dial them as written. If you
+edit `phone.display` or `phoneAfterHours.display` in `site.json`, keep the `href`
+beside it in step: on the Take away cards the digits shown and the number dialled
+must never disagree, because the digits are the only thing a visitor can check
+before tapping.
+
 **Adding a social network:** add an entry to `social` with an `id`, `label` and
 `url`. The `id` picks the icon out of `src/components/SocialLinks.astro` — add
 the SVG path there first, or the entry is skipped rather than rendered blank.
@@ -459,8 +480,8 @@ Two things happen as you scroll the homepage on a desktop or tablet:
 - **The page settles on the bands.** When a scroll ends near the boundary
   between two sections, it clicks that section neatly under the navigation bar.
   It does **not** force one section per scroll: several bands are taller than a
-  laptop screen — Where to Find Us is one and a half on a laptop — so being
-  forced section-by-section would hide their bottom halves. Tall bands scroll through
+  laptop screen — From the Kitchen and Reserve your spot • Take away both are —
+  so being forced section-by-section would hide their bottom halves. Tall bands scroll through
   normally, then the next one settles into place.
 - **Each band rises into view** as it arrives, over about seven tenths of a
   second. The hero is excluded, because it is the first thing painted.

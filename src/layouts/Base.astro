@@ -387,12 +387,14 @@ const dictJson = JSON.stringify(dictionaries);
           string still comes from the dictionary, so the language switch keeps
           working on it afterwards.
 
-          There was briefly a `setTextKey` alongside it, the same idea for
-          visible text, added for the after-hours phone swap and removed with it
-          when both numbers went on the page at once. If visible text ever has to
-          change with state again, it is four lines — but it must still take a
-          *key*, because `dict` is private to this closure and a caller writing
-          the words itself would hard-code both locales.
+          There has twice been a `setTextKey` alongside it, the same idea for
+          visible text: added for the after-hours phone swap and removed with it,
+          then added for Find Us's open/closed pill and removed with that. Both
+          times it was four lines and both times it left with its only caller. If
+          visible text has to change with state a third time, write it again —
+          but it must still take a *key*, because `dict` is private to this
+          closure and a caller writing the words itself would hard-code both
+          locales and go stale the moment the copy moved.
         */
         window.fokiaI18n = {
           refresh: function () {

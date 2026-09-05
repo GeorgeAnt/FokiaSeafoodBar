@@ -93,30 +93,37 @@ const schedule = [
 <section class="section section-dark" id="find-us">
   <div class="wrap">
     {/*
-      The heading sits inside the grid's first column rather than above the
-      grid, so that the photo starts on the same line as it. Above the grid it
-      pushed the whole row down and the image top sat a heading's height lower
-      than the words it belongs to.
+      The heading is centred over the whole band rather than sitting in a
+      column. It used to be inside the grid's first column so the photograph
+      beside it started on the same line as the words; that photograph is gone
+      and the grid is two text columns now, so a heading left in the first one
+      would be centred over half the band and read as a column label instead of
+      as the band's title.
+
+      It carries its own data-reveal, like .plates__head, so the sibling rule in
+      global.css brings the head in a beat ahead of the columns.
+    */}
+    {/*
+      Not .section-head: that sets --step-3, and this heading is --step-2 to
+      match From the kitchen and Our Goal. Same reasoning as .plates__head —
+      the two rules have equal specificity, so overriding would have meant
+      depending on source order. .section-head--inline existed only for this
+      one header and went with it.
+    */}
+    <header class="find__head" data-reveal>
+      <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
+    </header>
+
+    {/*
+      One text column — address, hours, phone, email, in that order, the same
+      order the column stacks in below the breakpoint — beside the photograph.
+      It used to be two text columns side by side with no photo at all; the
+      client didn't like the band without one, and asked for the desktop layout
+      to read the way the mobile stack already does, with the picture filling
+      the space that freed up on the right. See .find__col and .find__media.
     */}
     <div class="find__grid" data-reveal>
-      {/*
-        The text column is centred, like Our Goal and From the kitchen. The
-        photograph keeps its own column beside it rather than moving below —
-        making this a third full-width centred stack would leave the homepage
-        running the same shape three bands out of four. See the layout note in
-        CLAUDE.md.
-      */}
       <div class="find__col">
-        {/*
-          Not .section-head: that sets --step-3, and this heading is --step-2 to
-          match From the kitchen and Our Goal. Same reasoning as .plates__head —
-          the two rules have equal specificity, so overriding would have meant
-          depending on source order. .section-head--inline existed only for this
-          one header and went with it.
-        */}
-        <header class="find__head">
-          <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
-        </header>
         <div class="find__block">
           <p class="find__label" data-i18n="findUs.addressLabel">
             {t(locale, 'findUs.addressLabel')}
@@ -169,45 +176,6 @@ const schedule = [
           </address>
         </div>
 
-
-        <div class="find__block">
-          <p class="find__label" data-i18n="contact.phoneLabel">
-            {t(locale, 'contact.phoneLabel')}
-          </p>
-          {/*
-            Icons are inline SVG in the same idiom as SocialLinks — 24x24,
-            fill none, stroke currentColor at 1.6 — rather than Font Awesome.
-            The site ships no icon library and self-hosts everything it renders;
-            three glyphs are not worth a CDN request, a webfont, or FA's CC BY
-            attribution requirement, and inline SVG inherits currentColor so the
-            icons follow the link's hover and focus states for free.
-
-            aria-hidden on every one of them: the link text beside the icon is
-            already the accessible name, and an unlabelled decorative glyph
-            inside a link would either add nothing or duplicate it.
-          */}
-          <p class="find__contact">
-            <a href={`tel:${site.phone.href}`}>
-              <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
-              </svg>
-              <span>{site.phone.display}</span>
-            </a>
-          </p>
-          <p class="find__label find__label--tight" data-i18n="contact.emailLabel">
-            {t(locale, 'contact.emailLabel')}
-          </p>
-          <p class="find__contact">
-            <a href={`mailto:${site.email}`}>
-              <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                <rect x="3" y="5" width="18" height="14" rx="2" />
-                <path d="m3.6 6.6 8.4 5.9 8.4-5.9" />
-              </svg>
-              <span>{site.email}</span>
-            </a>
-          </p>
-        </div>
-
         <div class="find__block">
           <p class="find__label" data-i18n="findUs.hoursLabel">{t(locale, 'findUs.hoursLabel')}</p>
           <ul class="find__hours">
@@ -249,8 +217,64 @@ const schedule = [
             }
           </ul>
         </div>
+
+        <div class="find__block">
+          <p class="find__label" data-i18n="contact.phoneLabel">
+            {t(locale, 'contact.phoneLabel')}
+          </p>
+          {/*
+            Icons are inline SVG in the same idiom as SocialLinks — 24x24,
+            fill none, stroke currentColor at 1.6 — rather than Font Awesome.
+            The site ships no icon library and self-hosts everything it renders;
+            three glyphs are not worth a CDN request, a webfont, or FA's CC BY
+            attribution requirement, and inline SVG inherits currentColor so the
+            icons follow the link's hover and focus states for free.
+
+            aria-hidden on every one of them: the link text beside the icon is
+            already the accessible name, and an unlabelled decorative glyph
+            inside a link would either add nothing or duplicate it.
+          */}
+          <p class="find__contact">
+            <a href={`tel:${site.phone.href}`}>
+              <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+              </svg>
+              <span>{site.phone.display}</span>
+            </a>
+          </p>
+        </div>
+
+        {/*
+          Email is its own .find__block rather than a second label inside the
+          phone block, so every group in the column spaces the same way —
+          `.find__block + .find__block`, 2rem. It used to ride on
+          `.find__label--tight` (1.1rem) back when phone and email were a
+          second column of their own; that rule existed only to level "Email"
+          with "Ώρες λειτουργίας" next door, which stopped being a question the
+          moment there was only one column to level.
+        */}
+        <div class="find__block">
+          <p class="find__label" data-i18n="contact.emailLabel">
+            {t(locale, 'contact.emailLabel')}
+          </p>
+          <p class="find__contact">
+            <a href={`mailto:${site.email}`}>
+              <svg class="find__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3.6 6.6 8.4 5.9 8.4-5.9" />
+              </svg>
+              <span>{site.email}</span>
+            </a>
+          </p>
+        </div>
       </div>
 
+      {/*
+        No fixed aspect ratio here on purpose — see the CSS. The image is meant
+        to match the text column's height exactly, not the other way round,
+        which is what keeps it from dominating the band the way a tall portrait
+        crop did in the very first version of this section.
+      */}
       <div class="find__media">
         <Picture
           src={galleryPhoto(photo.file)}

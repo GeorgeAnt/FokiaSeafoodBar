@@ -140,14 +140,46 @@ order; there are only three tiers and both ends are pinned black.
 pairing.** Hero is a split, Our Goal is a centred stack of text, From the
 kitchen is a centred head over a staggered photo row, Take away is two small
 rounded photo cards that are themselves the call buttons, over a centred stack of
-two paragraphs, Find Us is a text and image split.
+two paragraphs, Find Us is a centred heading over a text column and a
+photograph.
+
+**Find Us has had three different shapes in the space of one project, and the
+history is worth keeping because the same request keeps nearly repeating.**
+
+1. Originally a text-and-image split — a centred text column beside a 3:4
+   portrait, `1fr 1.15fr`, photo in the wider track.
+2. The client removed the photo. What was left was the text column sitting in
+   the narrow half of that grid, centred over 46% of the band with the other
+   half empty charcoal — a layout with something missing rather than a layout —
+   so it was rebuilt as **two** text columns: address and opening hours on the
+   left, phone and email on the right, both capped at 46rem and centred as a
+   pair.
+3. The client didn't like the band without a photo either, and asked for the
+   desktop layout to read the way the two-column version already stacked on
+   mobile — one column, address → hours → phone → email — with the picture
+   filling the space that freed up on the right. That is the current shape.
+
+Two things carried across all three: the grouping **address+hours** then
+**phone+email** (state 2's column split, state 3's single-column order — the
+grouping survives even though the columns that expressed it did not), and the
+constraint that the photo must never read as visually bigger than the
+information beside it. State 1 didn't satisfy that constraint — a fixed 3:4 crop
+in the wider track was taller than the text next to it — and state 3 is built
+specifically to fix it; see `.find__media` for how.
 
 Take away's own notes are centred and stacked at the client's request, on the
 same 46rem axis as Our Goal and with the measure on the container rather than on
-each paragraph — see the note on `.contact__notes`. That makes three centred
-compositions on a four-band page, which is the failure mode recorded under the
-Team history below; what still separates them is that this one is a pair of
-*controls* over its text rather than a heading and a button.
+each paragraph — see the note on `.contact__notes`.
+
+**Every other band on this page is a centred stack, and Find Us is the one that
+doesn't have to be.** Our Goal is a centred stack, From the kitchen is a centred
+head over photographs, Take away is a pair of controls over centred notes — three
+centred compositions already, which is the failure mode the note above records.
+Find Us being a text-column-plus-photo split rather than a fourth centred stack
+is what keeps the homepage from running that shape on every band below the
+hero. Do not simplify it into a centred stack to make it "match" — that would
+create the exact repetition problem the rest of this file spends so much time
+warning about.
 
 **The three band headings are one size.** `.goal__heading`, `.plates__head h2`
 and `.find__head h2` are all `--step-2`. None of them uses `.section-head`,
@@ -170,9 +202,11 @@ centred stack would be too many.
 **That rule was being broken by Team, and moving Team to `/team` is what fixed
 it** — worth recording, because the repetition problem was live for a long time
 and two different attempts were made on it. As alternating rows the section ran
-the same image-and-text composition once per member, and Find Us below is
+the same image-and-text composition once per member, and Find Us below was
 another of the same shape, so at five people the homepage ran that composition
-six times and **Team and Find Us were no longer distinguishable shapes**. The
+six times and **Team and Find Us were no longer distinguishable shapes**.
+(Find Us has since lost its photograph, so that composition is not on the
+homepage at all any more — but the history is what the rule is made of.) The
 first attempt was a portrait grid, which held the section to 1030px and did
 break the repetition — and was reverted, because five equal columns are ~220px
 and set a bio about four words to the line. The client chose the measure over
@@ -182,9 +216,16 @@ The second attempt is the page. The rows keep their full width, the homepage
 loses the repetition, and neither had to be traded for the other. The numbers:
 Team was **3249px** at 1366x768, 4.2 viewports in one band, and 4507px on a
 390x844 phone. The homepage went from ~7786px to **4537px** — it lost 42% of its
-height to one move. Before adding a section here, still check what shape its
-neighbours already are; Find Us is now the only instance of that composition on
-the page.
+height to one move. It has since been **4058px**, while Find Us had no
+photograph, and is **4269px** now that Find Us has one again in its new shape
+(text column plus photo, not the alternating rows Team used) — re-measured at
+1366x768; do not assume either older figure still holds.
+
+Before adding a section here, still check what shape its neighbours already
+are. Find Us is once again an image-and-text split, which is the shape Team
+used to share with it — so that composition is **in use** on the homepage
+again, and a new band reaching for it would recreate the exact repetition this
+history is about.
 
 **From the kitchen is not in the nav — but the width argument that used to
 forbid it is gone, so do not repeat it.** It said "cannot be", and that was
@@ -244,11 +285,13 @@ both locales, and would go stale the moment the copy moved. Re-aiming the
 attribute is also what keeps the language switch working afterwards: `apply()`
 re-reads `data-i18n` off the DOM.
 
-There was briefly a third, `setTextKey`, the same idea for *visible* text. It was
-added for the after-hours phone swap and removed with it when both numbers went
-onto the panels. Recorded because the shape is the reusable part: if visible text
-ever has to change with state again it is four lines, and it must still take a
-key, for the reason above.
+There has twice been a third, `setTextKey`, the same idea for *visible* text:
+added for the after-hours phone swap and removed with it, then added for Find
+Us's open/closed pill and removed with that. **Both times it was four lines and
+both times it left with its only caller**, which is the argument for keeping this
+note rather than the code — the shape is the reusable part. If visible text has
+to change with state a third time, write it again, and it must still take a key,
+for the reason above.
 
 Both are called with `?.` — the section scripts are modules and run after the
 inline one, but a control still has to work if it never loaded. The type lives in
@@ -284,21 +327,26 @@ The gallery *tiles* are the deliberate exception and stay in the page: each is a
 script does not run, and JS only intercepts the click.
 
 **Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
-bands are not viewport-sized and cannot be. Re-measured at 1366x768 after Team
-moved to its own page: Plates 834, Contact 1004 and Find Us 1082 are all taller
-than the screen. Team was the extreme case at **3249px**, 4.2 viewports on its
-own, and it is gone from this page — but the remaining three still rule
-`mandatory` out on their own. Take away used to be the short-band case at 232;
-the two photo panels took it past a full screen, so there is no longer a band
-short enough for a whole screen to be absurd either.
+bands are not viewport-sized and cannot be. Re-measured at 1366x768 with Find
+Us in its current shape (text column plus photo): Our Goal 681, From the
+kitchen **918**, Take away **853**, Find Us **753**. Two of the four are still
+taller than the screen, which rules `mandatory` out on its own. Team was the
+extreme case at **3249px**, 4.2 viewports, and it is gone from this page.
+
+Note that the figures move a lot and the *identity* of the tall band moves with
+them, and Find Us in particular has now been measured at three different
+heights across three different shapes: 1082 with its original 3:4 portrait,
+542 with no photo at all, 753 in the current text-plus-photo layout — tallest,
+shortest, then in between, in that order. Take away used to be the short-band
+case at 232, before its photo panels. Re-measure; do not quote these.
 `mandatory` pulls the reader out of a band they are still reading and gives the
 short band a whole screen for two lines. `proximity` only settles a scroll that
 already ended near a boundary, so tall bands scroll through normally. Snapping is
 gated at 48rem (below it there is nothing to settle onto) and on
 `prefers-reduced-motion` (it moves the page without being asked). This is also
 why full scroll-hijacking — one wheel tick per section — is not on the table:
-it would hide the bottom of Find Us and Take away and break every `/#anchor` in
-the nav.
+it would hide the bottom of From the kitchen and Take away and break every
+`/#anchor` in the nav.
 
 **A rule that hides content must be owned by the script that can un-hide it.**
 `[data-reveal]` blocks are invisible only under `.has-reveal`, and that class is
@@ -766,10 +814,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
   against a card interior of 27 and a band of 31.
 
   It needed all three of a large radius, a transform, and a light background, so
-  `.team__photo` and `.find__media` are not affected — both are `--radius` (2px)
-  and neither is transformed. They do still flash a light block while their lazy
-  image loads on a dark band, which is the same choice made worse in a different
-  direction, and is worth fixing if anyone notices.
+  `.team__photo` is not affected — it is `--radius` (2px) and is not transformed.
+  It does still flash a light block while its lazy image loads on a dark band,
+  which is the same choice made worse in a different direction, and is worth
+  fixing if anyone notices. `.find__media` was the other example here and is gone
+  with the Find Us photograph; the rule was never about that band specifically.
 
   Measuring this needs a pixel scan, not a screenshot: it is one or two pixels on
   a curve, and it is only there while the pointer is on the card.
@@ -837,10 +886,11 @@ Node is installed but **not on the shell PATH**; prepend it first:
   and its own `min-height`.
 
   `.btn` itself is three places and all three are on the homepage: the hero CTA,
-  the From the kitchen CTA, the Find Us map button — and all three are
-  `.btn--primary` since the client asked for them to match, so the pill, the
-  fill and the label are one style rather than two. Nothing on /menu, /gallery or
-  /team uses `.btn`, so that change could not leak.
+  the From the kitchen CTA and the Our Goal "meet the team" button. Find Us had a
+  fourth for one revision and it was removed again — see the note on the address
+  above. All are `.btn--primary` since the client asked for them to match, so the
+  pill, the fill and the label are one style rather than two. Nothing on /menu,
+  /gallery or /team uses `.btn`, so that change could not leak.
 
   Written as a literal `999px` to match every other pill already in the file
   (the menu tab group, the jump chips, the tags) rather than adding a second
@@ -957,24 +1007,58 @@ Node is installed but **not on the shell PATH**; prepend it first:
   legally required heading on the site at default Garamond `h2` size instead of
   the small uppercase label it is written to be. Grep the tag, not just the
   class, when a rule looks like it is not doing anything.
-- **The address in Find Us *is* the map link.** There was a "view on map" button
-under it; the client asked for it to go, and the street line took over its
-`href`. Three things about that are load-bearing:
+- **The address in Find Us *is* the map link, and the separate button has now
+been added and removed twice.** The history is the useful part, because the same
+argument keeps being made and keeps losing:
 
-- `findUs.viewOnMap` did **not** become a dead key. It is rendered inside the
+  1. There was a "view on map" button under the address. The client asked for it
+     to go and the street line took over its `href`, with `findUs.viewOnMap`
+     carried on as `.sr-only` text inside the link.
+  2. A review objected that the band promises "where to find us" and nothing on
+     screen offers directions. The button came back at band level, centred.
+  3. It was removed again on request, and `findUs.viewOnMap` went back to being
+     sr-only text inside the address link.
+
+  So the band has **no `.btn` of any kind**, and `.btn--primary` is back to three
+  instances, all on the homepage's other bands. What answered the review's
+  underlying complaint instead was underlining the links — see below. Before
+  proposing the button a third time, note that the affordance problem it existed
+  to solve has since been solved another way.
+
+- `findUs.viewOnMap` is **not** a dead key. It is rendered inside the address
   link as `.sr-only` text, so the accessible name is "Λάσκου 3 Ελευσίνα Δείτε
-  στον χάρτη" — verified in the a11y tree. Appending rather than using
-  `aria-label` keeps the visible words inside the accessible name, which WCAG
-  2.5.3 (Label in Name) requires: a speech-input user saying "Λάσκου 3" still
-  matches the link.
+  στον χάρτη" — verified in the a11y tree, and re-verified in English as
+  "Laskou 3 Elefsína View on map". Appending rather than using `aria-label` keeps
+  the visible words inside the accessible name, which WCAG 2.5.3 (Label in Name)
+  requires: a speech-input user saying "Λάσκου 3" still matches the link. The
+  underline now says the address *is* a link; this text is what says where it
+  goes.
+
 - The `site.mapUrl` guard stays. With no URL the address renders as plain text
   rather than as a control that goes nowhere — the same rule the button had.
-- **Nothing on screen marks it as a link.** The client asked for the underlines
-  to go from the phone, the email and the hours rows, and the address link
-  inherits that. Colour does not distinguish it either, since it is the body
-  colour. What is left is the hover and focus state in `.find__contact a,
-  .find__map`; removing those would leave four links with no affordance at all.
-  This is a recorded trade-off, not an oversight.
+- **The address, phone and email are underlined at rest, and this reverses a
+  client request on purpose.** The client had asked for the underlines to go from
+  the phone, the email and the hours rows. Two separate rounds of review then
+  objected that the three read as static text: they are the body colour and the
+  body weight, so colour cannot mark them and nothing else did. The client's
+  removal was re-confirmed once and overridden the second time. The hours rows
+  stay un-ruled — they are not links, and the rules between them were a table
+  treatment rather than an affordance.
+
+  **The underline goes on the inner `<span>`, never on the anchor**, and that is
+  load-bearing rather than fussy. `.find__contact a` and `.find__map` are
+  `inline-flex`, and a text decoration set on a flex container propagates into
+  its flex items — the icon is one — so an underline on the anchor draws a line
+  under the pin, phone and envelope glyphs as well as the words. That is the
+  "border under the whole box" look the decoration was chosen over in the first
+  place. On the span it follows the text and clears descenders, which matters
+  most on the email address. Verified: `textDecorationLine` is `underline` on
+  each span and `none` on every anchor and every `svg`.
+
+  Hover and focus therefore only change *colour* now (to `--salt`); the underline
+  is permanent, so the old `text-decoration: underline` in the hover rule was
+  doing nothing and went.
+
 
 **Find Us runs a three-step ramp, and the emphasis is inverted from where it
 started.** Heading `--step-2` salt, label `--step-1` salt bold, value
@@ -994,14 +1078,40 @@ Two things inside that are worth keeping:
   hero wordmark and the CTA fill. The day names took the same muted stone the
   times already had, and the rules between rows went with the underlines.
 
-**The blocks read Address, Phone, Email, Opening hours — hours last, at the
-client's request — and the hours themselves run Monday first.** That second one
-is a sort, not a reordering of the data: every run, open and closed, is ordered
-by `dayIndex(run.from)`. It used to be the open ranges in the order the client
-listed them followed by the closed days, which put Monday last precisely because
-Monday was the closed one. **It no longer is — the restaurant opens seven days —
-and the sort is why that change needed no code**: nothing here assumes which day
-is shut, or that any day is.
+**The blocks are in one column now — address, opening hours, phone, email, in
+that order — beside the photograph, and the ordering is the one thing that
+survived every layout this band has had.** The grouping is "where and when"
+(address, hours) then "how to reach us" (phone, email), which is why hours
+comes second rather than last despite an earlier request that it read Address,
+Phone, Email, Opening hours last; the client asked for these two groupings
+instead, and grouping "where and when" against "how to reach us" puts hours
+second. Below the 55rem breakpoint the column is the whole band (the photo just
+stacks below it), so the same order is what a phone visitor reads too — there
+is now only one order to keep straight, where the two-column version had to
+keep a column's internal order and the stacked order in agreement.
+
+The Monday-first part is a sort, not a reordering of the data: every run, open
+and closed, is ordered by `dayIndex(run.from)`. It used to be the open ranges in
+the order the client listed them followed by the closed days, which put Monday
+last precisely because Monday was the closed one. **It no longer is — the
+restaurant opens seven days — and the sort is why that change needed no code**:
+nothing here assumes which day is shut, or that any day is.
+
+**There is no "open now / closed now" indicator, and one was built and removed.**
+It rendered from `isOpenAt` in Europe/Athens, cloned out of a `<template>` so a
+build-time value could never be shown as a live one, and it worked — both paths
+verified. It was removed on request. Two things are worth keeping from it:
+
+- The reason it had to be client-side is not the usual "a control that would do
+  nothing without JS". It is that a static site renders at *build* time, so a
+  status baked into the HTML reports the restaurant as of the last deploy, with
+  the real schedule directly beneath it to contradict. Any future live indicator
+  on this site has the same constraint.
+- `setTextKey` came back for it and went away with it — the second such round
+  trip. See the note in `Base.astro`.
+
+The schedule rows are the whole of what the band says about hours, which is the
+state this section has been in for most of its life.
 
 **Day names are written out in full, and there is no abbreviated set any more.**
 The keys are `hours.<Day>` — "Δευτέρα", "Παρασκευή" — read as
@@ -1010,19 +1120,98 @@ values were three-letter clips ("Δευ", "Παρ") while English was already sp
 out, so the two locales disagreed about what "short" meant; the client asked for
 full names and the key lost the word with the abbreviation. Do not reintroduce a
 parallel short set for one narrow layout — the measure is the thing to check
-first. Measured at 1366px after the change: the longest row is "Δευτέρα –
-Σάββατο" at 163px against 110px of times inside the 352px (22rem) cap, and 145 +
-98 within 348px at 390px. Both stay on one line with room to spare, which is why
-this was a rename and not a layout change.
+first. Both locales still fit at every width this band uses; re-measured below.
 
-**The text column is centred; the photograph is not.** `.find__col` carries
-`text-align: center` and the photo keeps its own grid column beside it. Making
-this a third full-width centred stack was the alternative and was not taken: Our
-Goal and From the kitchen are already that shape, and a third would leave the
-homepage running one composition in three bands out of four — the failure mode
-recorded under the layout rule above. The hours list needs its own centring
-because it is a fixed-width block of rows rather than a run of text, so the 22rem
-cap moved from the `<li>` up to the `<ul>` where auto margins can act on it.
+**The text column is centred, and it is no longer capped to bring it closer to
+a second column of text — there is no second column of text any more.** Two
+turns of this band's history live in that one sentence and both are worth
+knowing before "fixing" the current width:
+
+1. With two text columns side by side, `.find__grid` had `max-width: 46rem` so
+   the pair would centre close together rather than spreading to the wrap's
+   full 1248px, where the two centred axes landed ~650px apart with a band of
+   empty charcoal between them.
+2. That cap is gone now that the second column is a photograph rather than
+   text. `.find__grid` is `grid-template-columns: 1fr 1fr` with no `max-width`,
+   filling the wrap the way `.find__media` needs to — see below for why the
+   photo's size, not the text column's, is what this layout is actually built
+   to constrain.
+
+`.find__col` still carries `text-align: center`, unchanged by any of this — the
+text inside the column has been centred since the very first two-column
+version and staying centred was never in question.
+
+**The floor on how narrow this column can go is still the hours list**, which
+is the widest object in it. Its longest row is 163px of days + 24px gap + 110px
+of times = 297px at 1366px (154 + 104 within a narrower cap at 880px), so a
+column under ~300px starts wrapping the schedule. At the current `1fr 1fr`
+split the column measures 596px at 1366 and 389px at the 880px breakpoint —
+comfortably clear in both locales, Greek being the longer of the two. Verified
+at 1366, 880, 768, 390 and 320: every hours row is one line, nothing overflows.
+
+The heading sits **above** the grid with its own `text-align: center`, not
+inside the column. It was inside the column, back when the column was the
+band's only content and a photo (if any) sat beside it at the same starting
+line; with the column no longer spanning the whole band's meaning on its own, a
+heading inside it would be centred over half the band and read as a column
+label rather than the band's title.
+
+**The breakpoint stays `55rem`, not the `48rem` the rest of the site uses, and
+`.find__hours` is still why** — a fixed-width block of rows needs more room
+than most of this site's breakpoints assume. Below it the grid has no
+`grid-template-columns` of its own, so it collapses to a single implicit
+column and the photograph stacks after the text — see `.find__media` for what
+changes in its own sizing at the same breakpoint.
+
+The hours list needs its own centring on top of `text-align` because it is a
+block of rows rather than a run of text, so the auto margins sit on the `<ul>`,
+where they have a width to act on. `align-content: start` on `.find__col` is
+defensive rather than load-bearing now — it mattered when a taller sibling
+`.find__col` could stretch a shorter one's grid row and this kept the shorter
+one's content hugging the top rather than centring in the extra space. There is
+one `.find__col` now, beside `.find__media`, and `.find__media` is built to
+take its height *from* the column rather than stretch it — so in the normal
+case this rule does nothing. It stays in case that ever stops being true.
+
+**`.find__hours` is `width: fit-content`, and 22rem is a ceiling rather than the
+width — a fix worth understanding before anyone "tidies" it away.** It was a
+flat 22rem (352px) with its rows laid out `space-between`, wider than the rows
+actually need, so the surplus went into the gap and pinned the days and times to
+fixed x-positions while every label and value above them centred on a different
+axis. **Three alignment axes in one centred column**, which a review caught.
+Shrinking the box to its content leaves one axis for the whole column.
+`space-between` stays and now does its actual job — the shorter row's time is
+still pushed to the block's right edge, so the times right-align with each
+other and the schedule reads as a schedule rather than as rows whose columns
+wander. The lesson generalises: **a fixed width plus `space-between` is a
+distributed layout wearing a table's clothes**, and it only looks aligned while
+the content happens to fill the box.
+
+Email being its own `.find__block` (rather than a second label folded into the
+phone block) is left over from when phone and email were a second column that
+had to level its rows against the first — it doesn't do that job any more with
+one column, but splitting it out costs nothing and un-splitting it would just be
+churn.
+
+**`.find__media` is sized so it can never read as bigger than the text column,
+and that constraint is closer to the point of this layout than any particular
+width.** There is deliberately no `aspect-ratio` on it at this breakpoint.
+Instead its `<img>` is `position: absolute; inset: 0`, which takes the image out
+of normal flow entirely — an out-of-flow element contributes nothing to its
+parent's content size, so `.find__media` has no natural height of its own for
+the grid's `auto` row-track sizing to measure. The row's height is set by
+`.find__col` alone, `.find__media` stretches to match it (grid's default
+`align-items: stretch`), and the image fills that exact box via
+`object-fit: cover`. Verified at both 1366 and the 880px breakpoint:
+`.find__media`'s rendered height equals `.find__col`'s exactly, to the pixel,
+at both widths. `min-height: 20rem` is a floor for the case the text column is
+unusually short, not the usual operating height.
+
+Below 55rem this reverses: the photo stacks under the text as a normal photo
+frame with a fixed `aspect-ratio: 4/5` and an in-flow `<img>`, the same idiom as
+`.team__photo`. There is nothing to match at that width — the two are stacked,
+not side by side — so a fixed ratio is the simpler, more predictable choice
+there.
 
 **The address, phone and email icons are inline SVG, not Font Awesome.** The
 client asked for "fa icons"; what shipped is three glyphs in the same idiom as

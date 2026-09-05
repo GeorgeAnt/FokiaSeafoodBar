@@ -2448,21 +2448,51 @@ main > .section-dark:last-child {
 /* --------------------------------------------------------------------------
    Where to find us
    -------------------------------------------------------------------------- */
+/*
+  One text column beside the photograph — address, opening hours, phone, email
+  in a single stack, the same order it already read in below the breakpoint.
+  This band has been two text columns with no photo, and a photo beside a
+  single text column before that; this is the second arrangement again, with
+  the column's internal order kept from the two-column version rather than
+  reverted to whatever it was originally.
+
+  The breakpoint stays 55rem rather than dropping to the 48rem the rest of the
+  site uses, because .find__hours is a fixed-width block of rows and needs the
+  room; see the note on it further down. Below the breakpoint the grid has no
+  `grid-template-columns` of its own, so it is an implicit single column and
+  the photograph simply stacks after the text.
+*/
 .find__grid {
   display: grid;
   gap: clamp(1.5rem, 1rem + 3vw, 4rem);
 }
 @media (min-width: 55rem) {
   .find__grid {
-    grid-template-columns: 1fr 1.15fr;
+    /*
+      Even columns, not the `1fr 1.15fr` this band used the first time it had a
+      photo. That split gave the picture the wider track on the assumption that
+      a photo is the bigger object by default; the second time round the client
+      asked for the opposite — the photo should not read as bigger than the
+      information beside it — so the columns start equal and the real limit on
+      the photo's size is the height rule below, not an intentionally generous
+      width.
+    */
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
   }
 }
 
-/* The heading is inside the column here, so its trailing space is the gap to
-   the first block rather than to a whole grid below it. --step-2 matches
-   .plates__head and .goal__heading: the three band headings are one size. */
+/*
+  The heading is centred over the whole band, above the grid rather than inside
+  a column — a --step-2 title over two columns, not a label on one of them. It
+  needs its own text-align now that it is no longer inheriting .find__col's.
+
+  --step-2 matches .plates__head and .goal__heading: the three band headings
+  are one size.
+*/
 .find__head {
   margin-bottom: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  text-align: center;
 }
 .find__head h2 {
   font-size: var(--step-2);
@@ -2470,13 +2500,76 @@ main > .section-dark:last-child {
 }
 
 /*
-  The text column is centred; the photograph beside it is not affected. The
-  hours list needs its own centring because it is a fixed-width block of rows
+  Centred, the way the text in this band always has been. The hours list needs
+  its own centring on top of that because it is a fixed-width block of rows
   rather than a run of text — text-align does nothing to it, so the 22rem cap
-  moved from the <li> up to the <ul> where auto margins can act on it.
+  sits on the <ul>, where auto margins have a width to act on.
+
+  align-content: start is defensive rather than load-bearing now. It mattered
+  when there were two `.find__col`s side by side and a taller one could stretch
+  the shorter one's grid row, pushing its content toward the middle unless told
+  to hug the top. There is one `.find__col` now, beside `.find__media` rather
+  than another text column, and .find__media is built to take its height *from*
+  this column (see below) rather than the other way round — so in the normal
+  case this column is never taller than its own content and the rule does
+  nothing. It stays in case that ever stops being true.
 */
 .find__col {
   text-align: center;
+  align-content: start;
+}
+
+/*
+  Two different sizing rules either side of the 55rem breakpoint, because the
+  photograph is doing a different job in each layout.
+
+  Below 55rem it stacks under the text as a normal photo frame, same idiom as
+  `.team__photo`: a fixed aspect-ratio and an `<img>` in normal flow, sized
+  `100%`/`100%` with `object-fit: cover`. Nothing here needs to match anything
+  else at that width, so a fixed ratio is the simple, predictable choice.
+
+  At 55rem and above it sits beside the text column, and *that* is where "the
+  photo shouldn't read as bigger than the information" is actually a layout
+  constraint rather than a preference — the first time this band had a photo, a
+  fixed 4:5 crop in the wider of two tracks made the picture noticeably taller
+  than the text beside it. The fix is to stop giving the photo a size of its own
+  at that width at all: `aspect-ratio` is reset to `auto` and the `<img>` is
+  taken out of normal flow with `position: absolute; inset: 0`. An out-of-flow
+  element contributes nothing to its parent's content size, so `.find__media`
+  has no natural height left for the grid's `auto` row-track sizing to measure.
+  The row's height is set by `.find__col` alone, `.find__media` stretches to
+  match it (grid's default `align-items: stretch`), and the image fills that
+  exact box via `object-fit: cover`. The photo ends up precisely as tall as the
+  information beside it, not the other way round — verified at 1366px and 880px,
+  where `.find__media`'s rendered height equals `.find__col`'s within a pixel.
+
+  min-height only applies in the second mode, as a floor for the case the text
+  column is unexpectedly short — a translated line that wraps less than Greek,
+  say — so the photo can't collapse to a sliver. 20rem is well short of anything
+  the real content produces at this breakpoint; it bounds an edge case, it does
+  not set the usual height.
+*/
+.find__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--salt-deep);
+}
+.find__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (min-width: 55rem) {
+  .find__media {
+    aspect-ratio: auto;
+    min-height: 20rem;
+  }
+  .find__media img {
+    position: absolute;
+    inset: 0;
+  }
 }
 
 .find__block + .find__block {
@@ -2507,10 +2600,6 @@ main > .section-dark:last-child {
   color: var(--salt);
   margin-bottom: 0.35rem;
 }
-.find__label--tight {
-  margin-top: 1.1rem;
-}
-
 .find__contact {
   line-height: 1.5;
 }
@@ -2541,10 +2630,34 @@ main > .section-dark:last-child {
   align-items: center;
   gap: 0.55rem;
   text-align: start;
+  /* No decoration on the anchor itself — see the rule below for why. */
   text-decoration: none;
+  transition: color 0.18s var(--ease);
+}
+/*
+  The underline goes on the inner span, never on the anchor, and that is a
+  consequence of the anchor being `inline-flex`. A decoration set on a flex
+  container propagates to its flex items, and the icon is one of them, so the
+  rule would draw a line under the pin/phone/envelope as well as the words —
+  which is exactly the "border under the whole box" look this was written to
+  avoid. On the span it follows the text and clears descenders, which matters
+  most on the email address.
+
+  The sr-only span is excluded for tidiness rather than effect: it is clipped,
+  so an underline on it would not paint anything.
+
+  These are underlined **at rest** now. The client had asked for the underlines
+  to go and this reverses that, twice-reviewed: two rounds of feedback objected
+  that the address, phone and email are the same colour and weight as the text
+  around them with nothing marking them as links. Colour cannot do that job here
+  — they are the body colour on purpose — so the underline is the only
+  affordance available that does not add a control.
+*/
+.find__contact a > span,
+.find__map > span:not(.sr-only) {
+  text-decoration: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
-  transition: color 0.18s var(--ease);
 }
 /* Sized in em so it tracks the value's font-size rather than needing its own
    number if that changes. flex: none stops it squashing when the address wraps. */
@@ -2568,7 +2681,6 @@ main > .section-dark:last-child {
 .find__map:hover,
 .find__map:focus-visible {
   color: var(--salt);
-  text-decoration: underline;
 }
 /* The values — address, hours, phone, email — are one size and one colour:
    --step-0 in --light-stone, under a larger salt label. The hours list was
@@ -2586,17 +2698,30 @@ main > .section-dark:last-child {
 }
 
 /*
-  The 22rem cap and the auto margins are on the <ul>, not the <li>: this is a
-  fixed-width block of rows sitting in a centred column, so the auto margins need
-  something with a width to act on.
+  `width: fit-content` is what puts this block on the same centre as everything
+  else in the column, and it is the whole of the fix for an alignment bug worth
+  understanding before anyone "tidies" it away.
 
-  The day names are written out in full — Δευτέρα, not Δευ — at the client's
-  request, so this measure now has to hold a range like "Δευτέρα – Σάββατο"
-  beside its times rather than "Δευ – Σάβ". Measured after the change; see
-  CLAUDE.md.
+  The list was a flat 22rem (352px) inside a 436px column, with rows laid out
+  `space-between`. 22rem is wider than the rows actually need — the widest is
+  163px of days beside 110px of times — so `space-between` spent the surplus on
+  the gap and pinned the days to x=261 and the times to x=613, while every label
+  and value above them centred on x=437. Three alignment axes in one column,
+  under headings that are all centred. Reported in review, and correctly.
+
+  Shrinking the box to its content leaves one: at ~297px wide with auto margins
+  the block centres on 436.5, hairline to the labels above it. `space-between`
+  stays, and now does the job it is actually for — the shorter row's time is
+  still pushed to the block's right edge, so the times right-align with each
+  other and the schedule still reads as a schedule rather than as two centred
+  phrases whose columns wander row to row.
+
+  The 22rem stays as a `max-width` for the case fit-content cannot handle: a
+  future long day range on a narrow screen. It is a ceiling now, not the width.
 */
 .find__hours {
-  max-width: 22rem;
+  width: fit-content;
+  max-width: min(22rem, 100%);
   margin-inline: auto;
   font-variant-numeric: tabular-nums;
 }
@@ -2611,25 +2736,6 @@ main > .section-dark:last-child {
   color: var(--text-muted);
 }
 
-.find__media {
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--salt-deep);
-}
-.find__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  aspect-ratio: 4 / 5;
-}
-@media (min-width: 55rem) {
-  .find__media img {
-    aspect-ratio: 3 / 4;
-  }
-}
-
-/* Sits directly under the address it belongs to now, not at the end of the
-   column, so it needs the spacing of a related element rather than a break. */
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */

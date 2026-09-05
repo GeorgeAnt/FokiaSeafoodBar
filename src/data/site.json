@@ -4,11 +4,11 @@
   "tagline": "seafood bar",
   "$comment-phone": "Two numbers, both rendered by the server and both visible on the page. `phone` is the landline and is the site's primary number: it answers reservations and take away during service, and it is what the JSON-LD advertises. `phoneAfterHours` is the mobile, for reservations made once the restaurant has shut. The Take away section shows both on the reservations panel, each under the window it answers in, and the landline alone on the take away panel — take away only runs during service. There was once a clock-driven swap that showed one at a time, evaluated against `hours` below in Europe/Athens; it was removed when both numbers went on the page, since a visible label does the same job with no JavaScript. Editing either number here changes it everywhere.",
   "phone": {
-    "display": "21 3099 1571",
+    "display": "+30 213 099 1571",
     "href": "+302130991571"
   },
   "phoneAfterHours": {
-    "display": "698 298 0267",
+    "display": "+30 698 298 0267",
     "href": "+306982980267"
   },
   "email": "fokiaseafoodbar@gmail.com",
