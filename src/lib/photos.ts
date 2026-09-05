@@ -50,4 +50,4 @@ export const carouselPhotos: ImageMetadata[] = Object.keys(carousel)
  * hero and the footer, and scripts/prepare-favicons.mjs generates the icons from
  * it. The old opaque 512px square went with the nav logo it existed for.
  */
-export { default as logoClean } from '../assets/photos/logo-clean.png';
+export { default as logoClean } from '../assets/photos/backgrounds/logo-clean.png';

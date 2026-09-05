@@ -352,7 +352,7 @@ Greek); the `unicode-range` values for both subsets are in each package's
 
 ### Favicons
 
-`npm run favicons` regenerates them from `src/assets/photos/logo-clean.png`
+`npm run favicons` regenerates them from `src/assets/photos/backgrounds/logo-clean.png`
 into `public/`. Run it only if the logo changes. The badge is centred in a wide
 transparent field there, so the script trims to the badge and normalises it to
 512×512 first; every crop in it is expressed against that square.
@@ -578,7 +578,7 @@ Several have gone stale before.
 
 ```
 src/
-  assets/photos/      downsampled masters — carousel, gallery, team, logo-clean
+  assets/photos/      downsampled masters — carousel, gallery, team, backgrounds
   components/         Nav, Hero, Goal, Plates, Menu, MenuCategory, MenuItem,
                       Team, Gallery, Contact, FindUs, Footer
   data/               ← content lives here (menu, team, gallery, site, legal)

@@ -22,7 +22,7 @@ import { dirname, join } from 'node:path';
 import sharp from 'sharp';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SOURCE = join(root, 'src/assets/photos/logo-clean.png');
+const SOURCE = join(root, 'src/assets/photos/backgrounds/logo-clean.png');
 const DEST = join(root, 'public');
 
 /**
