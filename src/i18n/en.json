@@ -1,11 +1,11 @@
 {
-  "$comment": "English UI strings. Must contain exactly the same keys as el.json — `npm run check:i18n` enforces this. Menu dish names live in menu-*.json and are NEVER translated.",
+  "$comment": "English UI strings. Must contain exactly the same keys as el.json — `npm run check` enforces this. Menu dish names live in menu-*.json, locale-keyed the same way this file is; see lib/i18n.ts.",
 
   "meta.title": "fokia — seafood bar | Fish, sushi and cocktails",
   "meta.description": "fokia is a seafood bar pairing fresh Greek fish with Japanese technique. Sushi, raw plates, hot dishes and cocktails built on Greek spirits.",
 
   "meta.menuTitle": "The Menu | fokia — seafood bar",
-  "meta.menuDescription": "The full fokia menu: salads, raw and hot starters, sushi, maki, noodles, main courses, wines and cocktails. Served in Greek.",
+  "meta.menuDescription": "The full fokia menu: salads, raw and hot starters, sushi, maki, noodles, main courses, wines and cocktails.",
 
   "meta.teamTitle": "The Team | fokia — seafood bar",
   "meta.teamDescription": "The people behind the counter and the bar at fokia: the chef, the kitchen and the service.",
@@ -45,7 +45,6 @@
   "goal.cta": "Meet the team",
 
   "menu.heading": "The Menu",
-  "menu.intro": "Our menu is written in Greek. Please ask us about anything on it.",
   "menu.food": "Food",
   "menu.drinks": "Drinks",
   "menu.jumpTo": "Jump to a category",

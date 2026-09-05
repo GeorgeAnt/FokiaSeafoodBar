@@ -1,38 +1,47 @@
 /**
  * Menu data access and price formatting.
  *
- * Menu strings are Greek in both locales and never translated — see lib/i18n.ts.
+ * Menu strings are locale-keyed the same way team.json's are — see lib/i18n.ts,
+ * which flattens `name` / `description` / `unit` / variants / wine fields into
+ * the same dictionary the rest of the site's chrome uses. `volume` is the one
+ * field that stays a plain string: "250 ml" reads the same in either language.
  * Only the *formatting* of a price is locale-independent here: Greek convention
- * throughout (comma decimal, trailing euro sign), because the menu is Greek.
+ * throughout (comma decimal, trailing euro sign), because the euro sign and the
+ * client's own printed prices don't change with the language toggle.
  */
 import foodData from '../data/menu-food.json';
 import drinksData from '../data/menu-drinks.json';
 
+export interface LocalizedText {
+  el: string;
+  en: string;
+}
+
 export interface Wine {
-  producer?: string;
-  label?: string;
-  grape?: string;
-  style?: string;
+  producer?: LocalizedText;
+  label?: LocalizedText;
+  grape?: LocalizedText;
+  style?: LocalizedText;
 }
 
 export interface MenuItem {
   id: string;
-  name: string;
-  description?: string;
+  name: LocalizedText;
+  description?: LocalizedText;
   /** null = the client has not priced this item yet. Renders as an em dash; never dropped. */
   price: number | null;
-  unit?: string;
+  unit?: LocalizedText;
   volume?: string;
-  variants?: string[];
+  variants?: LocalizedText[];
   wine?: Wine;
   tags?: string[];
 }
 
 export interface MenuGroup {
   id: string;
-  name: string;
+  name: LocalizedText;
   /** Applies to every item in the group, e.g. "6 τεμάχια | 6 pieces". */
-  unit?: string;
+  unit?: LocalizedText;
   items?: MenuItem[];
   subcategories?: MenuGroup[];
 }
@@ -50,9 +59,3 @@ export function formatPrice(price: number): string {
   const text = Number.isInteger(price) ? String(price) : price.toFixed(2).replace('.', ',');
   return `${text} €`;
 }
-
-/** Wine producer / label / grape / style, joined for its own line under the name. */
-export function wineLine(wine: Wine): string {
-  return [wine.producer, wine.label, wine.style, wine.grape].filter(Boolean).join(' · ');
-}
-

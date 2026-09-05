@@ -1,5 +1,5 @@
 {
-  "$comment": "Greek UI strings — the default locale. Every key here must also exist in en.json. Menu dish names live in menu-*.json and are NEVER translated. `footer.rights` is English here ON PURPOSE — the client asked for a single copyright line in both locales; it is not the untranslated-string bug it resembles.",
+  "$comment": "Greek UI strings — the default locale. Every key here must also exist in en.json. Menu dish names live in menu-*.json, locale-keyed the same way this file is; see lib/i18n.ts. `footer.rights` is English here ON PURPOSE — the client asked for a single copyright line in both locales; it is not the untranslated-string bug it resembles.",
 
   "meta.title": "fokia — seafood bar | Ψάρι, sushi και κοκτέιλ",
   "meta.description": "Το fokia είναι ένα seafood bar που συνδυάζει το φρέσκο ελληνικό ψάρι με ιαπωνική τεχνική. Sushi, ωμά, ζεστά πιάτα και κοκτέιλ με ελληνικά αποστάγματα.",
@@ -45,7 +45,6 @@
   "goal.cta": "Γνωρίστε την ομάδα",
 
   "menu.heading": "Το Μενού",
-  "menu.intro": "Ο κατάλογος είναι στα ελληνικά. Ρωτήστε μας ελεύθερα για οτιδήποτε.",
   "menu.food": "Φαγητό",
   "menu.drinks": "Ποτά",
   "menu.jumpTo": "Μετάβαση σε κατηγορία",

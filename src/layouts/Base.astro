@@ -32,25 +32,27 @@ const description = t(locale, descriptionKey);
 /* ---------------------------------------------------------------------------
    Structured data.
 
-   The menu is Greek-only, so Menu/MenuSection/MenuItem carry Greek values in
-   both locales — inventing English dish names purely for search engines would
-   describe food the restaurant does not serve under those names.
+   Menu text is locale-keyed now (see lib/i18n.ts), so this pulls the value for
+   whatever locale actually rendered the page. /menu always server-renders the
+   default locale (Greek) — see src/pages/menu.astro — so `inLanguage` below is
+   still pinned to 'el' rather than derived from `locale`; if the page is ever
+   locale-routed this graph should follow it.
    --------------------------------------------------------------------------- */
 const menuSections = [...foodCategories, ...drinkCategories].flatMap((category) => {
   const groups = category.subcategories?.length
     ? category.subcategories.map((sub) => ({
-        name: `${category.name} — ${sub.name}`,
+        name: `${category.name[locale]} — ${sub.name[locale]}`,
         items: sub.items ?? [],
       }))
-    : [{ name: category.name, items: category.items ?? [] }];
+    : [{ name: category.name[locale], items: category.items ?? [] }];
 
   return groups.map((group) => ({
     '@type': 'MenuSection',
     name: group.name,
     hasMenuItem: group.items.map((item) => ({
       '@type': 'MenuItem',
-      name: item.name,
-      ...(item.description ? { description: item.description } : {}),
+      name: item.name[locale],
+      ...(item.description ? { description: item.description[locale] } : {}),
       ...(item.price !== null
         ? {
             offers: {

@@ -5,8 +5,8 @@ dedicated menu page at `/menu`, a gallery at `/gallery` and the team at `/team`.
 which ships **zero JavaScript frameworks** — the homepage loads about 18 KB of
 HTML/CSS (gzipped) plus images.
 
-Greek is the default language. The site chrome switches to English; **the menu
-itself always stays in Greek**, by design (see [Languages](#languages)).
+Greek is the default language. The whole site is bilingual, menu included — see
+[Languages](#languages).
 
 ---
 
@@ -81,30 +81,47 @@ Both files use the same shape. A minimal item needs only three fields:
 ```json
 {
   "id": "salata-surimi",
-  "name": "Σαλάτα surimi",
+  "name": { "el": "Σαλάτα surimi", "en": "Surimi salad" },
   "price": 9
 }
 ```
 
 `id` must be unique across both files — it is only used internally, so any short
-lowercase name works. `name` and `description` are written in Greek exactly as
-they appear on the printed menu; they are **never translated**.
+lowercase name works. `name` and `description` are locale-keyed, the same way a
+team member's bio is in `team.json`: `el` is the client's menu exactly as
+printed, and `en` is its English translation — **never a different dish, price,
+or invented item**, just the same one in the other language.
+
+If a unit or category name was written as a dual literal before the site was
+bilingual — `"6 τεμάχια | 6 pieces"`, `"Νερό | Water"` — **split it** across
+locales like any other field (`"el": "6 τεμάχια", "en": "6 pieces"`), don't
+carry the whole `"X | Y"` string into both. The "|" was just how the client
+wrote a bilingual label before there was a mechanism for one.
+
+A couple of fields genuinely are identical in both locales rather than
+translated, because translating them would be wrong:
+
+- A dish or drink name that is already English, or a brand — `"Tuna tacos"`,
+  `"Bao buns"`, `"Nikka Whisky From The Barrel"` — put the same string in both.
+- Wine producer/label names (`"Κτήμα Ζαφειράκη"` → `"Zafeirakis Estate"`) are
+  transliterated proper nouns, not translations of meaning — the same treatment
+  a person's name gets in `team.json`.
 
 Optional fields, each safe to leave out:
 
 | Field | What it does | Example |
 |---|---|---|
-| `description` | A line under the name | `"Λάχανο, καρότο, τηγανητό surimi"` |
+| `description` | A line under the name | `{ "el": "…", "en": "…" }` |
 | `price` | A number, or `null` if not priced yet | `9`, `2.5`, `null` |
-| `unit` | Portion size | `"2 τεμάχια"` |
-| `volume` | For drinks | `"330 ml"` |
-| `variants` | One price, several choices | `["Σολομός", "Τόνος", "Λαβράκι"]` |
-| `wine` | Renders on its own line, in medium weight | `{ "producer": "…", "label": "…", "grape": "…", "style": "…" }` |
+| `unit` | Portion size | `{ "el": "2 τεμάχια", "en": "2 pieces" }` |
+| `volume` | For drinks — same in both languages, so it's a plain string | `"330 ml"` |
+| `variants` | One price, several choices | `[{ "el": "Σολομός", "en": "Salmon" }, …]` |
+| `wine` | Renders on its own line, in medium weight | `{ "producer": {"el":"…","en":"…"}, "label": {…}, "grape": {…}, "style": {…} }` |
 | `tags` | Small chips beside the item | `["spicy"]` |
 
 **Prices.** Write them as numbers with a **dot**, not a comma — `2.5`, not `2,5`.
-The site formats them the Greek way when it renders: `2.5` becomes `2,50 €` and
-`9` becomes `9 €`.
+The site formats them the Greek way in both languages when it renders: `2.5`
+becomes `2,50 €` and `9` becomes `9 €`.
 
 **Items with no price yet.** Use `"price": null`. The item still appears on the
 menu with an em dash where the price goes. Never delete an item just because it
@@ -115,8 +132,8 @@ is unpriced, and never write `"price": "??"`.
 ```json
 {
   "id": "nea-katigoria",
-  "name": "Νέα Κατηγορία",
-  "unit": "6 τεμάχια | 6 pieces",
+  "name": { "el": "Νέα Κατηγορία", "en": "New Category" },
+  "unit": { "el": "6 τεμάχια", "en": "6 pieces" },
   "items": [ … ]
 }
 ```
@@ -125,6 +142,9 @@ is unpriced, and never write `"price": "??"`.
 and Inside-outs work). Categories appear in the order they are listed, and the
 "jump to" chips update automatically. `Κρασί` additionally uses `subcategories`
 (Ποτήρι / Φιάλη); any category can do the same.
+
+Run `npm run check` after editing — it fails if `el` or `en` is missing anywhere
+in the menu, the same way it fails on a missing UI string.
 
 ### The two phone numbers — `src/data/site.json`
 
@@ -247,24 +267,31 @@ The allergen notice, the frozen-ingredient list, the 24-hour freezing protocol,
 the consumer-rights and receipt notices, and the named commercial manager.
 
 **This is legally required content.** It always renders under the menu, is never
-collapsed behind a toggle, and should not be shortened. Unlike the menu, it is
-genuinely bilingual, because the client supplied both versions.
+collapsed behind a toggle, and should not be shortened. It is bilingual, same
+as the rest of the menu now, because the client supplied both versions.
 
 ---
 
 ## Languages
 
-Two tiers, and the distinction is deliberate:
+Everything on the site is translated: navigation, headings, buttons, body copy,
+image alt text, the legal block, team roles and bios, and — since the client
+asked for it — the menu itself. Two places hold the strings:
 
-**Tier 1 — translated.** All site chrome: navigation, headings, buttons, body
-copy, image alt text, the legal block, team roles and bios. These live in
-`src/i18n/el.json` and `src/i18n/en.json`.
+- **`src/i18n/el.json` / `en.json`** — site chrome: nav, headings, buttons, body
+  copy, `a11y.*` labels.
+- **Locale-keyed JSON fields** — content that lives in `src/data/`, not the
+  i18n files: team names/roles/bios in `team.json`, gallery alt text in
+  `gallery.json`, and dish/drink names, descriptions, units, variants and wine
+  fields in `menu-food.json` / `menu-drinks.json`. Each of these is
+  `{ "el": "…", "en": "…" }` per field, and `src/lib/i18n.ts` flattens them into
+  the same dictionary the chrome strings use — so a new team member or menu item
+  needs no entry in `el.json` / `en.json`.
 
-**Tier 2 — never translated.** The menu. Dish names, descriptions and category
-names are Greek in both languages. Several dishes are natively English or mixed
-("Tuna tataki με jalapeño sauce", "Bao buns") and render exactly as written. The
-menu section keeps `lang="el"` even on the English page, so screen readers
-pronounce it correctly.
+Several dish and drink names are intentionally identical in both locales rather
+than translated — see the menu section above for which, and why. Several dishes
+are natively English or mixed ("Tuna tataki με jalapeño sauce", "Bao buns") and
+render exactly as written in both languages, same as before.
 
 ### Adding or changing a UI string
 

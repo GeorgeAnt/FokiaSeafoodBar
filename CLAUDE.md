@@ -6,16 +6,41 @@ how a non-developer edits the content.
 
 ## Rules that are easy to break
 
-**The menu is never translated.** Dish names, descriptions and category names in
-`src/data/menu-food.json` and `menu-drinks.json` are flat Greek strings that
-render identically in both locales. Some are natively English or mixed ("Tuna
-tataki με jalapeño sauce") — render verbatim, never transliterate. The `#menu`
-section keeps `lang="el"` on the English page. Site *chrome* is bilingual and
-lives in `src/i18n/{el,en}.json`.
+**The menu is bilingual now — it used to be the one thing on the site that
+wasn't.** `name`, `description`, `unit`, `variants` and the `wine` fields in
+`src/data/menu-food.json` and `menu-drinks.json` are locale-keyed
+(`{ "el": "…", "en": "…" }`), the same shape `team.json` uses for a person's
+bio, and flow through the same mechanism in `src/lib/i18n.ts`
+(`menuGroupKeys`) that the rest of the site's content keys do. `el` is the
+client's menu exactly as printed and is the source of truth; `en` is a
+translation of it, never a different dish. `volume` (`"250 ml"`) stays a plain
+string — it reads the same in either language.
 
-**The menu content is real client data.** Never invent a dish, a price, or an
-English translation of one. Nine items have `"price": null` because the client
-has not priced them; they must still render, with an em dash.
+A unit or category name the client had written as a dual literal before the
+site was bilingual — `"6 τεμάχια | 6 pieces"`, `"Νερό | Water"` — is **split**
+across locales like any other field (`el: "6 τεμάχια"`, `en: "6 pieces"`), not
+carried over as one string in both. The "|" was how the client wrote a
+bilingual label before the site had a translation mechanism of its own; it is
+not a separator worth preserving now that one exists.
+
+Some strings genuinely are identical across both locales rather than
+translated, and that is not a bug:
+
+- A dish or drink name that is already English or a brand ("Tuna tacos", "Bao
+  buns", "Nikka Whisky From The Barrel") — render verbatim in both, never
+  transliterate.
+- Wine producer/label names ("Κτήμα Ζαφειράκη" → "Zafeirakis Estate") are
+  transliterated proper nouns, not translations of meaning — the same
+  treatment `team.json` gives a person's name.
+
+The menu section no longer forces `lang="el"` — it takes `lang={locale}` like
+the rest of the page, since its content now genuinely differs by locale.
+
+**The menu content is real client data.** Never invent a dish or a price. An
+English *translation* of an existing dish is expected now (the client asked for
+it) — what stays off-limits is inventing a dish, a price, or a translation that
+changes what's actually being served. Nine items have `"price": null` because
+the client has not priced them; they must still render, with an em dash.
 
 **The legal block is legally required.** `src/data/legal.json` always renders
 under the menu, never collapsed, never shortened.

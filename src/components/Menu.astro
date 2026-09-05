@@ -23,21 +23,15 @@ const views = [
 ];
 ---
 
-<!--
-  lang="el" on the whole section, in both locales. The menu is Greek content;
-  telling a screen reader otherwise would make it mispronounce every dish.
--->
 <section
   class="section section--concrete-test"
   id="menu"
-  lang="el"
   style={`--bg-texture: url(${bgTest.src})`}
 >
   <div class="wrap">
     <header class="section-head" lang={locale}>
       {/* The menu has a page to itself, so this is the page's h1. */}
       <h1 data-i18n="menu.heading">{t(locale, 'menu.heading')}</h1>
-      <p data-i18n="menu.intro">{t(locale, 'menu.intro')}</p>
     </header>
 
     <!--
@@ -70,7 +64,9 @@ const views = [
           <div class={`menu__panel menu__panel--${view.id}`}>
             <nav class="menu__jump" aria-label={t(locale, 'menu.jumpTo')} data-i18n-label="menu.jumpTo">
               {view.categories.map((category) => (
-                <a href={`#cat-${category.id}`}>{category.name}</a>
+                <a href={`#cat-${category.id}`} data-i18n={`menu.category.${category.id}.name`}>
+                  {t(locale, `menu.category.${category.id}.name`)}
+                </a>
               ))}
             </nav>
 
@@ -88,8 +84,8 @@ const views = [
       Required on the menu by Greek regulation: allergens, the frozen-ingredient
       list, the 24-hour freezing protocol, the consumer's right to information,
       the receipt notice, tax inclusion, and the named commercial manager.
-      Always rendered, never behind a toggle. Unlike the menu, this block IS
-      bilingual — the client supplied both versions.
+      Always rendered, never behind a toggle, and bilingual — the client
+      supplied both versions.
     -->
     <aside class="menu__legal" lang={locale}>
       <h2 data-i18n="menu.legalHeading">{t(locale, 'menu.legalHeading')}</h2>

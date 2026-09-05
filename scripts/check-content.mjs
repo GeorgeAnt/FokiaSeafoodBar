@@ -88,27 +88,49 @@ const unpriced = [];
 let itemCount = 0;
 let categoryCount = 0;
 
+// Menu text is locale-keyed ({ el, en }) the same way team.json's fields are —
+// see lib/i18n.ts. A field is optional per-item, but when present it must have
+// both locales, same rule the team/legal/gallery checks above already apply.
+const localeParity = (label, obj) => {
+  for (const loc of ['el', 'en']) if (!obj?.[loc]?.trim()) fail(`${label} is missing ${loc}`);
+};
+
 const walk = (groups, trail) => {
   for (const g of groups) {
-    const path = [...trail, g.name];
+    localeParity(`menu category "${g.id}" name`, g.name);
+    if (g.unit) localeParity(`menu category "${g.id}" unit`, g.unit);
+    const path = [...trail, g.name?.el ?? g.id];
     if (g.items) categoryCount++;
     for (const item of g.items ?? []) {
       itemCount++;
-      if (!item.id) fail(`item "${item.name}" has no id`);
+      if (!item.id) fail(`item with name "${item.name?.el}" has no id`);
       else if (ids.has(item.id)) fail(`duplicate item id "${item.id}"`);
       else ids.add(item.id);
 
-      if (!item.name?.trim()) fail(`item "${item.id}" has no name`);
+      localeParity(`item "${item.id}" name`, item.name);
+      if (item.description) localeParity(`item "${item.id}" description`, item.description);
+      if (item.unit) localeParity(`item "${item.id}" unit`, item.unit);
+      if (item.variants) {
+        item.variants.forEach((v, i) => localeParity(`item "${item.id}" variant[${i}]`, v));
+      }
+      if (item.wine) {
+        for (const field of ['producer', 'label', 'grape', 'style']) {
+          if (item.wine[field]) localeParity(`item "${item.id}" wine.${field}`, item.wine[field]);
+        }
+      }
+
       if (!('price' in item)) fail(`item "${item.id}" has no price field (use null if unpriced)`);
       else if (item.price !== null && (typeof item.price !== 'number' || !(item.price >= 0))) {
         fail(`item "${item.id}" has an invalid price: ${JSON.stringify(item.price)}`);
       } else if (item.price === null) {
         // Several unpriced wines share a producer name, so the label and grape
-        // have to be included or the list cannot be acted on.
-        const detail = item.wine
-          ? ` (${[item.wine.label, item.wine.style, item.wine.grape].filter(Boolean).join(', ')})`
+        // have to be included or the list cannot be acted on. Greek only here —
+        // this list is for the client.
+        const wine = item.wine;
+        const detail = wine
+          ? ` (${[wine.label?.el, wine.style?.el, wine.grape?.el].filter(Boolean).join(', ')})`
           : '';
-        unpriced.push(`${path.join(' / ')} — ${item.name}${detail}`);
+        unpriced.push(`${path.join(' / ')} — ${item.name?.el}${detail}`);
       }
     }
     if (g.subcategories) walk(g.subcategories, path);

@@ -1,5 +1,5 @@
 ---
-import { formatPrice, wineLine, type MenuItem } from '../lib/menu';
+import { formatPrice, type MenuItem } from '../lib/menu';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 
 interface Props {
@@ -8,13 +8,20 @@ interface Props {
 }
 const { item, locale = defaultLocale } = Astro.props;
 
-/* `unit` and `volume` never both appear on the same item, but the renderer does
-   not need to care which one a category uses. */
-const meta = [item.unit, item.volume].filter(Boolean).join(' · ');
+/* description / meta / variants / wine are each pre-joined per locale into one
+   dictionary key in lib/i18n.ts's menuGroupKeys, so a lookup here is enough —
+   see the note there for why. `t()` returns '' for a missing key's locale
+   value only when the key itself is absent from the dictionary, which for an
+   optional field means "this item has none": guard on the field, not on t(). */
+const name = t(locale, `menu.item.${item.id}.name`);
+const description = item.description ? t(locale, `menu.item.${item.id}.description`) : null;
+const meta = item.unit || item.volume ? t(locale, `menu.item.${item.id}.meta`) : null;
+const variants = item.variants?.length ? t(locale, `menu.item.${item.id}.variants`) : null;
+const wineLine = item.wine ? t(locale, `menu.item.${item.id}.wineLine`) : null;
 ---
 
 <li class="menu__item">
-  <p class="menu__item-name">{item.name}</p>
+  <p class="menu__item-name" data-i18n={`menu.item.${item.id}.name`}>{name}</p>
 
   {
     item.price !== null ? (
@@ -33,15 +40,29 @@ const meta = [item.unit, item.volume].filter(Boolean).join(' · ');
     )
   }
 
-  {item.description && <p class="menu__item-desc">{item.description}</p>}
+  {description && (
+    <p class="menu__item-desc" data-i18n={`menu.item.${item.id}.description`}>
+      {description}
+    </p>
+  )}
 
-  {/* Ternary, not `&&` — see the note in MenuCategory.astro: `[]` is `0`, and
-      Astro renders that as the text "0". */}
-  {item.variants?.length ? <p class="menu__item-variants">{item.variants.join(' / ')}</p> : null}
+  {variants && (
+    <p class="menu__item-variants" data-i18n={`menu.item.${item.id}.variants`}>
+      {variants}
+    </p>
+  )}
 
-  {item.wine && <p class="menu__item-wine">{wineLine(item.wine)}</p>}
+  {wineLine && (
+    <p class="menu__item-wine" data-i18n={`menu.item.${item.id}.wineLine`}>
+      {wineLine}
+    </p>
+  )}
 
-  {meta && <p class="menu__item-meta">{meta}</p>}
+  {meta && (
+    <p class="menu__item-meta" data-i18n={`menu.item.${item.id}.meta`}>
+      {meta}
+    </p>
+  )}
 
   {
     item.tags?.length ? (

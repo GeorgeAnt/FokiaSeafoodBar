@@ -1,19 +1,25 @@
 ---
 import MenuItem from './MenuItem.astro';
 import type { MenuGroup } from '../lib/menu';
-import { defaultLocale, type Locale } from '../lib/i18n';
+import { t, defaultLocale, type Locale } from '../lib/i18n';
 
 interface Props {
   category: MenuGroup;
   locale?: Locale;
 }
 const { category, locale = defaultLocale } = Astro.props;
+const name = t(locale, `menu.category.${category.id}.name`);
+const unit = category.unit ? t(locale, `menu.category.${category.id}.unit`) : null;
 ---
 
 <section class="menu__category" id={`cat-${category.id}`}>
   <header class="menu__category-head">
-    <h2>{category.name}</h2>
-    {category.unit && <span class="menu__category-unit">{category.unit}</span>}
+    <h2 data-i18n={`menu.category.${category.id}.name`}>{name}</h2>
+    {unit && (
+      <span class="menu__category-unit" data-i18n={`menu.category.${category.id}.unit`}>
+        {unit}
+      </span>
+    )}
   </header>
 
   {
@@ -35,7 +41,9 @@ const { category, locale = defaultLocale } = Astro.props;
        the renderer handles them generically so the client can add more. */
     category.subcategories?.map((sub) => (
       <>
-        <h3 class="menu__subhead">{sub.name}</h3>
+        <h3 class="menu__subhead" data-i18n={`menu.category.${sub.id}.name`}>
+          {t(locale, `menu.category.${sub.id}.name`)}
+        </h3>
         <ul>
           {(sub.items ?? []).map((item) => (
             <MenuItem item={item} locale={locale} />
