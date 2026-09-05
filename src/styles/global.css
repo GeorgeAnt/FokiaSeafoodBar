@@ -2407,6 +2407,40 @@ main > .section-dark:last-child {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
+/*
+  The affordance for these cards used to be an arrow, and it was removed — see
+  the note in Contact.astro — because an arrow says "goes somewhere" and a
+  tel: link places a call. This is the replacement: a filled circle behind the
+  phone glyph, same fill-plus-dark-glyph idiom as `.btn--primary` and `.lang`,
+  the site's other two filled controls. It reads as a button without borrowing
+  an icon that means the wrong thing.
+
+  Sized in em off .contact__panel-call's own font-size (--step-0), so it never
+  needs its own breakpoint. 1.8em is deliberately roomier than the icon inside
+  it — a circle that exactly hugs its glyph reads as a decorated icon, not a
+  control; a badge with air around the glyph is what makes it read as one.
+*/
+.contact__phone-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+  background: var(--salt);
+}
+/*
+  Black on the fill, not currentColor — currentColor here would still resolve
+  to --salt, the same as the fill, and the glyph would vanish. Same reasoning
+  documented in CLAUDE.md for why `background: currentColor` is never paired
+  with an element's own `color`.
+*/
+.contact__phone-badge .contact__phone-icon {
+  color: var(--black);
+  width: 0.95em;
+  height: 0.95em;
+}
 .contact__phone-icon {
   flex: none;
   width: 1.05em;

@@ -121,12 +121,24 @@ const schedule = JSON.stringify(site.hours.entries);
                 Icon in the SocialLinks / FindUs idiom — 24x24, fill none, stroke
                 currentColor at 1.6 — and aria-hidden, since the text beside it
                 is already part of the name. There is no arrow any more: an arrow
-                says "goes somewhere", and this places a call.
+                says "goes somewhere", and this places a call. It sits inside a
+                circular badge now — see the note just below — which is a
+                different fix for the same "doesn't read as a button" complaint
+                an arrow would otherwise have answered.
               */}
               <span class="contact__panel-call">
-                <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                  <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
-                </svg>
+                {/*
+                  The circle is the affordance; the glyph inside it is still a
+                  phone, not an arrow. An arrow was tried and removed once
+                  already — see the note above — because it says "goes
+                  somewhere" and this places a call. The circle says "this is a
+                  button" without changing what the icon means.
+                */}
+                <span class="contact__phone-badge">
+                  <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+                  </svg>
+                </span>
                 <span class="contact__phone-number">{site.phone.display}</span>
               </span>
             </span>
