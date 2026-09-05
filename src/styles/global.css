@@ -1657,6 +1657,43 @@ main > .section-dark:last-child {
    the line. Rows give the paragraph a real measure again. If a sixth member
    arrives, weigh the page length before adding a sixth row.
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   TEMP concrete ground — under test on /team and /menu. Not meant to survive in
+   this form; see the notes in Team.astro and Menu.astro.
+
+   The texture itself comes from the component as --bg-texture, because it has
+   to go through Astro's image pipeline (the source jpg is 9.3MB). Only the
+   overlay lives here, so the two pages cannot drift apart on it.
+
+   The overlay is a *lightening* pass, not a darkening one: measured, the
+   texture's mean luma is 146.6 and the logo badge's concrete fill is ~170, so
+   no amount of black could have reached the logo's brightness. --salt at 28%
+   over the texture lands the ground at 170.
+
+   At that brightness this is a light ground, so both pages keep the light tier
+   (--text: --black). --text-muted is the one token that had to move: the light
+   tier sets it to --stone (#625e60), a mid grey on mid-grey concrete, which
+   measured 1.80:1 at the ground's darkest patches against the 4.5 body text
+   owes — it merged into the background. Black instead: 5.15:1 at that same
+   worst patch, 7.50:1 at the ground's median.
+
+   The cost is hierarchy. Body copy is now the same ink as the headings, where
+   on flat --salt the muted grey separated them at 5.2:1. On /menu that costs
+   more than on /team, because --text-muted carries the dish descriptions, the
+   wine lines, the tags and the legal block — everything that is not a dish
+   name. Size and weight are what tell them apart now.
+
+   Still outstanding on both: --accent (--wood) is 2.32:1 at the worst patches
+   and 3.37:1 at the median, against the 4.5 its small uppercase owes. That is
+   the team role labels and the menu subheads. */
+.section--concrete-test {
+  background-image: linear-gradient(rgba(226, 232, 235, 0.28), rgba(226, 232, 235, 0.28)),
+    var(--bg-texture);
+  background-size: cover;
+  background-position: center;
+  --text-muted: var(--black);
+}
+
 .team__list {
   display: flex;
   flex-direction: column;

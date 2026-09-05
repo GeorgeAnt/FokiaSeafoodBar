@@ -1,13 +1,20 @@
 ---
-import { Picture } from 'astro:assets';
+import { Picture, getImage } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 import { teamPhoto } from '../lib/photos';
 import team from '../data/team.json';
+import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 interface Props {
   locale?: Locale;
 }
 const { locale = defaultLocale } = Astro.props;
+
+// TEMP: visual test of the grey concrete texture as the section background.
+// The overlay and the token changes live on .section--concrete-test in
+// global.css; this only hands it the optimised texture, because the source jpg
+// is 9.3MB and has to go through the image pipeline rather than a CSS url().
+const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 1920 });
 ---
 
 {/*
@@ -15,7 +22,11 @@ const { locale = defaultLocale } = Astro.props;
   it is that page's only one. It was an <h2> while the section sat on the
   homepage under the hero logo's h1. See src/pages/team.astro for why it moved.
 */}
-<section class="section" id="team">
+<section
+  class="section section--concrete-test"
+  id="team"
+  style={`--bg-texture: url(${bgTest.src})`}
+>
   <div class="wrap">
     <header class="section-head" data-reveal>
       <h1 data-i18n="team.heading">{t(locale, 'team.heading')}</h1>

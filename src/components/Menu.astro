@@ -1,13 +1,20 @@
 ---
+import { getImage } from 'astro:assets';
 import MenuCategory from './MenuCategory.astro';
 import { foodCategories, drinkCategories } from '../lib/menu';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 import legal from '../data/legal.json';
+import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 interface Props {
   locale?: Locale;
 }
 const { locale = defaultLocale } = Astro.props;
+
+// TEMP: same concrete ground as /team — see .section--concrete-test in
+// global.css, which owns the overlay and the token changes. This only hands it
+// the optimised texture; the source jpg is 9.3MB.
+const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 1920 });
 
 const views = [
   { id: 'food', key: 'menu.food', categories: foodCategories },
@@ -19,7 +26,12 @@ const views = [
   lang="el" on the whole section, in both locales. The menu is Greek content;
   telling a screen reader otherwise would make it mispronounce every dish.
 -->
-<section class="section" id="menu" lang="el">
+<section
+  class="section section--concrete-test"
+  id="menu"
+  lang="el"
+  style={`--bg-texture: url(${bgTest.src})`}
+>
   <div class="wrap">
     <header class="section-head" lang={locale}>
       {/* The menu has a page to itself, so this is the page's h1. */}
