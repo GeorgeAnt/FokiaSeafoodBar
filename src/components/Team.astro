@@ -14,7 +14,13 @@ const { locale = defaultLocale } = Astro.props;
 // The overlay and the token changes live on .section--concrete-test in
 // global.css; this only hands it the optimised texture, because the source jpg
 // is 9.3MB and has to go through the image pipeline rather than a CSS url().
-const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 1920 });
+//
+// 2560 rather than the source's native 4666: this is a full-bleed cover
+// background, so it has to outrun the widest ordinary desktop viewport rather
+// than match a fixed box. 1920 was visibly soft stretched across a wider
+// screen; 2560 (654KB webp) covers that without paying for the full 4666
+// (1.7MB+) a background texture does not need.
+const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 ---
 
 {/*

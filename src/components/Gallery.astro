@@ -3,6 +3,7 @@ import { Picture, getImage } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 import { galleryPhoto } from '../lib/photos';
 import gallery from '../data/gallery.json';
+import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 interface Props {
   locale?: Locale;
@@ -21,6 +22,12 @@ const { locale = defaultLocale } = Astro.props;
   The masters are 1707x2560, so 1400 never upscales.
 */
 const FULL_WIDTH = 1400;
+
+// TEMP: same concrete ground under test on /team and /menu — see
+// .section--concrete-test in global.css, which owns the overlay and the token
+// changes. This only hands it the optimised texture; the source jpg is 9.3MB.
+// 2560, not the native 4666 — see the width note in Team.astro.
+const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 
 const items = await Promise.all(
   gallery.images.map(async (image) => {
@@ -43,7 +50,11 @@ const items = await Promise.all(
 );
 ---
 
-<section class="section" id="gallery">
+<section
+  class="section section--concrete-test"
+  id="gallery"
+  style={`--bg-texture: url(${bgTest.src})`}
+>
   <div class="wrap">
     <header class="section-head">
       <h1 data-i18n="gallery.heading">{t(locale, 'gallery.heading')}</h1>

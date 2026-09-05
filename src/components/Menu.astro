@@ -13,8 +13,9 @@ const { locale = defaultLocale } = Astro.props;
 
 // TEMP: same concrete ground as /team — see .section--concrete-test in
 // global.css, which owns the overlay and the token changes. This only hands it
-// the optimised texture; the source jpg is 9.3MB.
-const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 1920 });
+// the optimised texture; the source jpg is 9.3MB. 2560, not the native 4666 —
+// see the width note in Team.astro.
+const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 
 const views = [
   { id: 'food', key: 'menu.food', categories: foodCategories },
