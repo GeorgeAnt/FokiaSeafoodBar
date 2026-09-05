@@ -53,9 +53,21 @@ const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 }
     -->
     <div class="team__list" data-reveal>
       {
-        team.members.map((member) => (
+        team.members.map((member, index) => (
           <article class="team__member">
             <div class="team__photo">
+              {/* The first row is in the initial viewport at every width this
+                  section supports, so it is eager and high priority — it is
+                  this page's LCP image, and the same call Hero.astro makes for
+                  its first slide. Everything below it stays lazy.
+
+                  Recorded because it is a plausible-sounding wrong answer:
+                  this was changed while chasing "the first team photo doesn't
+                  appear until I scroll", and it did NOT fix that. The cause
+                  was the reveal observer's threshold in Base.astro — the photo
+                  had loaded fine all along (`img.complete === true`) and was
+                  sitting under `opacity: 0`. Eager is still right here on its
+                  own merits, but do not read it as the fix for that bug. */}
               <Picture
                 src={teamPhoto(member.photo)}
                 formats={['avif', 'webp']}
@@ -63,8 +75,9 @@ const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 }
                 sizes="(min-width: 48rem) 40vw, 100vw"
                 alt={t(locale, `team.${member.id}.name`)}
                 data-i18n-alt={`team.${member.id}.name`}
-                loading="lazy"
+                loading={index === 0 ? 'eager' : 'lazy'}
                 decoding="async"
+                fetchpriority={index === 0 ? 'high' : 'auto'}
               />
             </div>
 

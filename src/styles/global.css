@@ -196,11 +196,34 @@ html {
      ONLY offset for it — see the note above .wrap; adding scroll-margin-top to
      a target stacks with this rather than replacing it.
 
-     Bar is 6rem + 1px of border = 97px, and this leaves the same ~19px of air
-     under it that the old 81px bar had at 6.25rem. Both numbers move together:
-     changing .nav__inner min-height without changing this drops every anchored
-     heading behind the bar. */
-  scroll-padding-top: 7.25rem;
+     Bar is 6rem + 1px of border = 97px, and this matches it exactly — no extra
+     "breathing room" added on top. There used to be ~19px more (7.25rem), left
+     over from the old alternating-tier homepage: back then a scroll landing
+     flush with the bar exposed a sliver of neutral tier background above the
+     heading, so a little air read as intentional. It reads differently now
+     that the homepage is one ground with drawn edges (`id="goal"` etc. sit on
+     the `<section>` itself, which butts directly against the section above
+     it) — that "air" was scrolling past the section boundary into the PREVIOUS
+     section, so an anchor jump left a sliver of the hero photo (or whatever
+     band precedes the target) visible under the bar. Every section already
+     carries 4–8rem of its own top padding before the heading (`--section-y`),
+     so there was never any breathing room to gain by not matching the bar
+     exactly. Both numbers still move together: changing .nav__inner min-height
+     without changing this drops every anchored heading behind the bar.
+
+     The -2px is not slop, it is the fix for a second bug and it must stay.
+     Landing *exactly* on the boundary sounds right and is not: at a 125%
+     display scale the bar's 97px snaps to 121 device px, i.e. 96.8 CSS px,
+     while this padding stays a literal 97px, so every jump finished 0.55 of a
+     device pixel short — and that fractional row anti-aliases whatever is
+     above the boundary into a hairline under the bar. It was reported as "a
+     small gap" on Our Goal and Where to Find Us and NOT on Take away, which
+     is the tell: the bands above those two are the hero photograph and the
+     Take away photo panels, both bright, while the band above Take away is
+     charcoal and hides the same seam. Overshooting by 2px tucks the boundary
+     under the bar at any scale factor; the section's own top hairline is what
+     gets hidden, and the bar's border-bottom is already drawing that edge. */
+  scroll-padding-top: calc(6.0625rem - 2px);
   -webkit-text-size-adjust: 100%;
   /* The site is one fixed light theme — the dark bands are surface tiers, not a
      dark mode. Stated so the UA paints scrollbars, the overscroll gutter and
@@ -645,8 +668,9 @@ main > .section-dark:last-child {
   left in the base rule because it does the right thing in both — end of its
   track in grid, pushed to the end of the row in flex.
 
-  6rem = 96px, +1px of border. Raising this means raising scroll-padding-top on
-  <html> in the same edit or every anchor jump lands under the bar.
+  6rem = 96px, +1px of border = 97px, which is exactly what scroll-padding-top
+  on <html> is set to. Raising this means raising scroll-padding-top in the
+  same edit or every anchor jump lands under the bar.
 */
 .nav__inner {
   display: grid;

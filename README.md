@@ -336,10 +336,12 @@ script if the folder moves.
 
 **2. Build time.** Astro generates responsive AVIF and WebP variants with a JPEG
 fallback from those masters, at the widths each section actually needs. Every
-image carries explicit dimensions, so nothing shifts as the page loads. Only the
-first hero photo and the nav logo load eagerly; everything else is lazy. The
-gallery additionally builds one 1400px variant per photo, which is both what the
-lightbox shows and the link a visitor without JavaScript follows.
+image carries explicit dimensions, so nothing shifts as the page loads. The nav
+logo, the first hero photo and the first row on `/team` load eagerly — each is
+already in the initial viewport and is its page's LCP image. Everything else on
+the site is lazy. The gallery additionally builds one 1400px variant per photo,
+which is both what the lightbox shows and the link a visitor without JavaScript
+follows.
 
 ### Fonts
 

@@ -233,9 +233,27 @@ const dictJson = JSON.stringify(dictionaries);
                 observer.unobserve(entry.target);
               });
             },
-            // Held back from the very bottom edge so a band starts moving once
-            // it is properly in view rather than as its first pixel appears.
-            { rootMargin: '0px 0px -10% 0px', threshold: 0.08 }
+            /*
+              Held back from the very bottom edge so a band starts moving once
+              it is properly in view rather than as its first pixel appears.
+              That job belongs to `rootMargin` alone.
+
+              `threshold` MUST stay 0, and this is the second time that has
+              mattered. A threshold is a fraction of the *target's own area*,
+              not of the viewport, so the taller the target the more of the
+              screen it has to fill before it fires — and a target taller than
+              the viewport can be unable to reach the number at all. It was
+              0.08, and `.team__list` is a single ~2863px target holding every
+              member: at a 600px viewport only ~150px of it can ever show,
+              which is 5.2%, so /team loaded with the whole list at opacity 0
+              until the visitor scrolled. It cleared 8% at a 768px viewport by
+              0.07 of a percentage point, which is why it looked fine when it
+              was tested and broken on a laptop.
+
+              Anything that reveals a block whose height is content-driven has
+              this failure mode. Keep the trigger height-independent.
+            */
+            { rootMargin: '0px 0px -10% 0px', threshold: 0 }
           );
 
           document.querySelectorAll('[data-reveal]').forEach(function (el) {

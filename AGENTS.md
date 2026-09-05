@@ -311,6 +311,29 @@ means the class lands before first paint, so nothing shows and then hides. Keep
 that contract if you add reveal targets — never add `.has-reveal` from anywhere
 else.
 
+**That observer's `threshold` must stay 0, and a non-zero one silently hides
+tall content.** An IntersectionObserver threshold is a fraction of the
+*target's own area*, not of the viewport, so the taller the target the more of
+the screen it has to fill before it fires — and a target taller than the
+viewport may be unable to reach the number at all. It was `0.08`, and
+`.team__list` is a single ~2863px target holding every member: at a 600px
+viewport only ~150px of it can ever be showing, which is 5.2%, so `/team`
+loaded with the entire list at `opacity: 0` until the visitor scrolled. On a
+390px phone the list is 4435px and it is worse. Holding a band back until it is
+properly on screen is `rootMargin`'s job (`0px 0px -10% 0px`), and that one is
+height-independent; verified after the change that the homepage bands still
+reveal progressively on scroll rather than all at once.
+
+Two things about how this was found are worth keeping. It cleared 8% at a
+768px viewport by **0.07 of a percentage point**, which is why it tested fine
+and shipped broken — a reveal bug that depends on viewport height will not
+show up at one viewport height. And the first fix attempted was making the
+first `/team` photo `loading="eager"`, which was a plausible story (an
+above-the-fold lazy image) and was **wrong**: `img.complete` was already
+`true`. Check whether the pixels are loaded or merely transparent before
+touching the loading strategy — `getComputedStyle(el).opacity` answers it in
+one line.
+
 **The hero wordmark is the site's only display type, and it is deliberately off
 the step scale.** `.hero__wordmark-name` is `clamp(3rem, 1.8rem + 5.5vw,
 5.5rem)` — 88px at 1366, 50px at 390 — against the 47px that `--step-3` tops out
@@ -1066,12 +1089,26 @@ dependency decision, not a styling one.
   whether something has reintroduced a `scroll-margin-top` on top of it.
 
   **It is paired with the bar's height and the two move together.** The bar is
-  `min-height: 6rem` + 1px of border = 97px, and `scroll-padding-top: 7.25rem`
-  (116px) leaves 19px of air under it — the same air the old 81px bar had at
-  6.25rem. Re-verified by jumping to `/#goal` — the `/#team` anchor this used
-  to cite is a page of its own now: the bar's bottom is at 97px and the section
-  lands at 116px. Change one without the other and every anchored
-  heading goes behind the bar, or sits in a band of nothing.
+  `min-height: 6rem` + 1px of border = 97px, and `scroll-padding-top` is
+  `6.0625rem` — 97px, exactly matching, no extra air on top. Change one
+  without the other and every anchored heading goes behind the bar.
+
+  **There used to be 19px of extra air (`7.25rem`, 116px) and it was a bug,
+  not a margin.** It was carried over from the old alternating-tier homepage,
+  where a scroll landing flush with the bar exposed a sliver of neutral tier
+  background above the heading — so a little air read as breathing room. It
+  stopped meaning that once the homepage became one ground with drawn edges:
+  `id="goal"` and friends sit on the `<section>` itself, which butts directly
+  against the section above it, so the 19px was scrolling *past* the section
+  boundary into the previous band. Jumping to `/#goal` left a visible sliver
+  of the hero photo peeking out under the bar — reported as "I still see a
+  part of the section above" — because the gap isn't neutral space, it's
+  whatever the previous section actually is. Every section already carries
+  4–8rem of its own top padding before the heading (`--section-y`), so the
+  extra offset was never buying any breathing room to begin with; it only had
+  a bleed-through cost. Re-verified by jumping to `/#goal`: the bar's bottom is
+  at 97px and the section starts flush at 97px, hairline to hairline, nothing
+  of the hero visible above it.
 - Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
   nav links need `display: block` or the tap targets collapse to ~26px.
 - **`.section--tight` has been removed, and the reason is worth keeping.** It
