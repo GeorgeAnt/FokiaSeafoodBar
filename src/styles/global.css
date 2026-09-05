@@ -1351,7 +1351,10 @@ main > .section-dark:last-child {
   display: inline-flex;
   gap: 0.25rem;
   padding: 0.25rem;
-  border: 1px solid var(--rule);
+  /* var(--rule) is a band-divider hairline, not a control outline — see the
+     note on .menu__jump a. Same fix: --text-muted (--stone), 5.16:1 on
+     --salt against --rule's ~1.46:1. */
+  border: 1px solid var(--text-muted);
   border-radius: 999px;
   margin-bottom: 2.5rem;
 }
@@ -1415,7 +1418,13 @@ main > .section-dark:last-child {
   text-decoration: none;
   color: var(--text-muted);
   padding: 0.35rem 0.85rem;
-  border: 1px solid var(--rule);
+  /* var(--rule) is a hairline meant for dividing bands, not a control's own
+     boundary — composited on --salt it reads at ~1.46:1, under the 3:1 a
+     control outline owes (WCAG 1.4.11). These chips are links, not dividers,
+     so they take --text-muted's own colour (--stone, 5.16:1 on --salt) —
+     already the chip's label colour, so the outline now matches the word
+     inside it instead of nearly disappearing against the page. */
+  border: 1px solid var(--text-muted);
   border-radius: 999px;
   transition:
     color 0.18s var(--ease),
@@ -2778,14 +2787,14 @@ main > .section-dark:last-child {
   color: var(--salt);
   --text-muted: var(--light-stone);
   --accent: var(--wood-light);
-  padding-block: clamp(3rem, 2rem + 3vw, 4.5rem);
+  padding-block: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
 }
 
 .footer__inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.75rem;
   text-align: center;
 }
 
@@ -2793,7 +2802,7 @@ main > .section-dark:last-child {
    width constraint would size the empty margins rather than the mark. */
 .footer__logo {
   width: auto;
-  height: clamp(4.5rem, 3.6rem + 3.5vw, 6.5rem);
+  height: clamp(2.75rem, 2.3rem + 1.8vw, 3.75rem);
 }
 
 .footer__rights {
