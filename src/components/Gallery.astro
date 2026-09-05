@@ -26,7 +26,12 @@ const FULL_WIDTH = 1400;
 // TEMP: same concrete ground under test on /team and /menu — see
 // .section--concrete-test in global.css, which owns the overlay and the token
 // changes. This only hands it the optimised texture; the source jpg is 9.3MB.
-// 2560, not the native 4666 — see the width note in Team.astro.
+//
+// 2560, not the source's native 4666, works here because
+// `#gallery.section--concrete-test { background-attachment: fixed }` in
+// global.css ties `cover`'s scaling to the viewport rather than to this page's
+// own scrolling height, which grows with the photo count — see the width note
+// in Team.astro for the underlying math.
 const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 
 const items = await Promise.all(

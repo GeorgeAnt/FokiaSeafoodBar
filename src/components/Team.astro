@@ -15,11 +15,15 @@ const { locale = defaultLocale } = Astro.props;
 // global.css; this only hands it the optimised texture, because the source jpg
 // is 9.3MB and has to go through the image pipeline rather than a CSS url().
 //
-// 2560 rather than the source's native 4666: this is a full-bleed cover
-// background, so it has to outrun the widest ordinary desktop viewport rather
-// than match a fixed box. 1920 was visibly soft stretched across a wider
-// screen; 2560 (654KB webp) covers that without paying for the full 4666
-// (1.7MB+) a background texture does not need.
+// 2560, not the source's native 4666. `background-size: cover` scales by
+// whichever axis needs more stretching, and this list is a portrait-shaped box
+// (it runs to 3249px at 1366x768 — see the layout note above) under a
+// landscape-cropped texture, so *height* dominates: covering this section's
+// own scrolling height would need the texture upscaled ~1.9x, which pixelates.
+// `#team.section--concrete-test { background-attachment: fixed }` in
+// global.css sidesteps that instead of outrunning it with a bigger source —
+// it ties `cover`'s math to the viewport, which is always shorter than this
+// list, so 2560 downscales rather than upscales at any member count.
 const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 ---
 

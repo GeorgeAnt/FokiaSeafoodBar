@@ -1727,6 +1727,24 @@ main > .section-dark:last-child {
   --text-muted: var(--black);
 }
 
+/* All three concrete-ground pages, not just /menu: `cover` scales against
+   whichever axis needs more stretching, and on a long, narrow page against a
+   landscape texture that's height, not width — see the width notes this
+   replaced in Team.astro and Gallery.astro. `fixed` ties that math to the
+   *viewport* instead of the full scrolling section, which is always shorter
+   than the page, so one 2560px source stays sharp (in fact slightly
+   downscaled) at any section length instead of needing an ever-larger source
+   image to outrun it — /team's member list and /gallery's masonry grid both
+   grow with content the same way /menu's category list does. Safe here
+   because nothing between these sections and the viewport carries a
+   transform — a transformed ancestor would make `fixed` compute against it
+   instead and silently stop working. */
+#menu.section--concrete-test,
+#team.section--concrete-test,
+#gallery.section--concrete-test {
+  background-attachment: fixed;
+}
+
 .team__list {
   display: flex;
   flex-direction: column;

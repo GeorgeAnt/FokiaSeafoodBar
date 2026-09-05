@@ -11,10 +11,16 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-// TEMP: same concrete ground as /team — see .section--concrete-test in
-// global.css, which owns the overlay and the token changes. This only hands it
-// the optimised texture; the source jpg is 9.3MB. 2560, not the native 4666 —
-// see the width note in Team.astro.
+// TEMP: same concrete ground as /team and /gallery — see .section--concrete-test
+// in global.css, which owns the overlay and the token changes. This only hands
+// it the optimised texture; the source jpg is 9.3MB.
+//
+// 2560, not the source's native 4666, works here because
+// `#menu.section--concrete-test { background-attachment: fixed }` in
+// global.css ties `cover`'s scaling to the viewport rather than to this page's
+// own (much taller) scrolling height — so 2560 covers it at a downscale, not
+// an upscale, and stays sharp at any menu length. Without that rule this would
+// need a much bigger source; see the note in Team.astro for the math.
 const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 
 const views = [
