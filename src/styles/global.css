@@ -1037,8 +1037,17 @@ main > .section-dark:last-child {
   margin-inline-start: 0.35em;
 }
 
+/*
+  --step-0, the same size .goal__body p inherits, at the client's request that
+  the two read alike. It was a bespoke clamp (1.3rem → 1.75rem, ~28px at 1366)
+  sitting off the step scale entirely; the token is used rather than a literal
+  matching value so the two move together if the scale is ever retuned.
+
+  The measure is in `ch`, so it tracks the font rather than fighting it — the
+  column narrows with the type instead of stretching the line.
+*/
 .hero__intro {
-  font-size: clamp(1.3rem, 1.15rem + 0.7vw, 1.75rem);
+  font-size: var(--step-0);
   color: var(--light-stone);
   /* Held to a readable measure even though the column is wider than this. */
   max-width: 30ch;
