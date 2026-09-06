@@ -12,7 +12,7 @@
             "el": "Λάχανο, καρότο, τηγανητό surimi",
             "en": "Cabbage, carrot, fried surimi"
           },
-          "price": 9
+          "price": 12
         },
         {
           "id": "salata-wakame",
@@ -74,7 +74,7 @@
             "el": "Chips ρυζιού με tartar γαρίδας κοιλάδος",
             "en": "Rice chips with valley-shrimp tartare"
           },
-          "price": 9
+          "price": 13
         }
       ]
     },
@@ -122,12 +122,12 @@
             "el": "Χειροποίητα spring rolls με γλυκόξινη sauce",
             "en": "Handmade spring rolls with sweet & sour sauce"
           },
-          "price": 8
+          "price": 7
         },
         {
           "id": "spare-ribs",
           "name": { "el": "Spare ribs με hoisin sauce", "en": "Spare ribs with hoisin sauce" },
-          "price": 12
+          "price": 15
         },
         {
           "id": "kotopoulo-tonkatsu",
@@ -248,11 +248,6 @@
           "price": 7
         },
         {
-          "id": "maki-triple-fish-futo",
-          "name": { "el": "Triple fish futo maki", "en": "Triple fish futo maki" },
-          "price": null
-        },
-        {
           "id": "maki-aggouri",
           "name": { "el": "Αγγούρι", "en": "Cucumber" },
           "price": 4
@@ -280,7 +275,7 @@
         },
         {
           "id": "io-shrimp-roll",
-          "name": { "el": "Shrimp roll", "en": "Shrimp roll" },
+          "name": { "el": "Shrimp", "en": "Shrimp" },
           "description": {
             "el": "Γαρίδα tempura, mayo, avocado",
             "en": "Tempura shrimp, mayo, avocado"
@@ -289,7 +284,7 @@
         },
         {
           "id": "io-salmon-roll",
-          "name": { "el": "Salmon roll", "en": "Salmon roll" },
+          "name": { "el": "Salmon", "en": "Salmon" },
           "description": {
             "el": "Σολομός, αβοκάντο, philadelphia",
             "en": "Salmon, avocado, Philadelphia cream cheese"
@@ -298,7 +293,7 @@
         },
         {
           "id": "io-tuna-roll",
-          "name": { "el": "Tuna roll", "en": "Tuna roll" },
+          "name": { "el": "Tuna", "en": "Tuna" },
           "description": {
             "el": "Τόνος, αγγούρι, κρεμμυδάκι, spicy mayo",
             "en": "Tuna, cucumber, spring onion, spicy mayo"
@@ -307,7 +302,7 @@
         },
         {
           "id": "io-surimi-california",
-          "name": { "el": "Surimi California roll", "en": "Surimi California roll" },
+          "name": { "el": "Surimi", "en": "Surimi" },
           "description": {
             "el": "Surimi, τηγανητό κρεμμύδι, αβοκάντο, spicy mayo",
             "en": "Surimi, fried onion, avocado, spicy mayo"
@@ -331,15 +326,6 @@
           "price": 15
         },
         {
-          "id": "premium-tuna-tataki",
-          "name": { "el": "Tuna tataki", "en": "Tuna tataki" },
-          "description": {
-            "el": "Καψαλισμένος τόνος, μάνγκο, κρεμμυδάκι, αγγούρι, spicy mayo, ponzu",
-            "en": "Seared tuna, mango, spring onion, cucumber, spicy mayo, ponzu"
-          },
-          "price": 15
-        },
-        {
           "id": "premium-seabass",
           "name": { "el": "Seabass", "en": "Seabass" },
           "description": {
@@ -347,6 +333,15 @@
             "en": "Seabass, mango, spring onion, cucumber, masago"
           },
           "price": 14
+        },
+        {
+          "id": "premium-tuna-tataki",
+          "name": { "el": "Tuna tataki", "en": "Tuna tataki" },
+          "description": {
+            "el": "Καψαλισμένος τόνος, μάνγκο, κρεμμυδάκι, αγγούρι, spicy mayo, ponzu",
+            "en": "Seared tuna, mango, spring onion, cucumber, spicy mayo, ponzu"
+          },
+          "price": 15
         },
         {
           "id": "premium-spicy-tuna-tartar",
@@ -373,7 +368,7 @@
             "el": "Σολομός, surimi, αβοκάντο, κρεμμυδάκι, τυρί κρέμα",
             "en": "Salmon, surimi, avocado, spring onion, cream cheese"
           },
-          "price": null
+          "price": 18
         },
         {
           "id": "premium-king-crab-california",
@@ -381,6 +376,15 @@
           "description": {
             "el": "Βασιλικό καβούρι, αβοκάντο, τηγανητό κρεμμύδι, wasabi mayo",
             "en": "King crab, avocado, fried onion, wasabi mayo"
+          },
+          "price": 18
+        },
+        {
+          "id": "maki-triple-fish-futo",
+          "name": { "el": "Triple fish futo maki", "en": "Triple fish futo maki" },
+          "description": {
+            "el": "Σολομός, λαβράκι, τόνος, μάνγκο, masago, αγγούρι, wasabi mayo",
+            "en": "Salmon, seabass, tuna, mango, masago, cucumber, wasabi mayo"
           },
           "price": 18
         }
@@ -479,15 +483,15 @@
         {
           "id": "tiramisu-mango",
           "name": { "el": "Tiramisu mango", "en": "Tiramisu mango" },
-          "price": 8
+          "price": 12
         },
         {
           "id": "namelaka-lefkis-sokolatas",
           "name": {
-            "el": "Namelaka λευκής σοκολάτας με φρούτα του δάσους, yuzu & φύλλα spring rolls",
-            "en": "White chocolate namelaka with forest fruits, yuzu & spring roll sheets"
+            "el": "Namelaka λευκής σοκολάτας με φρούτα του δάσους & φύλλα spring rolls",
+            "en": "White chocolate namelaka with forest fruits & spring roll sheets"
           },
-          "price": null
+          "price": 8
         },
         {
           "id": "tiganito-pagoto",
@@ -495,7 +499,7 @@
             "el": "Τηγανητό παγωτό με σοκολάτα bitter και κρέμα γιαουρτιού",
             "en": "Fried ice cream with bitter chocolate and yogurt cream"
           },
-          "price": null
+          "price": 10
         }
       ]
     }

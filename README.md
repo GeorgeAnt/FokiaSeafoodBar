@@ -82,7 +82,7 @@ Both files use the same shape. A minimal item needs only three fields:
 {
   "id": "salata-surimi",
   "name": { "el": "Σαλάτα surimi", "en": "Surimi salad" },
-  "price": 9
+  "price": 12
 }
 ```
 
@@ -271,7 +271,7 @@ dials, and the email opens a mail app. The opening-hours rows are not underlined
 because they are not links.
 
 **The phone numbers now carry the country code** — `+30 213 099 1571` and
-`+30 698 298 0267` — so an international visitor can dial them as written. If you
+`+30 698 298 0367` — so an international visitor can dial them as written. If you
 edit `phone.display` or `phoneAfterHours.display` in `site.json`, keep the `href`
 beside it in step: on the Take away cards the digits shown and the number dialled
 must never disagree, because the digits are the only thing a visitor can check

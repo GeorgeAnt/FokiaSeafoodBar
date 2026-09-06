@@ -199,7 +199,7 @@
             {
               "id": "fiali-lafazani-seirios",
               "name": { "el": "Οινοποιία Γ. Λαφαζάνη", "en": "G. Lafazanis Winery" },
-              "price": null,
+              "price": 26,
               "wine": {
                 "label": { "el": "Σείριος", "en": "Seirios" },
                 "grape": { "el": "Μαλαγουζιά", "en": "Malagousia" }
@@ -227,7 +227,7 @@
             {
               "id": "fiali-lafazani-electus-lefkos",
               "name": { "el": "Οινοποιία Γ. Λαφαζάνη", "en": "G. Lafazanis Winery" },
-              "price": null,
+              "price": 22,
               "wine": {
                 "label": { "el": "Electus", "en": "Electus" },
                 "style": { "el": "Λευκός", "en": "White" },
@@ -257,7 +257,7 @@
             {
               "id": "fiali-lafazani-oinanthi-erythros",
               "name": { "el": "Οινοποιία Γ. Λαφαζάνη", "en": "G. Lafazanis Winery" },
-              "price": null,
+              "price": 20,
               "wine": {
                 "label": { "el": "Οινάνθη", "en": "Oinanthi" },
                 "style": { "el": "Ερυθρός", "en": "Red" },
@@ -286,7 +286,7 @@
             {
               "id": "fiali-lafazani-oinanthi-roze",
               "name": { "el": "Οινοποιία Γ. Λαφαζάνη", "en": "G. Lafazanis Winery" },
-              "price": null,
+              "price": 20,
               "wine": {
                 "label": { "el": "Οινάνθη", "en": "Oinanthi" },
                 "style": { "el": "Ροζέ", "en": "Rosé" },
@@ -296,7 +296,7 @@
             {
               "id": "fiali-lafazani-elysian-roze",
               "name": { "el": "Οινοποιία Γ. Λαφαζάνη", "en": "G. Lafazanis Winery" },
-              "price": null,
+              "price": 30,
               "wine": {
                 "label": { "el": "Elýsian", "en": "Elýsian" },
                 "style": { "el": "Ροζέ", "en": "Rosé" },
@@ -399,6 +399,24 @@
             "en": "White tequila, Pink Grapefruit Soda, lime"
           },
           "price": 10
+        },
+        {
+          "id": "margarita",
+          "name": { "el": "Margarita", "en": "Margarita" },
+          "description": {
+            "el": "Λευκή tequila, Triple Sec, σιρόπι sugar cane",
+            "en": "Blanco tequila, Triple Sec, sugar cane syrup"
+          },
+          "price": 10
+        },
+        {
+          "id": "negroni",
+          "name": { "el": "Negroni", "en": "Negroni" },
+          "description": {
+            "el": "Gin, Otto’s Athens Vermouth, Campari, πορτοκάλι",
+            "en": "Gin, Otto’s Athens Vermouth, Campari, orange"
+          },
+          "price": 12
         },
         {
           "id": "twisted-greek-negroni",

@@ -1371,7 +1371,7 @@ dependency decision, not a styling one.
   a screen-reader user hears before deciding whether to place a call. The picture
   illustrates the title; it does not identify the control. The same photograph
   keeps its real alt on `/gallery`, where it *is* the content. Verified in the
-  a11y tree: the two names are "Κλείστε τη θέση σας 698 298 0267" and "Take away
+  a11y tree: the two names are "Κλείστε τη θέση σας 698 298 0367" and "Take away
   21 3099 1571".
 
   The card title is a `<span>`, not an `<h3>`, for the neighbouring reason: a
