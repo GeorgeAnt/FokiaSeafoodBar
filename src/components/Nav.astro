@@ -12,12 +12,13 @@ const { locale = defaultLocale } = Astro.props;
 /*
   Logo, then one list in reading order, with the utilities after it.
 
-  Source order is left-to-right and matches the tab order; the *visual* centring
-  of the links is done by the grid in .nav__inner and moves nothing here. The
-  logo is at the start, not centred — the bar used to centre one absolutely,
-  which is what forced the links into two balanced groups, and it stays in flow
-  so the links can remain a single run. The social icons and the language button
-  sit at the end because that is where you go looking for them.
+  Source order is left-to-right and matches the tab order, but the link list
+  is never shown inline any more — `.nav__inner` in global.css always renders
+  it as a dropdown panel behind the burger toggle, at every viewport width.
+  Source order still governs the panel's reading order and the tab order, it
+  just no longer has to double as a visual layout. The logo is at the start,
+  the social icons and the language button sit at the end of the visible row
+  because that is where you go looking for them, and the toggle follows them.
 
   It renders logo-clean.png, the same file the hero and the footer use, cropped
   by `object-fit` rather than by a second asset — see the note on `.nav__logo`
@@ -29,8 +30,7 @@ const { locale = defaultLocale } = Astro.props;
 
   Four of the six entries are now whole pages rather than anchors. /team joined
   them when the section was moved off the homepage for its height; it keeps the
-  same nav.team label and the same position in the run, so the bar's width
-  budget is unchanged.
+  same nav.team label and the same position in the run.
 */
 const links = [
   { href: '/#goal', key: 'nav.goal' },
@@ -133,11 +133,12 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
         data-i18n-label={`a11y.lang.${other}`}
       >
         {/*
-          Two labels, one shown at a time by CSS. The word is what the client
-          asked for and is what shows everywhere it fits; the two-letter code
-          takes over on the collapsed bar at 22.5rem, where "English" costs 88px
-          against a 280px row and pushed the toggle onto a second line. The
-          swap is CSS-only — no second script path, and no measuring in JS.
+          Two spans, but only .lang__name ever shows — .lang__code is CSS-hidden
+          unconditionally now that the button itself is small enough not to need
+          a narrower fallback. Both still carry data-i18n and both are still
+          re-aimed by apply() on every locale switch (see Base.astro), so the
+          hidden span stays correct if a narrow-width fallback is ever wanted
+          again — nothing here assumes which one is visible.
 
           Hiding one is safe for assistive tech because the button's accessible
           name comes from aria-label, not from this text.

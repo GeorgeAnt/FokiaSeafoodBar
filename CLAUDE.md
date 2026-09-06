@@ -227,30 +227,21 @@ used to share with it — so that composition is **in use** on the homepage
 again, and a new band reaching for it would recreate the exact repetition this
 history is about.
 
-**From the kitchen is not in the nav — but the width argument that used to
-forbid it is gone, so do not repeat it.** It said "cannot be", and that was
-true while the bar collapsed at 64rem: a seventh Greek label cost ~133px against
-70px of clearance at 1025px and pushed the bar to a 1080px scroll width.
+**From the kitchen is not in the nav, and the question of whether a seventh
+label "fits" in the bar no longer applies to anything.** This used to be a long
+running argument about clearance at 1025px and 1201px, a moving breakpoint
+(64rem, then 75rem), and re-measuring `scrollWidth` every time the logo or the
+language control changed size — because the link list used to render inline in
+the bar above that breakpoint, and every label added to it spent real width.
 
-Moving the collapse to 75rem for the logo changed the answer. Re-tested at
-1201px by cloning a label in: it costs 117px, clearance goes 150px → 24px, and
-`scrollWidth` stays at 1201. **It fits.** So the band is out of the nav as a
-content decision — it is reached by scrolling and its own button goes to
-`/gallery` — not because the bar has no room.
-
-**The margin has since shrunk and that test was not re-run.** The nav logo went
-3.5rem → 5rem and took 24px of the row, and the language control went from a
-two-letter pair to the word "English" and took 34px more, so clearance at 1201px
-is **121px**, not the 150px the test started from. A 117px label would leave 4px.
-Re-measure with the real label before believing it still fits — on this figure
-it very nearly does not.
-
-24px is not room to spend casually, though, and 117px is a guess at copy that
-does not exist yet. Measure with the real label before adding one. And measure
-`document.documentElement.scrollWidth`, not the gap: `.nav__utils` does not
-shrink, so an overrun shows up as the whole bar running past the viewport while
-the clearance reading stays positive — which is exactly how the old test read at
-1025px.
+**The nav no longer shows the link list inline at any viewport width.** The
+client asked for the burger toggle to be the only way into the links, always,
+so the bar itself is now just the logo, the social icons, the language button
+and the toggle — see the note on `.nav__inner` in `global.css`. Adding a
+seventh link (or an eighth) costs the bar nothing any more; it is one more row
+in the dropdown panel. The old clearance/`scrollWidth` measuring discipline is
+kept here only as history, in case the bar ever grows a second inline element
+that isn't the link list and the same kind of budget question comes back.
 
 **Controls that only work with JS live in a `<template>`.** The hero carousel
 controls are cloned from `#hero-controls-template` at runtime, and the gallery
@@ -596,72 +587,29 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - Colours on a section come from tokens the surface tier sets (`--accent`,
   `--text-muted`, `--ghost-hover-*`). Don't reference `--wood` directly for
   text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
-- The nav is logo, links, utilities — three items in flow, nothing positioned,
-  and **the links are centred on the bar**. `.nav__inner` is a `1fr auto 1fr`
-  grid: the middle track is centred against the container, so the logo (80px)
-  and the utilities (192px) can be wildly different widths without dragging the
-  links off centre, and all three stay in flow.
+- **The nav shows no links inline any more, at any viewport width — the burger
+  toggle is the only way into them, on desktop as much as on a phone.** The bar
+  is logo, then `.nav__utils` (social icons, language button), then the toggle,
+  a wrapping flex row with `order` placing the three on one line; the link list
+  is a full-width panel under that row, shown only while
+  `.nav__inner[data-open='true']`. See `.nav__inner` in `global.css`.
 
-  That is the whole reason it is grid and not something simpler. The obvious way
-  to centre one of three flex children is to position it absolutely, and this
-  bar has been there before — it used to centre the *logo* that way, which took
-  it out of flow, left nothing holding the middle, and is why the links were
-  once split into two balanced groups either side of it. Do not go back to that.
-  `justify-content` cannot do it either: it distributes all three children, so
-  the links only land in the middle when the two outer items happen to match.
+  **History, kept because a future redesign might want it back and would
+  otherwise re-discover all of this from nothing.** The bar used to render the
+  links inline above a 75rem breakpoint, and getting that to hold cost a great
+  deal of the effort this file used to document: a `1fr auto 1fr` grid so the
+  link list could centre against the container rather than against its
+  neighbours (centring a flex child by `position: absolute` had already been
+  tried and reverted, because it took the logo out of flow and forced the links
+  into two balanced groups either side of it); a clearance measurement at
+  1201px that had to be re-taken every time the logo, the font or the language
+  control changed size, because each of those spent real width against a bar
+  that had none to spare; and a breakpoint that itself had moved once already
+  (64rem → 75rem) when the logo grew. None of that mechanism exists any more —
+  removing the inline links removed the width budget it was all protecting.
 
-  `margin-inline-start: auto` stays on `.nav__utils` and does a different job in
-  each layout — end of its own track in grid, pushed to the end of the row in
-  flex. The collapsed bar sets `display: flex` back, because it wraps the links
-  onto a full-width row and orders four children, which is not a three-column
-  grid's job.
-
-  **Centring is exact above ~1230px and 14px out at 1201px.** The side tracks
-  take an automatic minimum from their content, so the split is only even while
-  each `1fr` share is wider than the item sitting in it. At 1201px the shares
-  would be 178px and the utilities need 192px, so that track grows and the
-  middle shifts left by the 14px difference. It never overflows — `scrollWidth`
-  is 1201 — and 14px is 1.2% of the bar, but it is the number that moves first
-  if anything in the utilities gets wider.
-
-  **Clearance stopped being the right measurement when the links were centred.**
-  It used to be the gap between the links and the utilities, and it worked
-  because everything was packed at the start of the row, so that gap *was* the
-  slack. With a centred middle track the leftover is split into two gaps and
-  neither is the headroom. At 1201px the tracks now pack exactly: the measured
-  links-to-utilities gap is 24px, which is the grid `gap` itself — **zero
-  slack**. The figures below are kept as history. The live test is
-  `document.documentElement.scrollWidth` against the viewport, which is what
-  this file has always said actually counts.
-
-  **The bar collapses at 75rem, not 64rem, and the logo is why.** Clearance at
-  1025px was 70px in Greek; the logo spends 48px of that plus the row's 24px gap
-  — 72px against 70px — so the full bar stopped fitting at the old breakpoint
-  and hands over to the toggle sooner. Measured at 1201px, the first width above
-  the new breakpoint, clearance is **121px** and `scrollWidth` equals the
-  viewport. Re-measure at 1201px, not at 1025px.
-
-  History worth keeping, because the figure has moved three times and each move
-  was a different cause: 62px, until the social icons went 2.15rem → 2.75rem for
-  the touch target and spent 19px; 43px, until `--font-body` went Inter →
-  Open Sans, the narrower face, which gave 27px back (Inter set those six Greek
-  labels 29px wider in total, measured on a canvas at the nav's own size); 70px,
-  until the logo took 72px and moved the breakpoint to 75rem instead; then 146px
-  at the new breakpoint, 160px once `--font-body` went Open Sans → Manrope,
-  narrower again by 14px across the six, **136px** once the logo box itself went
-  3.5rem → 5rem and spent 24px, and **121px** once the language control became
-  one button and spent 34px more — after which the links were centred and the
-  measurement stopped meaning anything (see above). Two of those were a change
-  of *face*, which is the pattern: re-measure whenever `--font-body` changes,
-  whenever the logo box is resized, and now whenever the language button's copy
-  changes — it is the one label in the bar that is a word rather than a code.
-  "Κλείστε τη θέση σας • Take away" is still the longest nav label and Greek is
-  still the longer set, so Greek decides the fit, not English.
-
-  The language button still takes its 44px from `min-height` rather than from
-  vertical padding, which is why the height costs the row nothing. Its *width*
-  is no longer free, though — that note used to say the two-letter labels never
-  changed the pill's width, and one of them is now a word.
+  The language button no longer takes 44px from `min-height`; see the note
+  further down on `.lang` and `.social a` for the current, smaller sizing.
 
 - **The nav is a dark surface inside the light tier, so it carries the dark
   tier's tokens itself.** `.nav` sets `--text`, `--text-muted`, `--accent`,
@@ -901,44 +849,62 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - The `button` reset does not clear the UA's `padding: 1px 6px`. A carousel dash
   set to `width: 100%` inside a 2rem button is therefore 20px, not 32px — worth
   knowing before "fixing" a measurement that looks 12px short.
-- **The collapsed bar has its own width budget, and it is measured at 320px.**
-  It holds logo + utilities + toggle, which wants 297px against the 280px the
-  wrap leaves at 320px, so the toggle wrapped onto a second row. The bar did
-  *not* get taller when it did — two stacked ~44px rows still fit inside the
-  6rem min-height — so the only symptom was the toggle sitting under the logo,
-  which is easy to miss and was shipped once. Measure the toggle's `top` against
-  the logo's `bottom`; neither the bar's height nor `scrollWidth` will tell you.
+- **The collapsed bar's width budget went away with the inline link list, and
+  so did the word/code swap it used to force.** `.lang__name` / `.lang__code`
+  and the narrow-phone breakpoint that swapped between them (`.lang` showing
+  "English" normally, its two-letter code below 22.5rem) existed because the
+  logo, the language button and the social icons together used to come within
+  a few pixels of overflowing a 320px bar. Shrinking both controls bought that
+  back, so the swap went. `.lang__code` is now unconditionally hidden and
+  `.lang__name` always shows — see the comment on the two spans in `Nav.astro`
+  before reintroducing a swap, since the markup and the `data-i18n` plumbing
+  for it are still there.
 
-  The `max-width: 22.5rem` block buys the room back out of spacing and out of
-  *copy*, not out of targets. Spacing gives up the row's column gap,
-  `.nav__utils`'s gap and the language button's horizontal padding; copy gives
-  up the word.
+  **The budget itself did not go away, and it came back within one change.**
+  Widening the utilities' group gap from 0.5rem to 1.1rem spent ~10px the
+  320px bar did not have: groups 250px + two 1rem gaps = 282px against 280px,
+  and the toggle wrapped onto a second line. It is handled now by a
+  `max-width: 22.5rem` block that distributes the row instead of paying fixed
+  gaps — see `.nav__inner` at the end of the nav section. The lesson is that
+  the logo staying 5rem at every width is what keeps this tight: 80px of a
+  280px row is the single largest thing in the budget, and anything else that
+  grows is spending against it.
 
-  **The word is the expensive part, and it is why this block grew a label
-  swap.** "English" makes the button 88px, which puts the row at 292px against
-  the 280px a 320px screen leaves — 12px over, and the toggle went onto a second
-  line exactly as it did the first time this bar was got wrong. Trimming padding
-  alone recovers 13px and leaves 1px of margin, which is not a margin. So below
-  22.5rem the button shows its two-letter code instead: 36px, and the row lands
-  at **244px against 280px**. `min-width` is dropped there too — it exists to
-  stop the bar jumping between an 88px word and a 48px code, and once both
-  states are two characters there is nothing to reserve.
+  **`scrollWidth` is the wrong test here and it passed while the bar was
+  broken.** A wrapped row is not an overflowing one, so `scrollWidth` still
+  equals the viewport, and the bar does not get taller either — two ~40px rows
+  still fit inside its 6rem min-height. The reading that shows it is
+  `.nav__toggle`'s `top` against `.nav__logo`'s `bottom`. `scrollWidth` was
+  the right test for the *old* inline link list, which really did overrun;
+  it does not transfer to a row whose items are allowed to wrap.
+- **`.lang` and `.social a` are both a deliberate step down from the 44px
+  target this file otherwise holds every tappable control to, and the two are
+  now sized to align rather than to each hit their own floor.** `.social a` is
+  a 2rem (32px) box; `.lang` takes the same 2rem as its `min-height`, so the
+  two utility controls share one line height rather than one looking taller
+  than the other. Width is the other axis, and it moves independently:
+  `.lang`'s `min-width` (2.75rem) and horizontal padding (0.5rem) are pared
+  down separately from its height, at the client's request that the button in
+  particular read narrower, now that removing the inline link list means the
+  nav's utility row isn't fighting anything for width. 32px is still over the
+  24px WCAG 2.5.8 *minimum*, though a step down from this site's usual
+  generous 44px target — the same trade-off already made once for the hero
+  dots (2rem × 2.75rem), recorded here rather than quietly narrowed back the
+  next time someone re-reads the touch-target rule below and assumes it has
+  no exceptions.
 
-  The swap is CSS-only. `.lang__name` and `.lang__code` are both in the markup
-  and both carry `data-i18n`; the media query picks which is displayed, and
-  `apply()` re-aims both keys whenever the locale changes precisely because it
-  cannot know which one is visible. No target shrinks: the social icons keep
-  their 2.75rem box — the *mark* inside it grew 1.2rem → 1.5rem, which is free,
-  while the box is both the touch target and the width budget and cannot — and
-  the button keeps its `min-height`, so both stay 44px
-  tall, and at 36px wide the button is still over the 24px floor. The logo stays
-  3rem because it is the one thing in that bar meant to be looked at.
+  **Two gaps, not one, and the difference is what groups them.** `.social`
+  spaces its own two icons at 0.25rem; `.nav__utils` spaces the icon pair from
+  the language button at 1.1rem, at the client's request for air between the
+  two. Once all three controls are the same height, one even gap would set
+  them out as four peers in a row instead of a pair and a button — so if the
+  utility row is ever re-spaced, the *ratio* between those two numbers is the
+  part doing the work, not either value on its own.
 
-  **It still wraps below ~305px** (a 280px Galaxy Fold cover screen, say). The
-  remaining 24px can only come out of the two 44px social targets, which is a
-  deliberate decision documented below — so that is a trade to make on purpose,
-  not a bug to quietly fix.
-- Touch targets are 44px, and the hero dots are the one deliberate exception:
+  `.social svg` is the same 2rem as its box for a reason that is easy to
+  mistake for an oversight; the rule carries the explanation.
+- Touch targets are 44px except where noted above, and the hero dots are the
+  other deliberate exception:
   the box is 2rem wide because `::after` is `width: 100%`, so widening the target
   widens the dash and spreads the strip, which is the whole of that control's
   design. They are 2rem × 2.75rem — over the 24px WCAG 2.5.8 floor, and adjacent,
@@ -1458,7 +1424,8 @@ dependency decision, not a styling one.
   file's own pixels.
 
   **The nav deals with it without a second asset.** `.nav__logo` is a square box
-  — 5rem on the full bar, 3rem on the collapsed one — with `object-fit: cover`,
+  — 5rem, the same at every viewport width now that the bar no longer shrinks
+  it to make room for a wider link list — with `object-fit: cover`,
   which shows the central 940px of the source: the whole 888px badge with 26px
   to spare each side. The field is cropped away for
   free, the mark fills the box, and the bar reuses the asset the hero has already

@@ -502,17 +502,18 @@ The site was audited against the Web Interface Guidelines and the findings
 fixed. Most were invisible; three changed something you can see, so they are
 worth knowing about before you look at the site and wonder:
 
-- **Tap targets are 44px.** The social icons in the nav, the language button, the
-  menu's Food/Drinks tabs and its jump-to-category chips all grew to the size a
-  finger actually needs. The social marks were later drawn larger inside those
-  same 44px boxes — 19px to 24px — which changes how they look without changing
-  what they cost the bar.
+- **Tap targets are 44px**, with one deliberate exception: the nav's social
+  icons and language button. The menu's Food/Drinks tabs and its
+  jump-to-category chips are still full-size 44px.
 - **The heading above the legal notices** now renders as the small uppercase
   label it was always meant to be. A stylesheet rule had been pointing at the
   wrong tag, so it had been rendering at full heading size.
 
-- **The nav links sit in the middle of the bar**, with the logo at the left and
-  the social icons and language button at the right.
+- **The nav never shows its links inline any more, at any screen width.** The
+  bar is just the logo, the social icons, the language button and a burger
+  toggle; tapping the toggle drops the full link list down as a panel. The
+  social icons and language button were also shrunk down to a smaller, matched
+  size as part of the same change — see the tap-target note above.
 
 Two things are recorded trade-offs rather than oversights:
 
