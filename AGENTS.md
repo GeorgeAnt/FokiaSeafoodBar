@@ -571,6 +571,10 @@ npm run preview  # serve dist/ on :4321 (astro preview stop / status / logs)
 npm run check    # content validation + what is still missing from the client
 npx astro check  # type check (should stay at 0 errors)
 npm run photos   # re-run the one-time photo downsample (only for new originals)
+                 # NB: it reads the SOURCE folder only. A file dropped straight
+                 # into src/assets/photos/ is invisible to it and keeps whatever
+                 # size it arrived at — downsample it by hand to 2560px/q88,
+                 # which is what the script would have done (see gotchas).
 npm run favicons # regenerate favicons from logo-clean.png (only if it changes)
 ```
 
@@ -1476,6 +1480,22 @@ dependency decision, not a styling one.
   panels are side by side and 4:3 is the wider, better frame, so the switch is
   where the column count changes. Both panels move together; see the note on the
   4:3 compromise for why they must.
+- **A photo added straight to `src/assets/photos/` never meets the downsample,
+  and nothing in the build complains.** `prepare-photos.mjs` walks the SOURCE
+  folder outside the repo and writes *into* `src/assets`; it never reads what is
+  already there, so a file dropped directly in keeps whatever size it arrived
+  at. `dsc-9892.jpg` came in that way at **1836x4080 and 5.08MB**, against the
+  ~200-500KB the prepared masters run to, and `npm run check`, `astro check` and
+  the build all passed on it — Astro happily generates its responsive variants
+  from a 5MB master, so the only symptom is a repo carrying a file the project's
+  own docs say should never be committed. Applying the script's own treatment by
+  hand (`.rotate()`, `resize(2560, 2560, {fit:'inside', withoutEnlargement:true})`,
+  `jpeg({quality:88, mozjpeg:true})`) took it to 1152x2560 and 0.19MB.
+
+  **Do that to a copy, not in place.** Doing it in place is what happened here,
+  and it destroyed the only 5MB copy at that path — the file was untracked, so
+  git did not have it either. If the original matters, put it in the SOURCE
+  folder first, which also makes `npm run photos` able to reproduce the master.
 - `Plates.astro` picks its four photos **by id**, not by taking the first four in
   `gallery.json`. The gallery is ordered for the gallery — room, sign, drinks and
   plates interleaved — so position is not a stable way to ask for "the food", and

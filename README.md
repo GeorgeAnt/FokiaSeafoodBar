@@ -231,7 +231,15 @@ The heading and the button text are ordinary UI strings (`plates.*` in
 screen readers and search engines — it is required in both languages.
 
 To add new photos, drop the originals into the source folder and run
-`npm run photos` (see [Images](#images)).
+`npm run photos` (see [Images](#images)), then add an entry here.
+
+**Dropping a photo straight into `src/assets/photos/gallery/` also works, but
+it skips the downsample.** `npm run photos` only reads the source folder, so a
+file put directly in `src/assets` keeps whatever size it arrived at — a phone
+photo is often 5 MB against the ~200–500 KB the prepared masters run to, and
+nothing warns you. If you do it that way, shrink the file to 2560px on its
+longest edge first, and keep your original somewhere outside the repo (ideally
+in the source folder, so `npm run photos` can reproduce it later).
 
 ### Restaurant details — `src/data/site.json`
 
