@@ -275,13 +275,20 @@ split whose height is capped by the viewport rather than set by centred copy —
 that band went 681 to 698 and the page still got *shorter*, because the old
 centred column carried more vertical padding than the split does.
 
-It is **4294px** now, and Take away is the band that has moved it twice in
-opposite directions. Giving the two service notes photographs of their own took
-that band from **853 to 1372** — the largest single increase any band here has
-had, all of it a 1:1 media block sitting above the copy. Folding the copy into a
-click-revealed film took it back to **978**: the cards became the same 4:3 the
-panels are, and a paragraph that had been setting the card's height stopped
-contributing to it at all.
+It is **4428px** now, and Take away is the band that has moved it three times,
+twice in opposite directions. Giving the two service notes photographs of their
+own took that band from **853 to 1372** — the largest single increase any band
+here has had, all of it a 1:1 media block sitting above the copy. Folding the
+copy into a click-revealed film took it back to **978**: the cards became the
+same 4:3 the panels are, and a paragraph that had been setting the card's height
+stopped contributing to it at all. Giving the band a visible heading and an
+intro line then put it at **1111**, which is the current figure.
+
+That last 133px is the whole of the difference between this page number and the
+4294 recorded before the heading, and it is worth noting the *cards* have not
+moved a pixel through any of the changes since: the ratio is fixed, so putting
+the title and the cue on one line, or swapping the cue's glyph, changes nothing
+about the band's height.
 
 Re-measured at 1366x768 in Greek. Note the locale caveat that applied to the
 older figure no longer does: the paragraph is inside the film now, so Greek
@@ -388,7 +395,7 @@ script does not run, and JS only intercepts the click.
 bands are not viewport-sized and cannot be. Re-measured at 1366x768 with Find
 Us in its current shape (text column plus photo) and Our Goal in its new one
 (the hero-matching split): Our Goal **698**, From the kitchen **918**, Take
-away **978**, Find Us **753**. Three of the four are still taller than the
+away **1111**, Find Us **753**. Three of the four are still taller than the
 screen, which rules `mandatory` out on its own. Our Goal is now the closest of
 the four to a viewport, because its height is a vh-derived `min(88vh, 52rem)`
 rather than content plus padding — but "closest" is not "equal", and the other
@@ -402,8 +409,9 @@ heights across three different shapes: 1082 with its original 3:4 portrait,
 shortest, then in between, in that order. **Take away has swung further than
 any of them, and in both directions**: 232 as a heading and a phone number, 853
 with two photo panels, 1372 once the two service notes gained photographs of
-their own, and 978 once their copy moved into a film and the cards became one
-uniform 2x2. It was the short-band case that made `.section--tight` necessary
+their own, 978 once their copy moved into a film and the cards became one
+uniform 2x2, and 1111 once the band gained a visible heading. It was the
+short-band case that made `.section--tight` necessary
 and briefly the tall-band case; it is neither now. Re-measure; do not quote
 these.
 `mandatory` pulls the reader out of a band they are still reading and gives the
@@ -942,9 +950,18 @@ Node is installed but **not on the shell PATH**; prepend it first:
 - **The darkening on these cards is two layers, and only one of them may move.**
   `::before` is the scrim: it carries the title and number over blown highlights,
   it is what the measured ratios describe, and it is static. `::after` is the
-  wash — a flat 30% black over the whole card that fades to 0 on hover and comes
+  wash — a flat black over the whole card that fades to 0 on hover and comes
   back over 1.2s when the pointer leaves. Animating the scrim itself would walk
   the text contrast to nothing on every hover.
+
+  **The wash is 30% on the panels and 15% on the note cards**, and that split is
+  where a client request to "reduce the film by half" was actually paid. It is
+  the layer that can absorb a change like that for nothing: it only ever adds
+  darkness, so hovered — wash fully gone — is already the measured floor, and
+  lightening it moves the resting state *towards* that floor rather than past
+  it. It is also flat and covers the whole card, so it is the only thing dimming
+  the top of the picture, where there is no scrim at all. Halve the wash to
+  brighten a photograph; touch the scrim only with the pixel scan open.
 
   Because the wash only ever *adds* darkness, hovered — wash fully gone — is the
   contrast floor, and no state in the animation is worse than the table above.
@@ -952,6 +969,30 @@ Node is installed but **not on the shell PATH**; prepend it first:
   90-94% black from the scrim, so a flat wash adds almost nothing there and
   almost all of its effect where the picture is clean, which is why the card
   reads as lighting up from the top down rather than the text flickering.
+
+  **The note cards' scrim is shorter than the panels' — 6.5rem dense, out by
+  12rem, against 8rem and 16rem — and the amount was measured, not halved.** The
+  request was to cut it on the grounds that these cards carry one line where the
+  panels carry two, which is right about the copy and wrong about the geometry:
+  the note title is `--step-1` and the Greek "Διοργανώστε την εκδήλωσή σας"
+  **wraps to two lines**, so its block reaches 6.08rem off the card's bottom
+  against the panels' 6.04rem. The two blocks are the same height.
+
+  A true halving (4rem / 5.5 / 6.75 / 8) was built and measured before being
+  rejected, and the numbers are the reason this paragraph exists: **English
+  passed at 12.08:1 or better at every width, and Greek card 0 measured 2.73:1
+  at 1366 and 4.47:1 at 768** — a fail under even the 3:1 a large bold line owes,
+  visible in one locale, on one of the two cards, at some widths only. At
+  6.5rem the same worst pixel is 11.76:1 and reads `rgb(45,40,38)`, which is
+  essentially the scrim alone: the photograph is not contributing, so swapping
+  either picture cannot move the figure. 5.5rem was also measured, at 8.08:1 —
+  still ample, but its worst pixel is `rgb(72,65,62)`, i.e. the photograph *is*
+  showing through, and a blown-white highlight there computes to about 3.8:1.
+  Photo-independence is why 6.5 was kept over 5.5.
+
+  Worst single pixel, hovered, both locales, at 320, 390, 768, 1024 and 1366:
+  **11.76:1** (Greek, card 0, 768 and 1366), against the 3:1 a bold `--step-1`
+  line owes.
 
   The two durations are asymmetric and that is deliberate: a transition belongs
   to the state being *entered*, so the 0.8s lives on `:hover::after` (the fade
@@ -1610,19 +1651,49 @@ dependency decision, not a styling one.
   with a button and `aria-expanded` would be strictly more code and strictly less
   robust.
 
-  Three details that cost time:
+  Four details that cost time:
 
   - **The title must be hidden when open.** Kept, it forced the film to reserve
     5.5rem beneath the paragraph, and the copy plus the call then wanted 356px
     inside a 326px card — `margin-top: auto` collapsed and the phone number drew
     straight through the title. The paragraph identifies the card perfectly well
     on its own.
-  - **The cue crosses to the other corner when open**, because with the title
-    gone it would otherwise sit directly under the call: two discs stacked in one
-    corner. `text-align: right` on the head is the whole mechanism.
+  - **The head is `left: auto` when open, and that is what makes the phone
+    number clickable — it is not a way of aligning the cue right.** This one
+    shipped broken and was reported as "the phone is not calling". The head is
+    absolutely positioned inside the `<summary>` at `z-index: 4`, above the
+    film, and `left` + `right` together make it span the whole card. With the
+    title hidden that box is nearly empty, but it still lies directly over the
+    call link at the bottom of the film and swallows every click on it — the tap
+    lands on the summary, so the card *closes* instead of dialling. Dropping
+    `left` shrinks the box to the disc, which both parks the cue in the
+    bottom-right corner and hands the rest of the row back to the film. The
+    first version used `text-align: right`, which moves the glyph and changes
+    nothing about the box.
+
+    **A screenshot cannot see this and neither can a contrast sweep** — the card
+    looks exactly right in both states. `document.elementFromPoint` at the badge
+    and at the digits is the test, and the answer must be the anchor: it returned
+    `.contact__note-head` before the fix and `.contact__note-call` after.
+    Anything absolutely positioned over a film with something interactive in it
+    needs the same check.
+  - **The cue is two glyphs swapped by `display`, not one glyph rotated.** It
+    was a chevron turned 90° when open, which points it *down* — and a downward
+    chevron is what a **closed** disclosure conventionally wears, so the open
+    card was showing the closed card's icon. A cross needs no convention. Only
+    one is ever in the flow, so the disc cannot be sized by whichever glyph is
+    wider, and there is deliberately no transition: the two shapes share no
+    geometry, so nothing can tween and a cross-fade at 15px reads as a flicker.
   - **`list-style: none` *and* `::-webkit-details-marker`** are both needed to
     remove the disclosure triangle; Safari still draws it from the pseudo-element
     when only the first is set.
+
+  **The title and the cue share one line**, at the client's request — a flex row
+  with `space-between`, the disc `flex: none` so a wrapping Greek title cannot
+  squeeze it into an ellipse, and `align-items: flex-end` so a two-line title
+  keeps the arrow beside its last line rather than floating up beside its first.
+  Measured at 320, 390, 768, 1024 and 1366 in both locales: the disc stays square
+  (29-33px) and the gap between the words and the disc never falls below 12px.
 
   The arrow in the cue is the glyph an arrow was *removed* from the panels for
   being — see that note. It is right here for the same reason it was wrong there:

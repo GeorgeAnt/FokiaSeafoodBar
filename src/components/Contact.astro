@@ -320,12 +320,20 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
                   there, and the phone glyph moves inside the film, onto the
                   thing that actually dials.
 
-                  It rotates a quarter turn when open, so the one glyph reads as
-                  "open" and "close" without a second icon or a second label.
+                  **Two glyphs, not one rotated one.** The arrow used to turn a
+                  quarter circle when the card opened, which left a chevron
+                  pointing *down* — the icon a closed disclosure conventionally
+                  wears, so the open card was showing the closed card's cue. A
+                  cross says "close" and nothing else. Only one of the two is
+                  ever in the flow, so the disc's size never depends on which is
+                  showing.
                 */}
                 <span class="contact__note-cue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <svg class="contact__note-cue-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <svg class="contact__note-cue-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </span>
               </span>

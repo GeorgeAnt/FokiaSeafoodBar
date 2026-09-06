@@ -2611,9 +2611,28 @@ main > .section-dark:last-child {
 }
 
 /*
-  The scrim, and the same stops .contact__panel uses — lengths rather than
-  percentages, so the ramp covers a fixed text block whatever the card's size.
-  It carries the title only; the film is what carries the paragraph.
+  The scrim — lengths rather than percentages, so the ramp covers a fixed text
+  block whatever the card's size. It carries the title only; the film is what
+  carries the paragraph.
+
+  **Shorter than .contact__panel's, and the amount was measured rather than
+  chosen.** The client asked for less of the photograph to be greyed on these two
+  cards, on the reasoning that they carry one line where the panels carry two.
+  That reasoning is right about the copy and wrong about the geometry, which is
+  the thing to know before shortening it again: the note title is --step-1 and
+  the Greek "Διοργανώστε την εκδήλωσή σας" **wraps to two lines** at 1366, so its
+  block reaches 6.08rem off the card's bottom against the panels' 6.04rem. The
+  two blocks are the same height. Halving the stops outright would have left that
+  first line sitting at roughly 20-40% black.
+
+  So the dense end covers the measured block and the ramp finishes as soon as it
+  can afterwards: 6.5rem rather than 8, out by 12rem rather than 16. That is a
+  quarter off the ramp's reach and about 1.5rem more picture at the bottom of
+  every card — the visible half of the reduction comes from the wash below, which
+  costs nothing.
+
+  Re-measure this block and move these stops with it whenever a line is added or
+  removed, or the title's size changes. Worst *single* pixel, never the mean.
 */
 .contact__note-summary::before {
   content: '';
@@ -2624,35 +2643,61 @@ main > .section-dark:last-child {
   background: linear-gradient(
     to top,
     color-mix(in srgb, var(--black) 94%, transparent) 0,
-    color-mix(in srgb, var(--black) 90%, transparent) 8rem,
-    color-mix(in srgb, var(--black) 55%, transparent) 11rem,
-    color-mix(in srgb, var(--black) 20%, transparent) 13.5rem,
-    transparent 16rem
+    color-mix(in srgb, var(--black) 90%, transparent) 6.5rem,
+    color-mix(in srgb, var(--black) 55%, transparent) 8.5rem,
+    color-mix(in srgb, var(--black) 20%, transparent) 10rem,
+    transparent 12rem
   );
 }
-/* The wash — the layer that moves. Same split and same reasoning as the panels:
-   the scrim above is load-bearing for contrast and never animates, this is
-   atmosphere and does. */
+/*
+  The wash — the layer that moves. Same split and same reasoning as the panels:
+  the scrim above is load-bearing for contrast and never animates, this is
+  atmosphere and does.
+
+  **15%, half the panels' 30%, and this is where the client's "reduce it by half"
+  is actually paid.** It is a flat layer over the whole card, so it is what dims
+  the *top* of the picture where there is no scrim at all — halving it brightens
+  the photograph everywhere the title is not, which is the whole of what was
+  being asked for. And it cannot move a single contrast figure: the wash only
+  ever adds darkness and fades to nothing on hover, so hovered is already the
+  measured floor. A lighter wash makes the resting state closer to that floor
+  rather than worse than it.
+
+  The two rows therefore no longer wash identically. That is deliberate: the
+  panels' scrim carries a number as well as a title and has more to protect.
+*/
 .contact__note-summary::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: color-mix(in srgb, var(--black) 30%, transparent);
+  background: color-mix(in srgb, var(--black) 15%, transparent);
   transition: opacity 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* Title and cue in one block, pinned where .contact__panel-body sits, so the two
-   rows agree to the pixel about where a card's words begin. */
+/*
+  Title and cue on one line, pinned where .contact__panel-body sits, so the two
+  rows agree to the pixel about where a card's words begin.
+
+  A row, at the client's request that the wording and the arrow share a line
+  rather than stack. `space-between` is what puts the cue hard against the
+  card's right edge without the title needing a width, and `gap` is the floor
+  between the two when a Greek title runs long — the title is `min-width: 0` so
+  it wraps into the space it has rather than pushing the disc off the edge.
+*/
 .contact__note-head {
   position: absolute;
   z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
   left: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
   right: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
   bottom: clamp(0.9rem, 0.6rem + 1.1vw, 1.4rem);
 }
 .contact__note-title {
-  display: block;
+  min-width: 0;
   margin: 0;
   color: var(--salt);
   font-size: var(--step-1);
@@ -2672,6 +2717,10 @@ main > .section-dark:last-child {
 
   Sized in em off the head's own font-size so it never needs a breakpoint, and
   matched to .contact__phone-badge's 1.8em so the two rows' discs are one size.
+
+  `flex: none` is what keeps it circular next to a title that may wrap: without
+  it the disc is a flex item free to be squeezed, and a squeezed 50% radius is an
+  ellipse rather than a smaller circle.
 */
 .contact__note-cue {
   display: inline-flex;
@@ -2680,11 +2729,9 @@ main > .section-dark:last-child {
   flex: none;
   width: 1.8em;
   height: 1.8em;
-  margin-top: 0.35rem;
   border-radius: 50%;
   background: var(--salt);
   font-size: var(--step-0);
-  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .contact__note-cue svg {
   width: 0.95em;
@@ -2693,10 +2740,26 @@ main > .section-dark:last-child {
      same --salt as the disc and the glyph would vanish. */
   color: var(--black);
 }
-/* A quarter turn, so one glyph reads as both "open" and "close" without a second
-   icon or a second label. */
-.contact__note[open] .contact__note-cue {
-  transform: rotate(90deg);
+/*
+  Two glyphs, one at a time — a chevron closed, a cross open.
+
+  It was one glyph rotated a quarter turn, which is a common enough trick and is
+  wrong here: a chevron turned 90deg points *down*, and a downward chevron is
+  what a **closed** disclosure conventionally wears. The open card was therefore
+  showing the closed card's cue, which is worse than no state change at all. A
+  cross is unambiguous and needs no convention.
+
+  Toggled with `display`, so exactly one is ever in the flex flow and the disc
+  cannot be sized by whichever glyph happens to be wider. There is deliberately
+  no transition on the swap: the two shapes share no geometry, so nothing can
+  tween between them, and cross-fading a 15px icon reads as a flicker.
+*/
+.contact__note-cue-close,
+.contact__note[open] .contact__note-cue-open {
+  display: none;
+}
+.contact__note[open] .contact__note-cue-close {
+  display: block;
 }
 
 /*
@@ -2710,17 +2773,26 @@ main > .section-dark:last-child {
   the paragraph is a full sentence about the offer, so nothing on the open card
   is unidentified.
 
-  The cue then moves to bottom-*right* rather than staying put, because with the
-  title gone it would otherwise sit directly beneath the call — two discs stacked
-  in one corner. Opposite corners reads as "call" on one side and "close" on the
-  other, on one line. `text-align: right` is the whole mechanism; the head keeps
-  its own anchor, so nothing about the closed state moves.
+  **`left: auto` is load-bearing and is not the same thing as aligning the cue
+  right.** The head is absolutely positioned inside the summary at z-index 4 —
+  above the film — and left+right together make it span the whole card. With the
+  title hidden that box is almost entirely empty, but it still sits directly over
+  the call link at the bottom of the film and swallows every click on it: the tap
+  landed on the summary and closed the card instead of dialling. Verified with
+  `elementFromPoint` at the badge and at the digits — both returned
+  `.contact__note-head` before this line and the anchor after it. Dropping
+  `left` shrinks the box to the disc itself, which puts the cue in the
+  bottom-right corner *and* leaves the rest of the row to the film.
+
+  So the open card reads "call" on one side and "close" on the other, on one
+  line. The head keeps its own right and bottom anchors, so nothing about the
+  closed state moves.
 */
 .contact__note[open] .contact__note-title {
   display: none;
 }
 .contact__note[open] .contact__note-head {
-  text-align: right;
+  left: auto;
 }
 
 /*
@@ -2832,8 +2904,7 @@ main > .section-dark:last-child {
 @media (prefers-reduced-motion: reduce) {
   .contact__note,
   .contact__note-summary img,
-  .contact__note-summary::after,
-  .contact__note-cue {
+  .contact__note-summary::after {
     transition: none;
   }
   .contact__note:hover,
