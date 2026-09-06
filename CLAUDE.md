@@ -137,11 +137,31 @@ away is now a light band. Work the sequence out in full before changing an
 order; there are only three tiers and both ends are pinned black.
 
 **Each section on the homepage uses a different layout — with one deliberate
-pairing.** Hero is a split, Our Goal is a centred stack of text, From the
+pairing.** Hero is a split, Our Goal is the *same* split mirrored, From the
 kitchen is a centred head over a staggered photo row, Take away is two small
 rounded photo cards that are themselves the call buttons, over a centred stack of
 two paragraphs, Find Us is a centred heading over a text column and a
 photograph.
+
+**Our Goal deliberately continues the hero's grid, and that is the one place on
+this page where repeating a shape is the point.** Its photo column is the same
+half-width full-bleed track the carousel occupies, at the same
+`min(88vh, 52rem)` height and switching at the same 60rem breakpoint, but on the
+opposite side — so the two bands together read as one 2x2 block with the
+pictures on a diagonal: copy top-left, carousel top-right, photo bottom-left,
+copy bottom-right. Measured: carousel 683x704 at x=683, Goal photo 683x704 at
+x=0. If the hero's breakpoint, `min-height` or column split changes, this band
+has to move with it or the diagonal stops lining up — they are one composition
+written in two files.
+
+**This does put two image-and-text splits on the page**, since Find Us is one
+too, and the rest of this file is emphatic about that failure mode. The
+distinction being relied on: Goal is *full-bleed and locked to the hero's
+columns*, a continuation of the band above it, while Find Us is a contained
+split inside the wrap whose photo takes its height from the text beside it.
+They are the same idea at different scales rather than the same shape twice —
+which is a finer distinction than "no two bands share a composition", so it is
+worth re-reading the Team-and-Find-Us history below before adding a third.
 
 **Find Us has had three different shapes in the space of one project, and the
 history is worth keeping because the same request keeps nearly repeating.**
@@ -171,13 +191,12 @@ Take away's own notes are centred and stacked at the client's request, on the
 same 46rem axis as Our Goal and with the measure on the container rather than on
 each paragraph — see the note on `.contact__notes`.
 
-**Every other band on this page is a centred stack, and Find Us is the one that
-doesn't have to be.** Our Goal is a centred stack, From the kitchen is a centred
-head over photographs, Take away is a pair of controls over centred notes — three
-centred compositions already, which is the failure mode the note above records.
-Find Us being a text-column-plus-photo split rather than a fourth centred stack
-is what keeps the homepage from running that shape on every band below the
-hero. Do not simplify it into a centred stack to make it "match" — that would
+**Find Us is not a centred stack, and that is still load-bearing even though
+Our Goal has stopped being one.** From the kitchen is a centred head over
+photographs and Take away is a pair of controls over centred notes — so two
+centred compositions remain below the hero, down from three. Find Us being a
+text-column-plus-photo split is what keeps that from becoming the page's only
+idea. Do not simplify it into a centred stack to make it "match" — that would
 create the exact repetition problem the rest of this file spends so much time
 warning about.
 
@@ -189,15 +208,15 @@ later in the file. `.section-head` still owns `/menu`, `/gallery` and `/team`,
 where `--step-3` is a page title rather than a band label.
 `.section-head--inline` existed only for Find Us and went with the change.
 
-Our Goal and From the kitchen now share a composition on purpose: both are a
-centred heading at --step-2, body copy at --step-0 under it, and a centred
-.btn--primary, on the same 46rem axis. The client asked for the second to match
-the first. What still tells them apart is what sits between the head and the
-button — nothing in Our Goal, four photographs in From the kitchen — so the
-repetition is a *rhyme* between neighbours rather than the Team-and-Find-Us
-problem below, where two bands were the same shape doing the same job. Worth
-watching, though: it is the same failure mode one step earlier, and a third
-centred stack would be too many.
+Our Goal and From the kitchen used to share a composition on purpose — both a
+centred heading at --step-2 over body copy at --step-0 and a centred
+.btn--primary on the same 46rem axis, the client having asked for the second to
+match the first. That rhyme is **gone**, because Goal is a split now. Its
+heading, copy and button are still centred and still share the 46rem measure,
+but inside a half-width column rather than across the band, so the two no longer
+read as the same object at the same scale. Nothing was lost that the file was
+worried about: the note that used to sit here warned a *third* centred stack
+would be too many, and this change took the count down rather than up.
 
 **That rule was being broken by Team, and moving Team to `/team` is what fixed
 it** — worth recording, because the repetition problem was live for a long time
@@ -217,8 +236,11 @@ loses the repetition, and neither had to be traded for the other. The numbers:
 Team was **3249px** at 1366x768, 4.2 viewports in one band, and 4507px on a
 390x844 phone. The homepage went from ~7786px to **4537px** — it lost 42% of its
 height to one move. It has since been **4058px**, while Find Us had no
-photograph, and is **4269px** now that Find Us has one again in its new shape
-(text column plus photo, not the alternating rows Team used) — re-measured at
+photograph, was **4269px** once Find Us had one again (text column plus photo,
+not the alternating rows Team used), and is **4170px** now that Our Goal is a
+split whose height is capped by the viewport rather than set by centred copy —
+that band went 681 to 698 and the page still got *shorter*, because the old
+centred column carried more vertical padding than the split does. Re-measured at
 1366x768; do not assume either older figure still holds.
 
 Before adding a section here, still check what shape its neighbours already
@@ -319,9 +341,13 @@ script does not run, and JS only intercepts the click.
 
 **Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
 bands are not viewport-sized and cannot be. Re-measured at 1366x768 with Find
-Us in its current shape (text column plus photo): Our Goal 681, From the
-kitchen **918**, Take away **853**, Find Us **753**. Two of the four are still
-taller than the screen, which rules `mandatory` out on its own. Team was the
+Us in its current shape (text column plus photo) and Our Goal in its new one
+(the hero-matching split): Our Goal **698**, From the kitchen **918**, Take
+away **853**, Find Us **753**. Two of the four are still taller than the
+screen, which rules `mandatory` out on its own. Our Goal is now the closest of
+the four to a viewport, because its height is a vh-derived `min(88vh, 52rem)`
+rather than content plus padding — but "closest" is not "equal", and the other
+three are what decide this. Team was the
 extreme case at **3249px**, 4.2 viewports, and it is gone from this page.
 
 Note that the figures move a lot and the *identity* of the tall band moves with
@@ -482,29 +508,41 @@ dead-key sweep removed it for never being rendered, so rather than re-adding a
 second key holding the same two words, the nav label and the section title share
 one string deliberately.
 
-**Our Goal is one centred column, and it is the only band with a link out of
-it.** Heading, first paragraph, second paragraph, `.goal__cta` — a
-"Meet the team" button pointing at `/team`, added when Team moved off the
-homepage so the section describing how the place works still leads somewhere.
+**Our Goal is a photo beside a centred column, and it is the only band with a
+link out of it.** The photo is `.goal__media`, the column is `.goal__col`:
+heading, first paragraph, second paragraph, `.goal__cta` — a "Meet the team"
+button pointing at `/team`, added when Team moved off the homepage so the
+section describing how the place works still leads somewhere.
 
-The measure sits on `.goal__body`, not on each paragraph, which is the
-opposite of what the two-column grid did and is what centring requires: centred
-lines are read by their middles, so both paragraphs have to share one axis or
-the block comes apart. 46rem is deliberately narrower than `--measure` (62ch),
-because centred text wants a shorter line — there is no fixed left edge for the
-eye to return to.
+The measure sits on `.goal__body`, not on each paragraph, which is what centring
+requires: centred lines are read by their middles, so both paragraphs have to
+share one axis or the block comes apart. 46rem is deliberately narrower than
+`--measure` (62ch), because centred text wants a shorter line — there is no
+fixed left edge for the eye to return to. Inside a half-width column it now
+rarely reaches that cap, so the number is a ceiling rather than the working
+width; it is kept because the column is the full band below 60rem, where it
+does still bite.
 
-**Two things were given up for this, both on purpose.** The section was a
-two-column grid, and the button was pinned to the end of the second column so
-it sat on the same vertical line as `.plates__cta` in the band below — that
-alignment is gone, because a centred section puts its button in the middle of
-the page. Do not reinstate the old `margin-inline-start: auto` media query
-without moving the section back off centre; the two cannot both be true.
+**The band carries no `.wrap` and no `.section`.** The photo column has to
+reach the viewport edge to line up with the carousel's, which a wrap would
+prevent, and the vertical rhythm `--section-y` would supply is carried by
+`.goal__col`'s own padding instead. `.section-dark` is still on the section, so
+the hairline that separates it from the hero is unchanged.
 
-And the first paragraph is ~60 words, which is long for centred setting. The
-client asked for it with that pointed out. If it ever reads badly the fix is to
-range the paragraphs left inside the same centred column — drop `text-align`
-from the `p` rule — rather than to widen the column.
+**The band has been a two-column grid before, and this is not a return to it.**
+The old grid was two columns *of text* inside the wrap, with the button pinned
+to the end of the second so it sat on the same vertical line as `.plates__cta`
+below. That alignment is still gone and is not worth chasing: the button is
+centred in a half-width column now, which puts it at the three-quarter line of
+the page rather than the middle or the edge. Do not reinstate the old
+`margin-inline-start: auto` media query — it was written for a text column that
+no longer exists.
+
+And the first paragraph is ~60 words, which is long for centred setting — more
+noticeable now that it sets in a half-width column and runs to more lines. The
+client asked for centred copy with that pointed out. If it ever reads badly the
+fix is to range the paragraphs left inside the same column — drop `text-align`
+from the `p` rule — rather than to widen it.
 
 **Four pages.** `/` is the scrolling homepage; `/menu` is the menu and its
 legal block; `/gallery` is the photographs; `/team` is the five member rows,

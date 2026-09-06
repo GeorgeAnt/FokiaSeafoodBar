@@ -1202,25 +1202,95 @@ main > .section-dark:last-child {
 }
 
 /*
-  One centred column, replacing the two-column .goal__grid.
+  The band is a split that continues the hero's grid.
 
-  The measure is on this container rather than on each paragraph, which is the
-  opposite of what the grid did and is what centring requires: centred lines are
-  read by their middles, so both paragraphs have to share one axis or the block
-  comes apart. 46rem is narrower than --measure (62ch, ~44rem at this size) by
-  design — centred text wants a shorter line than ranged-left text, because
-  there is no fixed left edge for the eye to return to.
+  Above 60rem — the hero's own breakpoint, deliberately, so the two bands change
+  shape at the same width — this is two equal full-bleed columns and the photo
+  takes `min(88vh, 52rem)`, which is the hero's `min-height` verbatim. That is
+  what "the same dimensions as the carousel" means here: the picture below the
+  copy is the same box as the picture beside it.
 
-  KNOWN COST, accepted by the client when they asked for this: the first
+  No .wrap and no .section: the photo column has to reach the viewport edge to
+  line up with the carousel's, so the band cannot be inset by a wrap, and the
+  vertical rhythm --section-y would add is carried by the text column's own
+  padding instead. The .section-dark hairline still draws the top edge.
+
+  Stacked below 60rem the photo keeps a 4/5 frame, the same ratio .hero__media
+  falls back to.
+*/
+.goal__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 60rem) {
+  .goal__grid {
+    grid-template-columns: 1fr 1fr;
+    min-height: min(88vh, 52rem);
+  }
+}
+
+/*
+  The text column carries the band's padding, since the section has none — and
+  it is centred *within its own half* rather than across the whole band.
+*/
+.goal__col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(3rem, 2rem + 6vw, 6rem) var(--gutter);
+}
+@media (min-width: 60rem) {
+  .goal__col {
+    padding-inline: clamp(2rem, 1rem + 4vw, 5rem);
+  }
+}
+
+/*
+  Source order is text then photo, so the photo stacks *under* the text on a
+  phone — which is the right way round there. The hero above ends with the
+  carousel, so a photo-first Goal would put two photographs back to back with
+  nothing between them.
+
+  `order: -1` only inside the media query: it moves the picture to the left of
+  the text once they are side by side, which is the whole point of the layout,
+  and it is a purely visual move — the DOM keeps the h2 first.
+*/
+.goal__media {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--black) 80%, var(--stone));
+  aspect-ratio: 4 / 5;
+}
+.goal__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (min-width: 60rem) {
+  .goal__media {
+    order: -1;
+    aspect-ratio: auto;
+  }
+  /* Out of flow so the picture cannot set the row's height: the grid's height
+     comes from the text column and the min-height above, and the image fills
+     whatever that turns out to be. Same construction as .find__media. */
+  .goal__media img {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/*
+  The measure is on this container rather than on each paragraph, which is what
+  centring requires: centred lines are read by their middles, so both paragraphs
+  have to share one axis or the block comes apart. It is capped so the column
+  does not set an over-long centred line on a wide screen — inside a half-width
+  track it now rarely reaches the cap, which is the point.
+
+  KNOWN COST, accepted by the client when they asked for centred copy: the first
   paragraph is ~60 words, and that is long for centred setting. If it ever reads
-  badly, the fix is to range the paragraphs left inside this same centred column
-  (drop text-align on the p rule) rather than to widen it.
-
-  This also gave up an alignment. The button used to be pinned to the end of the
-  second column so it sat on the same vertical line as .plates__cta in the band
-  below; centred, it is in the middle of the page instead. That was the trade,
-  made deliberately — do not "restore" the old media query without moving the
-  section back off centre.
+  badly, the fix is to range the paragraphs left inside this same column (drop
+  text-align here) rather than to widen it.
 */
 .goal__body {
   max-width: 46rem;

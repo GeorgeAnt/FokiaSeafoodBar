@@ -1,10 +1,31 @@
 ---
+import { Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { galleryPhoto } from '../lib/photos';
+import gallery from '../data/gallery.json';
 
 interface Props {
   locale?: Locale;
 }
 const { locale = defaultLocale } = Astro.props;
+
+/*
+  Picked by id, never by position — the same rule Plates.astro follows, and for
+  the same reason: gallery.json is ordered for the gallery, so reordering it
+  would otherwise change this band silently. Throwing at build time is better
+  than rendering the column with a hole in it.
+*/
+const GOAL_PHOTO_ID = 'toast-outdoors';
+const photo = gallery.images.find((candidate) => candidate.id === GOAL_PHOTO_ID);
+if (!photo) {
+  throw new Error(
+    `Our Goal wants the gallery image "${GOAL_PHOTO_ID}", which has no entry in ` +
+      `data/gallery.json. Add one (with alt text in both locales), or point ` +
+      `GOAL_PHOTO_ID in Goal.astro at an id that exists.`
+  );
+}
+const photoSrc = galleryPhoto(photo.file);
+const photoAltKey = `gallery.${photo.id}.alt`;
 ---
 
 {/*
@@ -17,47 +38,79 @@ const { locale = defaultLocale } = Astro.props;
   hero-to-Goal edge is drawn rather than implied — and --charcoal is a step up
   from --black besides, so the two are not the same value either.
 */}
-<section class="section section-dark" id="goal">
+{/*
+  A split, not a centred band, and it is built to continue the hero's grid.
+
+  The photo column is the same half-width, full-bleed track the carousel sits
+  in directly above it, and takes the same height — so the top of the page
+  reads as one 2x2 block with the picture on a diagonal: copy top-left,
+  carousel top-right, photo bottom-left, copy bottom-right.
+
+  Source order is text then photo, which is both the reading order (the h2
+  opens the band) and the order this stacks in on a phone. `order` moves the
+  photo to the left only once the two are side by side — see .goal__media in
+  global.css for why it stacks *under* the text rather than over it.
+*/}
+<section class="section-dark goal" id="goal">
   {/* One reveal for the whole band: the heading, the two paragraphs and the
       button are a single thought, and staggering them made the heading arrive
       on its own above nothing. */}
-  <div class="wrap" data-reveal>
+  <div class="goal__grid" data-reveal>
+    <div class="goal__col">
+      {/*
+        The heading names the section, which it did not use to.
+
+        This band carried two stacked titles: a small wood eyebrow reading
+        "Our Goal" and, under it, a --step-2 sentence ("To serve fish with the
+        respect it deserves"). The client asked for one, so the eyebrow's words
+        were promoted into the sentence's size and the sentence itself was cut —
+        `goal.lead` went with it.
+
+        It reads `nav.goal` rather than a heading key of its own, which is what
+        the eyebrow did too. There was a `goal.heading` once and it was deleted
+        in a dead-key sweep for never being rendered; re-adding it would put the
+        same two words in two keys that can drift apart silently. The nav label
+        and the section title should agree, so they share one string.
+
+        This also makes Our Goal the last section to stop carrying an eyebrow —
+        see the note in CLAUDE.md about why they were a bug rather than a device.
+      */}
+      <h2 class="goal__heading" data-i18n="nav.goal">{t(locale, 'nav.goal')}</h2>
+
+      {/*
+        Heading, first paragraph, second, button — still one stack, and still
+        centred, but now centred inside its own half of the band rather than
+        across the whole of it. The measure stays on .goal__body rather than on
+        each paragraph: centred lines are read by their middles, so the two
+        paragraphs have to share one axis or the block comes apart.
+      */}
+      <div class="goal__body">
+        <p data-i18n="goal.body">{t(locale, 'goal.body')}</p>
+        <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
+        <a class="btn btn--primary goal__cta" href="/team" data-i18n="goal.cta">
+          {t(locale, 'goal.cta')}
+        </a>
+      </div>
+    </div>
+
     {/*
-      The heading names the section, which it did not use to.
+      Widths mirror the hero carousel's, because the column is the same size:
+      half the viewport above 60rem, the full width stacked below it.
 
-      This band carried two stacked titles: a small wood eyebrow reading
-      "Our Goal" and, under it, a --step-2 sentence ("To serve fish with the
-      respect it deserves"). The client asked for one, so the eyebrow's words
-      were promoted into the sentence's size and the sentence itself was cut —
-      `goal.lead` went with it.
-
-      It reads `nav.goal` rather than a heading key of its own, which is what
-      the eyebrow did too. There was a `goal.heading` once and it was deleted in
-      a dead-key sweep for never being rendered; re-adding it would put the same
-      two words in two keys that can drift apart silently. The nav label and the
-      section title should agree, so they share one string.
-
-      This also makes Our Goal the last section to stop carrying an eyebrow —
-      see the note in CLAUDE.md about why they were a bug rather than a device.
+      It keeps its real alt — unlike the Take away cards, nothing here is a
+      link, so the picture is content rather than part of a control's name.
     */}
-    <h2 class="goal__heading" data-i18n="nav.goal">{t(locale, 'nav.goal')}</h2>
-
-    {/*
-      One centred column, stacked: heading, first paragraph, second, button.
-
-      This was a two-column grid with the button pinned to the end of the second
-      column so it lined up with From the kitchen's button in the band below.
-      The client asked for the section to be centred instead, which puts the
-      button in the middle of the page — that alignment is deliberately given
-      up, not lost by accident, and the media query that produced it is gone
-      from global.css.
-    */}
-    <div class="goal__body">
-      <p data-i18n="goal.body">{t(locale, 'goal.body')}</p>
-      <p data-i18n="goal.body2">{t(locale, 'goal.body2')}</p>
-      <a class="btn btn--primary goal__cta" href="/team" data-i18n="goal.cta">
-        {t(locale, 'goal.cta')}
-      </a>
+    <div class="goal__media">
+      <Picture
+        src={photoSrc}
+        formats={['avif', 'webp']}
+        widths={[400, 600, 800, 1000, 1300, 1600]}
+        sizes="(min-width: 60rem) 50vw, 100vw"
+        alt={t(locale, photoAltKey)}
+        data-i18n-alt={photoAltKey}
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   </div>
 </section>
