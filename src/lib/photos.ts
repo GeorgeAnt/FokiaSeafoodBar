@@ -46,8 +46,28 @@ export const carouselPhotos: ImageMetadata[] = Object.keys(carousel)
   .map((k) => carousel[k]!.default);
 
 /**
- * The badge, transparent outside the circle. The only logo file: it carries the
- * hero and the footer, and scripts/prepare-favicons.mjs generates the icons from
- * it. The old opaque 512px square went with the nav logo it existed for.
+ * The badge, transparent outside the circle. It carries the nav and the footer,
+ * and scripts/prepare-favicons.mjs generates the icons from it. The old opaque
+ * 512px square went with the nav logo it existed for.
  */
 export { default as logoClean } from '../assets/photos/backgrounds/logo-clean.png';
+
+/**
+ * The horizontal wordmark lockup — "fokia" with the wave motif, SEAFOOD BAR
+ * under it — used as the hero's h1.
+ *
+ * Derived from the client's LOGO-01.png, which is a 4725x4725 canvas holding a
+ * 4725x2770 mark: trimmed to the artwork and resized to 600px wide. The trim is
+ * the point. The hero renders this as a CSS *mask* so the colour comes from
+ * --light-stone rather than from the file, and a mask sized `contain` would
+ * otherwise fit the square canvas and leave ~41% of the box as empty field
+ * above and below the mark.
+ *
+ * Regenerate with, from the repo root:
+ *   sharp('src/assets/photos/backgrounds/LOGO-01.png')
+ *     .trim({ threshold: 1 }).resize({ width: 600 }).png()
+ *
+ * The artwork is pure white (255,255,255) on transparency, so the shape lives
+ * entirely in the alpha channel — which is exactly what a mask reads.
+ */
+export { default as logoWordmark } from '../assets/photos/backgrounds/logo-wordmark.png';

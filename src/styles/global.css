@@ -996,45 +996,61 @@ main > .section-dark:last-child {
 }
 
 /*
-  The h1 is the logo, so there is no text here to size — only the image.
-  No border-radius: the artwork already carries its own round badge inside a
-  wide transparent field, and clipping the box would cut the field, not the
-  badge.
-*/
-/*
-  The typeset lockup that replaced logo-clean.png in the hero. It is the site's
-  one piece of display type: 88px at 1366, against the 47px of --step-3 that is
-  otherwise the largest thing on the site. That is deliberate and is why it is
-  not on the step scale — it stands in for a 214px logo, not for a heading, and
-  putting it on --step-4 would have dragged that token out of the ramp for one
-  use. Both colours are --light-stone: --stone measures 2.9:1 on the hero black
-  and fails even the 3:1 large-text minimum, so the stone that reads here is the
-  light one.
+  The client's own wordmark lockup, painted rather than placed.
+
+  It is a `mask-image`, not an <img>, and that is the whole reason this works
+  in a token. The artwork (LOGO-01.png, see lib/photos.ts) is pure white on
+  transparency, so its shape lives in the alpha channel: masked, the element's
+  own `background` is what you see, and the colour stays --light-stone rather
+  than being baked into a file that would need regenerating every time the
+  palette moved.
+
+  --light-stone, never --stone: 6.55:1 on the hero's Deep Black against 2.9:1,
+  which fails even the 3:1 large-text floor. That was true of the typeset
+  wordmark this replaces and it is no less true of a silhouette.
+
+  The size is carried over from that typeset lockup rather than invented: it
+  measured 191x114 at 1366 and 145x76 at 390, so the clamp below lands 192px
+  and 144px of *width* at those two viewports and the height follows from the
+  artwork's own 1.705 aspect — 113px and 84px. Matching the width matched the
+  height to within a pixel at the top end, which is luck, but it is why this
+  reads as the same object at the same scale rather than as a new one.
+
+  aspect-ratio, not a height: the mask has no intrinsic size to contribute, so
+  without it the box would collapse to nothing.
 */
 .hero__wordmark {
   margin: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.85rem;
-  color: var(--light-stone);
+  justify-content: center;
 }
-.hero__wordmark-name {
-  font-size: clamp(3rem, 1.8rem + 5.5vw, 5.5rem);
-  font-weight: 700;
-  line-height: 0.95;
-  /* Headings take -0.02em; a wordmark set this large needs more, or the
-     counters of a geometric sans open up and it stops reading as one word. */
-  letter-spacing: -0.04em;
+.hero__wordmark-mark {
+  display: block;
+  width: clamp(9rem, 7.9rem + 4.7vw, 12rem);
+  aspect-ratio: 1.705;
+  /*
+    The fill is gated behind support for the thing that shapes it, because this
+    rule fails *open*: a browser that paints the background but cannot mask it
+    shows a solid stone rectangle 191px wide in the middle of the hero, which
+    is far worse than showing nothing. Unsupported, the box stays empty and the
+    .sr-only text still gives the h1 its name.
+  */
+  -webkit-mask-image: var(--wordmark);
+  mask-image: var(--wordmark);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  /* contain, not cover: the asset is trimmed to the artwork, so the box and the
+     mark share an aspect and contain simply fills it. cover would crop the
+     lockup if that ever stopped being exactly true. */
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
-.hero__wordmark-tag {
-  font-size: var(--step--1);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.35em;
-  /* Tracking is applied after the last letter too, so a centred line sits half
-     a space left of centre. This pulls that trailing space back off. */
-  margin-inline-start: 0.35em;
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .hero__wordmark-mark {
+    background: var(--light-stone);
+  }
 }
 
 /*
