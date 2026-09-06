@@ -545,6 +545,13 @@ worth knowing about before you look at the site and wonder:
   social icons and language button were also shrunk down to a smaller, matched
   size as part of the same change — see the tap-target note above.
 
+- **On a phone the two social icons sit in the middle of the bar**, with the
+  logo on the left and the language button and burger on the right. From tablet
+  width up they move across and join the language button on the right. This
+  also fixed a bug on narrow phones (around 320px, an iPhone SE), where the
+  burger no longer fitted on the line and dropped underneath the rest of the
+  bar.
+
 Two things are recorded trade-offs rather than oversights:
 
 - **The carousel dashes** sit at 1.7–2.3:1 against the photos, under the 3:1 a

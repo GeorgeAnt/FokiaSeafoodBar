@@ -17,8 +17,9 @@ const { locale = defaultLocale } = Astro.props;
   it as a dropdown panel behind the burger toggle, at every viewport width.
   Source order still governs the panel's reading order and the tab order, it
   just no longer has to double as a visual layout. The logo is at the start,
-  the social icons and the language button sit at the end of the visible row
-  because that is where you go looking for them, and the toggle follows them.
+  the social icons follow it — they are centred in the bar, not ranged with the
+  utilities, so they are their own child rather than part of `.nav__utils` —
+  and the language button and the toggle end the row as one group.
 
   It renders logo-clean.png, the same file the hero and the footer use, cropped
   by `object-fit` rather than by a second asset — see the note on `.nav__logo`
@@ -93,9 +94,9 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
       }
     </ul>
 
-    <div class="nav__utils">
-      <SocialLinks class="nav__social" />
+    <SocialLinks class="nav__social" />
 
+    <div class="nav__utils">
       {/*
         One button, not a pair of them. It is labelled with the language it will
         switch *to* — "English" on the Greek page, "ΕΛ" on the English one — so
@@ -150,21 +151,29 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
           {t(locale, `lang.short.${other}`)}
         </span>
       </button>
-    </div>
 
-    <button
-      type="button"
-      class="nav__toggle"
-      id="nav-toggle"
-      aria-expanded="false"
-      aria-controls="nav-links"
-      aria-label={t(locale, 'a11y.openMenu')}
-      data-i18n-label="a11y.openMenu"
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
-      </svg>
-    </button>
+      {/*
+        The toggle sits inside `.nav__utils` rather than beside it because the
+        bar is a three-track grid now (see `.nav__inner` in global.css) and the
+        social icons own the middle track. Everything to the right of them has
+        to be one grid item or it would need a track of its own, which is
+        exactly what would stop the icons centring against the *bar* rather
+        than against their neighbours.
+      */}
+      <button
+        type="button"
+        class="nav__toggle"
+        id="nav-toggle"
+        aria-expanded="false"
+        aria-controls="nav-links"
+        aria-label={t(locale, 'a11y.openMenu')}
+        data-i18n-label="a11y.openMenu"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
   </nav>
 </header>
 

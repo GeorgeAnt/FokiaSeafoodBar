@@ -732,10 +732,36 @@ Node is installed but **not on the shell PATH**; prepend it first:
   text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
 - **The nav shows no links inline any more, at any viewport width — the burger
   toggle is the only way into them, on desktop as much as on a phone.** The bar
-  is logo, then `.nav__utils` (social icons, language button), then the toggle,
-  a wrapping flex row with `order` placing the three on one line; the link list
-  is a full-width panel under that row, shown only while
-  `.nav__inner[data-open='true']`. See `.nav__inner` in `global.css`.
+  is logo, social icons, then `.nav__utils` (language button and toggle), laid
+  out as a **three-track grid**; the link list is a full-width panel spanning
+  all three tracks, shown only while `.nav__inner[data-open='true']`. See
+  `.nav__inner` in `global.css`.
+
+  **The social icons are centred in the bar on a phone and ranged right from
+  48rem, and that one difference is the only thing the breakpoint changes.**
+  The tracks go `1fr auto 1fr` → `1fr auto auto`, so the empty right-hand
+  track collapses and the icons land beside the language button as one group
+  again — the arrangement the bar had before the client asked for centring on
+  mobile. Every item keeps its track and its `justify-self` at both sizes;
+  `.nav__social`'s `justify-self` is the single declaration that flips.
+
+  **The grid replaced a wrapping flex row and fixed a real bug doing it.** The
+  flex row paid two 1rem gaps plus 1.1rem inside `.nav__utils`, which at 320px
+  came to 281.6px of row inside a 280px wrap, and the toggle wrapped onto a
+  second line — the failure the entry below *claims* a `max-width: 22.5rem`
+  block was handling. There was no such block in the stylesheet; the note
+  outlived the code, which is exactly what the top of this file warns about.
+  A grid cannot wrap, so the failure mode is gone by construction rather than
+  by a narrow-width rule that has to be re-measured whenever a control resizes.
+
+  What it costs is symmetry: `1fr auto 1fr` centres the icons against the
+  *bar*, so both side tracks take the width of the wider one, and that is the
+  language-plus-toggle group (~92px), not the 80px logo. Measured at 320px:
+  92 + 68 + 92 and two 0.5rem gaps = 268px inside 280px, icons centred to
+  0.00px of the viewport centre, bar 97px, nothing wrapped. The gap opens to
+  1rem from 30rem and 1.1rem from 48rem. Verified at 320, 360, 390, 414, 767,
+  768, 1024 and 1366: one line at every width, and from 768 the icons sit
+  17.6px from the language button.
 
   **History, kept because a future redesign might want it back and would
   otherwise re-discover all of this from nothing.** The bar used to render the
@@ -1047,20 +1073,25 @@ Node is installed but **not on the shell PATH**; prepend it first:
   **The budget itself did not go away, and it came back within one change.**
   Widening the utilities' group gap from 0.5rem to 1.1rem spent ~10px the
   320px bar did not have: groups 250px + two 1rem gaps = 282px against 280px,
-  and the toggle wrapped onto a second line. It is handled now by a
-  `max-width: 22.5rem` block that distributes the row instead of paying fixed
-  gaps — see `.nav__inner` at the end of the nav section. The lesson is that
-  the logo staying 5rem at every width is what keeps this tight: 80px of a
-  280px row is the single largest thing in the budget, and anything else that
-  grows is spending against it.
+  and the toggle wrapped onto a second line.
 
-  **`scrollWidth` is the wrong test here and it passed while the bar was
-  broken.** A wrapped row is not an overflowing one, so `scrollWidth` still
-  equals the viewport, and the bar does not get taller either — two ~40px rows
-  still fit inside its 6rem min-height. The reading that shows it is
-  `.nav__toggle`'s `top` against `.nav__logo`'s `bottom`. `scrollWidth` was
-  the right test for the *old* inline link list, which really did overrun;
-  it does not transfer to a row whose items are allowed to wrap.
+  **This paragraph used to claim a `max-width: 22.5rem` block was handling
+  that, and no such block existed** — the bar was shipping broken at 320px
+  and was reported from a device. It is a grid now (see the nav entry above),
+  which cannot wrap at all. The lesson about the budget still holds and is why
+  the grid needs measuring rather than trusting: the logo staying 5rem at every
+  width is 80px of a 280px row, the single largest thing in it, and anything
+  else that grows is spending against it.
+
+  **`scrollWidth` is the wrong test for a wrapping row and it passed while the
+  bar was broken.** A wrapped row is not an overflowing one, so `scrollWidth`
+  still equals the viewport, and the bar does not get taller either — two ~40px
+  rows still fit inside its 6rem min-height. The reading that shows it is
+  `.nav__toggle`'s `top` against `.nav__logo`'s `bottom`, which is what
+  confirmed the grid: every item tops out at 28-32px in one row. `scrollWidth`
+  was the right test for the *old* inline link list, which really did overrun,
+  and it is the right test again now that the row cannot wrap — it only fails
+  in between, on a row whose items are allowed to wrap.
 - **`.lang` and `.social a` are both a deliberate step down from the 44px
   target this file otherwise holds every tappable control to, and the two are
   now sized to align rather than to each hit their own floor.** `.social a` is
@@ -1078,12 +1109,19 @@ Node is installed but **not on the shell PATH**; prepend it first:
   no exceptions.
 
   **Two gaps, not one, and the difference is what groups them.** `.social`
-  spaces its own two icons at 0.25rem; `.nav__utils` spaces the icon pair from
-  the language button at 1.1rem, at the client's request for air between the
-  two. Once all three controls are the same height, one even gap would set
-  them out as four peers in a row instead of a pair and a button — so if the
-  utility row is ever re-spaced, the *ratio* between those two numbers is the
-  part doing the work, not either value on its own.
+  spaces its own two icons at 0.25rem; the icon pair is set apart from the
+  language button at 1.1rem, at the client's request for air between the two.
+  Once all three controls are the same height, one even gap would set them out
+  as four peers in a row instead of a pair and a button — so if the utility row
+  is ever re-spaced, the *ratio* between those two numbers is the part doing
+  the work, not either value on its own.
+
+  **That 1.1rem moved out of `.nav__utils` and onto the grid when the icons
+  left the group**, and it now exists only from 48rem, in `.nav__inner`'s
+  media query — below that the icons are centred in their own track and there
+  is no gap to be the group boundary. `.nav__utils` keeps a plain 0.5rem for
+  the two unlike controls it still holds, a filled pill and a bare glyph,
+  which need less air between them than two groups did.
 
   `.social svg` is the same 2rem as its box for a reason that is easy to
   mistake for an oversight; the rule carries the explanation.

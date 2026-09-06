@@ -650,22 +650,78 @@ main > .section-dark:last-child {
   width-budget math it required (see CLAUDE.md's history on the old 75rem
   breakpoint) are gone rather than being one more tier to maintain.
 
-  What is left is the layout that used to be the "collapsed" fallback, now
-  unconditional: a wrapping flex row with `order` placing logo, utilities and
-  toggle on the first line and the link list (`.nav__links`, below) as a
+  What is left is a three-track grid with the logo in the first track, the
+  social icons in the middle one and the language button plus the toggle in the
+  last, and the link list (`.nav__links`, below) spanning all three as a
   full-width panel that only appears when `[data-open='true']`.
+
+  **The tracks change at 48rem and only the middle one moves.** On a phone the
+  grid is `1fr auto 1fr`, so the icons are centred in the bar; from 48rem it is
+  `1fr auto auto`, the empty track collapses onto the left of the logo, and the
+  icons land beside the language button as one right-hand group again — the
+  arrangement the bar had before, at the client's request that centring is a
+  phone treatment rather than the layout. Nothing else is restated: the three
+  items keep the same tracks and the same `justify-self` at both sizes, and the
+  only other declaration in the media query is the gap.
+
+  **The grid replaced a wrapping flex row, and it fixed a real bug rather than
+  only centring the icons.** The flex row paid two fixed 1rem gaps plus a
+  1.1rem gap inside `.nav__utils`, and at 320px the wrap is 280px against
+  80 (logo) + 68 (icons) + 44 (language) + 40 (toggle) = 232px of content: the
+  gaps came to 49.6px, the row came to 281.6px, and the toggle wrapped onto a
+  second line. It was reported from a device. Note that CLAUDE.md claimed a
+  `max-width: 22.5rem` block handled exactly this and no such block was in the
+  file — the note outlived the code.
+
+  The grid cannot wrap at all, so that failure mode is gone by construction
+  rather than by a breakpoint that has to be re-measured whenever a control
+  changes size. What it costs instead is symmetry: `1fr auto 1fr` centres the
+  icons against the *bar*, so both side tracks are as wide as the wider of the
+  two, and the wider one is the language-plus-toggle group at ~92px, not the
+  80px logo. At 320px that is 92 + 68 + 92 + two 0.5rem gaps = 268px inside
+  280px. The gap opens to 1rem from 30rem up, where there is room for it.
+
+  Centring against the container rather than against the neighbours is the same
+  thing the old inline link list needed, and `position: absolute` was tried and
+  reverted for it once already — see CLAUDE.md. A grid track does it in flow.
 
   6rem = 96px, +1px of border = 97px, which is exactly what scroll-padding-top
   on <html> is set to. Raising this means raising scroll-padding-top in the
   same edit or every anchor jump lands under the bar.
 */
 .nav__inner {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   row-gap: 0;
-  column-gap: 1rem;
+  column-gap: 0.5rem;
   min-height: 6rem;
+}
+@media (min-width: 30rem) {
+  .nav__inner {
+    column-gap: 1rem;
+  }
+}
+/*
+  Tablet and up: the icons stop being centred and rejoin the utilities on the
+  right. `auto` for the third track rather than `1fr` is the whole change —
+  the middle track then sits against it instead of in the middle of the bar.
+
+  1.1rem, not the 1rem above, because at this width the gap is doing the job
+  `.nav__utils` used to do with its own: it separates the pair of icons from
+  the language button, and it has to stay wider than `.social`'s 0.25rem or the
+  four controls read as four peers rather than a pair and a group. It applies
+  between the logo and the icons too, where nothing depends on it — the 1fr
+  track has already pushed them apart.
+*/
+@media (min-width: 48rem) {
+  .nav__inner {
+    grid-template-columns: 1fr auto auto;
+    column-gap: 1.1rem;
+  }
+  .nav__social {
+    justify-self: end;
+  }
 }
 .nav__inner[data-open='true'] {
   max-height: 100dvh;
@@ -673,17 +729,44 @@ main > .section-dark:last-child {
 }
 
 /*
-  The gap here separates the *groups* — the pair of social icons from the
-  language button — and is deliberately wider than `.social`'s own 0.25rem,
-  which keeps the two icons reading as one object. Same-sized controls set at
-  one even spacing would read as four peers in a row instead.
+  The language button and the toggle, as one grid item at the end of the bar.
+
+  The social icons used to live here too, and the 1.1rem gap that separated
+  them from the language button — deliberately wider than `.social`'s own
+  0.25rem, so the icon pair read as one object rather than as peers in a row —
+  went with them: the grid's middle track is what sets the icons apart now, and
+  it is a whole track rather than a gap. What is left is two unlike controls, a
+  filled pill and a bare glyph, which need far less air between them than two
+  groups did.
+
+  `justify-self: end` rather than `margin-inline-start: auto`: the track is
+  1fr and therefore wider than this group, so the item has to be pushed inside
+  its own cell.
 */
 .nav__utils {
   display: flex;
   align-items: center;
-  gap: 1.1rem;
-  order: 1;
-  margin-inline-start: auto;
+  gap: 0.5rem;
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+
+/*
+  The middle track, and the one item on this bar whose position changes with
+  the viewport: centred on a phone, ranged right with the utilities from 48rem
+  (see the media query above).
+
+  `justify-self: center` is redundant against an `auto` track that is exactly
+  the icons' width — the centring is really done by the two 1fr tracks either
+  side — and it is kept because it is the half of the pair the media query
+  overrides. Written as two states of one property, the phone/tablet difference
+  is legible in one line rather than spread across track lists.
+*/
+.nav__social {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
 }
 
 /*
@@ -726,8 +809,9 @@ main > .section-dark:last-child {
 */
 .nav__logo {
   display: block;
-  flex: none;
-  order: 0;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
   width: 5rem;
   height: 5rem;
   border-radius: 50%;
@@ -744,7 +828,9 @@ main > .section-dark:last-child {
   width, and stacks full width below the logo/utilities/toggle row.
 */
 .nav__links {
-  order: 3;
+  /* Row 2, spanning every track: the panel is the width of the bar. */
+  grid-column: 1 / -1;
+  grid-row: 2;
   width: 100%;
   display: none;
   flex-direction: column;
@@ -940,7 +1026,6 @@ main > .section-dark:last-child {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  order: 2;
   padding: 0.5rem;
 }
 .nav__toggle svg {
