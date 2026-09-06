@@ -2015,6 +2015,36 @@ main > .section-dark:last-child {
   }
 }
 
+/*
+  Centred head, sized to match the other bands rather than `.section-head`.
+
+  --step-2 on the heading and body size on the line under it are what
+  .plates__head, .goal__heading and .find__head h2 all render at; the three band
+  titles on this page are one size and this is the fourth. 46rem is the same
+  measure Our Goal and From the kitchen centre their copy on, so the four blocks
+  share an axis down the page.
+
+  **Deliberately not `.section-head`**, for the reason recorded on
+  .plates__head: that class sets --step-3 at the same specificity as a per-band
+  override, so keeping it would make each heading's size depend on which rule
+  came later in the file. `.section-head` still owns /menu, /gallery and /team,
+  where --step-3 is a page title rather than a band label.
+*/
+.contact__head {
+  max-width: 46rem;
+  margin-inline: auto;
+  margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+  text-align: center;
+}
+.contact__head h2 {
+  font-size: var(--step-2);
+  line-height: 1.25;
+}
+.contact__head p {
+  margin-top: 0.9rem;
+  color: var(--text-muted);
+}
+
 /* --------------------------------------------------------------------------
    Contact — two cards, each of which places one phone call.
 
@@ -2509,75 +2539,336 @@ main > .section-dark:last-child {
   `overflow: hidden` is what makes the photograph take the card's top corners;
   the media block below has no radius of its own.
 */
+/*
+  The note card is the panel card, plus a film.
+
+  It did not start that way: it was a photograph stacked *above* a flat panel
+  holding the paragraph, because a ~60-word paragraph cannot sit on
+  .contact__panel's scrim (a fixed-length ramp sized for two short bold lines
+  owing 3:1, where body copy owes 4.5:1). That construction was correct and it
+  was also the thing that made the lower row read as a different species from
+  the upper one — two photo cards over two article cards.
+
+  Moving the paragraph behind a disclosure dissolves the constraint rather than
+  fighting it. Closed, this is the same object as .contact__panel: same 4:3, same
+  1.75rem radius, same scrim, same title in the same corner, same circular badge.
+  Open, the film hides the photograph outright, so the paragraph is on a flat
+  surface and owes nothing to the scrim at all.
+
+  **Keep this in step with .contact__panel.** The two are now deliberately one
+  design in two files' worth of rules; a change to the panel's ratio, radius,
+  scrim or motion that is not made here reopens exactly the complaint this
+  revision existed to answer.
+*/
 .contact__note {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
-  border: 1px solid var(--rule);
   border-radius: 1.75rem;
+  /* Dark for the reason .contact__panel is: the card's own background paints in
+     the anti-aliased fringe of the rounded clip, so a light value traces a pale
+     hairline round the corner. It is also the placeholder behind a lazy image on
+     a dark band. */
   background: var(--black);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+/* Square while the cards are stacked one per row — the same switch, at the same
+   breakpoint, for the same reason .contact__panel makes it: a fixed-height text
+   block eats a far larger share of a short card. */
+@media (max-width: 47.999rem) {
+  .contact__note {
+    aspect-ratio: 1 / 1;
+  }
 }
 
 /*
-  Square, and the sources decide it rather than the layout: both photographs are
-  portrait — oysters 1152x2560 (1:2.22) and the shared table 1707x2560 (2:3) — so
-  a wide strip would have cut the oysters down to a band of crushed ice and taken
-  the noodle bowl off the bottom of the other. A centred 1:1 keeps the whole
-  subject of both, verified against the masters, and needs no object-position
-  override in either case.
+  The summary is the whole closed card, so it is sized to fill it rather than
+  laid out as a row of its own.
 
-  It is also the ratio .contact__panel takes below 48rem, so on a phone all four
-  cards in this band are square and the block stays one idea.
-
-  The cost is height, and it is real: a 1:1 media block is as tall as the card is
-  wide, so the pair adds ~440px at 1366 against the ~150px the two centred
-  paragraphs used to take. If that ever needs to come back, the thing to change
-  is the ratio *and* the photographs together — a landscape crop needs landscape
-  sources, which neither of these is.
+  `list-style: none` plus the -webkit- pseudo-element is what removes the
+  disclosure triangle; **both are needed**, because Safari still draws the marker
+  from the pseudo-element even when list-style is cleared.
 */
-.contact__note-media {
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  /* Dark for the same reason .contact__panel is: this is the placeholder behind
-     a lazy image on a dark band, and a light one flashes before the photo
-     arrives. There is no rounded-clip fringe to worry about here — the corners
-     belong to the card, which is already --black underneath. */
-  background: var(--black);
+.contact__note-summary {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  cursor: pointer;
 }
-/*
-  `video` as well as `img`: the events card carries a clip where the sourcing
-  card carries a photograph, and both fill the same square box the same way.
-  `object-fit` is doing nothing for the video today — it is encoded 1:1 to match
-  this box — but it is what keeps the rule honest if a future cut is not square,
-  and it is why the poster and the first frame line up exactly.
-*/
-.contact__note-media img,
-.contact__note-media video {
-  display: block;
+.contact__note-summary::-webkit-details-marker {
+  display: none;
+}
+.contact__note-summary img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Slower than the card, exactly as on the panels: the lift is the response to
+     the pointer and the photograph drifting behind it is the depth. */
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /*
-  The padding lives on the text block and the control rather than on the card,
-  because the photograph has to reach the card's edges. Roomier than
-  .contact__panel-body's inset: that block sits over a picture whose own frame is
-  doing some of the work, and this one has only the 1.75rem curve, which eats the
-  corners of a text box at this size.
+  The scrim, and the same stops .contact__panel uses — lengths rather than
+  percentages, so the ramp covers a fixed text block whatever the card's size.
+  It carries the title only; the film is what carries the paragraph.
+*/
+.contact__note-summary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--black) 72%, transparent);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--black) 94%, transparent) 0,
+    color-mix(in srgb, var(--black) 90%, transparent) 8rem,
+    color-mix(in srgb, var(--black) 55%, transparent) 11rem,
+    color-mix(in srgb, var(--black) 20%, transparent) 13.5rem,
+    transparent 16rem
+  );
+}
+/* The wash — the layer that moves. Same split and same reasoning as the panels:
+   the scrim above is load-bearing for contrast and never animates, this is
+   atmosphere and does. */
+.contact__note-summary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: color-mix(in srgb, var(--black) 30%, transparent);
+  transition: opacity 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Title and cue in one block, pinned where .contact__panel-body sits, so the two
+   rows agree to the pixel about where a card's words begin. */
+.contact__note-head {
+  position: absolute;
+  z-index: 4;
+  left: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
+  right: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
+  bottom: clamp(0.9rem, 0.6rem + 1.1vw, 1.4rem);
+}
+.contact__note-title {
+  display: block;
+  margin: 0;
+  color: var(--salt);
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/*
+  The cue: the same filled disc as .contact__phone-badge, carrying an arrow
+  instead of a phone.
+
+  An arrow was tried on the *panels* and removed, because an arrow says "goes
+  somewhere" and those cards place a call. These cards do go somewhere — they
+  open — so the glyph is right here for precisely the reason it was wrong there,
+  and the phone stays on the thing that dials, inside the film.
+
+  Sized in em off the head's own font-size so it never needs a breakpoint, and
+  matched to .contact__phone-badge's 1.8em so the two rows' discs are one size.
+*/
+.contact__note-cue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.8em;
+  height: 1.8em;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+  background: var(--salt);
+  font-size: var(--step-0);
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.contact__note-cue svg {
+  width: 0.95em;
+  height: 0.95em;
+  /* Black on the fill, never currentColor — currentColor would resolve to the
+     same --salt as the disc and the glyph would vanish. */
+  color: var(--black);
+}
+/* A quarter turn, so one glyph reads as both "open" and "close" without a second
+   icon or a second label. */
+.contact__note[open] .contact__note-cue {
+  transform: rotate(90deg);
+}
+
+/*
+  Open, the title goes and the cue crosses to the other corner.
+
+  **The title has to go, and the first attempt at keeping it is what proved it.**
+  With the title still pinned bottom-left, the film had to reserve 5.5rem under
+  the paragraph to clear it — and the copy plus the call then needed 356px inside
+  a 326px card, so `margin-top: auto` collapsed and the phone number was drawn
+  straight through the title. Hiding it gives that space back and costs nothing:
+  the paragraph is a full sentence about the offer, so nothing on the open card
+  is unidentified.
+
+  The cue then moves to bottom-*right* rather than staying put, because with the
+  title gone it would otherwise sit directly beneath the call — two discs stacked
+  in one corner. Opposite corners reads as "call" on one side and "close" on the
+  other, on one line. `text-align: right` is the whole mechanism; the head keeps
+  its own anchor, so nothing about the closed state moves.
+*/
+.contact__note[open] .contact__note-title {
+  display: none;
+}
+.contact__note[open] .contact__note-head {
+  text-align: right;
+}
+
+/*
+  The film — near-opaque, and that is the whole reason this layout works.
+
+  .contact__panel::before is a *gradient* because the picture has to stay visible
+  behind two short lines. This one is allowed to hide the photograph, so the
+  paragraph sits on what is effectively a flat surface: it measures like text on
+  a panel rather than text on a picture, and swapping either photograph cannot
+  change a single contrast figure.
+
+  z-index 3 puts it above the photo, the scrim and the wash, but below
+  .contact__note-head at 4 — so the title and the cue stay lit and clickable over
+  it, and the cue remains the way to close the card. The head does not create a
+  stacking context of its own, which is what lets it outrank a sibling's child.
+*/
+.contact__note-film {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
+  /* Bottom padding matches .contact__note-head's own offset, which is what puts
+     the call and the cue on one line in opposite corners. */
+  padding-bottom: clamp(0.9rem, 0.6rem + 1.1vw, 1.4rem);
+  /* Clear of the cue, so a long last line never runs under it. */
+  padding-right: calc(clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem) + 2.5rem);
+  background: color-mix(in srgb, var(--black) 93%, transparent);
+  /* A long paragraph in a short card is the one thing that could overflow here.
+     At the measured sizes it does not, at any width in either locale — this is
+     the guard rather than the mechanism. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/*
+  **The card keeps its ratio when open — it does not grow, and that was checked
+  rather than assumed.**
+
+  The obvious worry is a paragraph too long for a fixed-height card, and the
+  obvious fix is to let the card size to its copy: put the film back in flow
+  (the summary is `position: absolute`, so the film would be the only in-flow
+  child) and the height follows the text. Two measurements killed that:
+
+  - On its own it *shrinks* the card — 348 → 202 on a 390px phone — so opening
+    one made it visibly jump smaller than its neighbour.
+  - `display: grid` was the fix for the shrink, on the theory that a grid item's
+    `auto` min-height sets a floor while `aspect-ratio` sets the base. It holds
+    the floor but **not** the ceiling: with the paragraph artificially tripled,
+    the film grew to 495px and the card stayed at 326 and clipped it. So the
+    "larger of ratio and content" behaviour does not actually exist here;
+    `aspect-ratio` wins.
+
+  Which is the right outcome anyway. A card that grew would break the row it
+  shares — and a uniform 2x2 is the entire point of this revision. So the film
+  stays absolute and fills the card by construction, the copy is sized to fit
+  (see `.contact__note-text`), and `overflow-y` above is the guard if the client
+  ever lengthens a paragraph past what the ratio allows. Measured at 1366, 1024,
+  768, 390 and 320 in both locales: zero overflow, and the card is the same size
+  open as closed at every one.
+*/
+
+/*
+  Hover, focus and press on the card itself — the same lift, the same photograph
+  drift and the same wash fade .contact__panel makes, so the two rows respond
+  identically to a pointer.
+
+  Gated behind `hover: hover` and `pointer: fine` for the reason the rest of this
+  file repeats: a touch browser fakes :hover on tap and leaves it applied, and
+  these cards are tapped. `:focus-visible` is duplicated *outside* the gate
+  because a keyboard is not a pointer.
+
+  **Only while closed.** An open card has a film over the photograph, so lifting
+  and zooming a picture nobody can see is motion with nothing behind it — and
+  the wash fading under an opaque film is invisible work.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .contact__note:not([open]):hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1.5rem 2.5rem color-mix(in srgb, var(--black) 45%, transparent);
+  }
+  .contact__note:not([open]):hover .contact__note-summary img {
+    transform: scale(1.05);
+  }
+  .contact__note:not([open]):hover .contact__note-summary::after {
+    opacity: 0;
+    transition-duration: 0.8s;
+  }
+}
+.contact__note:has(.contact__note-summary:focus-visible) {
+  transform: translateY(-4px);
+  box-shadow: 0 1.5rem 2.5rem color-mix(in srgb, var(--black) 45%, transparent);
+}
+/* The ring goes on the summary, which is the focusable element; the card only
+   carries the lift. */
+.contact__note-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+  border-radius: 1.75rem;
+}
+/* A press has to land under the finger, not half a second after it. */
+.contact__note:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact__note,
+  .contact__note-summary img,
+  .contact__note-summary::after,
+  .contact__note-cue {
+    transition: none;
+  }
+  .contact__note:hover,
+  .contact__note:active,
+  .contact__note:has(.contact__note-summary:focus-visible) {
+    transform: none;
+  }
+  .contact__note:hover .contact__note-summary img {
+    transform: none;
+  }
+}
+
+/*
+  The paragraph, on the film rather than on the photograph — which is what lets
+  it be ordinary body copy at ordinary contrast. --text-muted resolves to
+  --light-stone on this tier; measured against the film further down.
 */
 .contact__note-text {
   margin: 0;
-  padding: clamp(1.3rem, 1rem + 1.1vw, 1.8rem) clamp(1.3rem, 1rem + 1.1vw, 1.8rem)
-    clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
+  /*
+    A step down from the --step-0 this copy had when it sat in a panel of its
+    own, because it now has to fit a card rather than set the card's height. At
+    --step-0 the Greek events paragraph plus the call needed 356px inside a 326px
+    card at 1366 — it fitted only after the title was dropped, with nothing to
+    spare, and Greek is the longer locale. This buys the margin back at every
+    width instead of at the one that was measured.
+  */
+  font-size: var(--step--1);
   color: var(--text-muted);
 }
 
 /*
-  `margin-top: auto` rather than a fixed gap: the grid stretches both cards to
-  the taller one's height, and the two paragraphs are not the same length, so
-  without it the badges would sit at different heights and the row would read as
-  two cards that failed to line up.
+  `margin-top: auto` pins the call to the bottom of the film whatever the
+  paragraph's length, so the two cards' badges land on one line when both are
+  open — the same job it did when the paragraph sat in a flat panel.
 
   `align-self: start` keeps the target the width of its own content — a
   full-width anchor would put a ~400px hit area under a ~150px control, and a
@@ -2595,7 +2886,6 @@ main > .section-dark:last-child {
   align-self: start;
   gap: 0.4rem;
   margin-top: auto;
-  padding: 0 clamp(1.3rem, 1rem + 1.1vw, 1.8rem) clamp(1.3rem, 1rem + 1.1vw, 1.8rem);
   border-radius: 999px;
   color: var(--salt);
   font-size: var(--step-0);

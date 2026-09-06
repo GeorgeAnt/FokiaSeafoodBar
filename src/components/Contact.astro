@@ -1,7 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
-import { galleryPhoto } from '../lib/photos';
+import { galleryPhoto, sushiEvents } from '../lib/photos';
 import gallery from '../data/gallery.json';
 import site from '../data/site.json';
 
@@ -88,40 +88,41 @@ const swapAttrs = {
   midnight. Both of these paragraphs ask to be contacted; neither is bound to a
   service window.
 
-  The photographs are picked against the copy, not for variety. `shared-table`
-  is a table mid-meal — a reaching hand, a board of rolls, a bowl of noodles, a
-  cocktail — which is what "προγραμματίσουμε τη δική σου εκδήλωση" is offering.
-  `oysters-on-ice` is the client's own request for the sourcing card, and it is
-  the right one: the paragraph is about getting hold of something particular,
-  and oysters are the most legible instance of that on the whole site.
+  The photographs are picked against the copy, not for variety, and both are the
+  client's own choices. `sushi-events.jpg` is a service being plated — trays of
+  rolls laid out in quantity — which is what "προγραμματίσουμε τη δική σου
+  εκδήλωση" is offering. `oysters-on-ice` is the sourcing card: the paragraph is
+  about getting hold of something particular, and oysters are the most legible
+  instance of that on the whole site.
 
-  Neither is used anywhere else on the homepage. `toast-outdoors` was the
-  obvious first pick for events and is already Our Goal's photograph, and
+  Neither is used anywhere else on the homepage. When the events card was still
+  drawing from the gallery, `toast-outdoors` was the obvious pick for it and is
+  already Our Goal's photograph, and
   `sushi-board-overhead` is one of the four plates directly above this band —
   check both before changing an id here.
 */
 /*
-  The events card carries a video where the sourcing card carries a photograph.
+  The events card's photograph does not come from the gallery and the sourcing
+  card's does, which is the one asymmetry in this band worth explaining.
 
-  **It is not in `src/assets`, and it cannot be.** Astro processes images only —
-  there is no `<Picture>` for video, no generated variants and no content hash —
-  so the encoded file is served verbatim out of `public/`. `scripts/prepare-video.mjs`
-  is the only record of how it was made, and `npm run video` remakes it.
+  `sushi-events.jpg` is the client's own shot of a service being plated, and
+  they did not want it as a tile on /gallery — so it is a named export from
+  lib/photos.ts with its alt in the locale files, rather than an id looked up in
+  gallery.json. See the note on `sushiEvents` there for why it is not simply
+  dropped into `gallery/` unlisted: `npm run check` would report it as "not
+  shown on the site", which would be false.
 
-  It replaced `shared-table`, which is consequently free again. Note the photo
-  and the video are **not** interchangeable: the photo is a portrait master
-  cropped down, the video is a 228x228 clip scaled up.
+  It replaced `shared-table`, which is consequently free again.
 */
 const NOTES = [
-  {
-    key: 'contact.events',
-    video: { src: '/video/sushi-events.mp4', poster: '/video/sushi-events-poster.jpg', w: 228, h: 228 },
-  },
-  { id: 'oysters-on-ice', key: 'contact.sourcing' },
+  { key: 'contact.events', titleKey: 'contact.eventsTitle', photo: sushiEvents },
+  { key: 'contact.sourcing', titleKey: 'contact.sourcingTitle', id: 'oysters-on-ice' },
 ];
 
-const notes = NOTES.map(({ id, key, video }) =>
-  video ? { key, video } : { ...fromGallery(id!, 'NOTES in Contact.astro'), key }
+const notes = NOTES.map(({ id, key, titleKey, photo }) =>
+  photo
+    ? { key, titleKey, src: photo }
+    : { ...fromGallery(id!, 'NOTES in Contact.astro'), key, titleKey }
 );
 ---
 
@@ -139,13 +140,36 @@ const notes = NOTES.map(({ id, key, video }) =>
   as one continuous run of photographs — and now that they are small and heavily
   rounded, they read as controls rather than as photography at all.
 
-  The section heading is .sr-only: it carries the combined nav label so the
-  outline and the /#contact anchor still have a heading, while the two card
-  titles say each half once.
+  The heading is visible now. It was `.sr-only` for as long as this band had no
+  title of its own — it carried the combined nav label, "Κλείστε τη θέση σας •
+  Take away", purely so the outline and the /#contact anchor had a heading, and
+  showing *that* string was never an option: it is word for word the two panel
+  titles directly beneath it, which is the two-titles-stacked failure the eyebrow
+  note in CLAUDE.md is entirely about. New copy is what made a visible heading
+  possible, not a change of mind about hiding it.
 */}
 <section class="section section-dark" id="contact">
   <div class="wrap">
-    <h2 class="sr-only" data-i18n="contact.heading">{t(locale, 'contact.heading')}</h2>
+    {/*
+      Heading plus one line, the same shape .plates__head has — this was the only
+      band below the hero without a visible title, so it is joining the pattern
+      rather than inventing one.
+
+      **It renders `nav.contact`, not a heading key of its own.** The nav label
+      and the title are now the same two words, and this codebase has already
+      decided that case once: `goal.heading` was deleted rather than kept beside
+      `nav.goal` holding identical text. `contact.heading` went the same way here.
+      Change the words in one place and the nav follows, which is the point.
+
+      The intro names the four services rather than explaining how to work the
+      cards. Saying "tap to see more" would have been wrong about half of them —
+      only the two note cards open; the panels dial on tap — and the arrows
+      already say which is which.
+    */}
+    <header class="contact__head" data-reveal>
+      <h2 data-i18n="nav.contact">{t(locale, 'nav.contact')}</h2>
+      <p data-i18n="contact.intro">{t(locale, 'contact.intro')}</p>
+    </header>
 
     <div class="contact__panels" data-reveal>
       {
@@ -243,95 +267,113 @@ const notes = NOTES.map(({ id, key, video }) =>
     <div class="contact__notes" data-reveal>
       {
         notes.map((note) => (
-          <div class="contact__note">
+          /*
+            A <details>, and that is the whole interaction — there is no script
+            behind these cards at all.
+
+            The site's other hide-and-reveal is `.has-reveal`, which exists
+            because a CSS rule that hides content has to be owned by something
+            that can un-hide it; the danger there is a failed script leaving the
+            page at opacity 0. A native disclosure has no such failure mode. It
+            opens without JS, it is keyboard-operable without JS, it announces
+            its own expanded state without ARIA, and the paragraph inside is real
+            DOM the whole time, so search engines and screen readers get the copy
+            whether or not anyone clicks. Do not "upgrade" this to a button and a
+            class toggle: that would be strictly more code and strictly less
+            robust.
+          */
+          <details class="contact__note">
             {/*
-              Square, and the sources are what decide it: both photographs are
-              portrait (1152x2560 and 1707x2560), so a wide strip would have cut
-              the oysters to a band of ice and taken the noodle bowl off the
-              bottom of the shared table. A centred 1:1 keeps the whole subject
-              of each — verified against both masters — and matches what the
-              panels above already do below 48rem.
+              The summary is the entire closed card — photograph, title and cue.
+
+              Which is exactly why the photograph is `alt=""` here, and it is the
+              same rule the panels above follow rather than a second one:
+              everything inside the control is concatenated into its accessible
+              name, so a descriptive alt would read a sentence about plated
+              sushi before the words that say what the control does. The picture
+              illustrates the title; the title identifies the control. This is
+              what the note cards' own real alt text was traded for when they
+              stopped being passive cards and became controls.
             */}
-            <div class="contact__note-media">
-              {
-                note.video ? (
-                  /*
-                    No `autoplay` and no `loop`, and both omissions are the
-                    feature.
+            <summary class="contact__note-summary">
+              <Picture
+                src={note.src}
+                formats={['avif', 'webp']}
+                widths={[400, 600, 900]}
+                sizes="(min-width: 48rem) 26rem, 100vw"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="contact__note-head">
+                <span class="contact__note-title" data-i18n={note.titleKey}>
+                  {t(locale, note.titleKey)}
+                </span>
+                {/*
+                  An arrow, where the panels carry a phone — and the difference
+                  is the point rather than an inconsistency.
 
-                    `preload="none"` plus the observer below means nothing is
-                    fetched until the card is nearly on screen — this band sits
-                    ~1800px down, and an eager fetch would put the file in front
-                    of the hero's LCP image on a page that otherwise makes zero
-                    JS requests.
+                  CLAUDE.md records an arrow being tried on the panels and
+                  removed, because an arrow says "goes somewhere" and those cards
+                  place a call. These cards genuinely do go somewhere: they open.
+                  So the arrow is correct here for the same reason it was wrong
+                  there, and the phone glyph moves inside the film, onto the
+                  thing that actually dials.
 
-                    Playing once, for 4.5s, is what keeps this clear of WCAG
-                    2.2.2: that rule covers movement which starts automatically
-                    and lasts more than five seconds, so a clip trimmed under it
-                    needs no pause control. Looping would have made the movement
-                    indefinite and required one. The site already carries one
-                    knowing 2.2.2 failure in the hero carousel; this is
-                    deliberately not a second.
+                  It rotates a quarter turn when open, so the one glyph reads as
+                  "open" and "close" without a second icon or a second label.
+                */}
+                <span class="contact__note-cue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </span>
+            </summary>
 
-                    `aria-hidden` because a <video> takes no alt and this one is
-                    illustration — the paragraph beside it says everything the
-                    card means. That is a small loss against the photograph it
-                    replaced, which did carry translated alt text.
-                  */
-                  <video
-                    data-autoplay-video
-                    src={note.video.src}
-                    poster={note.video.poster}
-                    width={note.video.w}
-                    height={note.video.h}
-                    muted
-                    playsinline
-                    preload="none"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <Picture
-                    src={note.src}
-                    formats={['avif', 'webp']}
-                    widths={[400, 600, 900]}
-                    sizes="(min-width: 48rem) 26rem, 100vw"
-                    alt={t(locale, note.altKey)}
-                    data-i18n-alt={note.altKey}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                )
-              }
+            {/*
+              The film. Near-opaque rather than a gradient, and that is what
+              makes this layout possible at all.
+
+              These paragraphs are ~60 words. The panels' scrim is a fixed-length
+              ramp sized for two short bold lines owing 3:1, and body copy owes
+              4.5:1 — putting a paragraph on it is the failure this band spent a
+              whole revision avoiding by stacking photo above text. A film that
+              is *allowed* to hide the photograph has none of that difficulty:
+              the copy sits on what is effectively a flat surface, so it measures
+              like text on a panel rather than text on a picture.
+            */}
+            <div class="contact__note-film">
+              <p class="contact__note-text" data-i18n={note.key}>
+                {t(locale, note.key)}
+              </p>
+              {/*
+                The same badge-and-number control the panels carry, so all four
+                cards end at one affordance. It swaps on the clock like the
+                reservations panel — see the note on NOTES above — and the href
+                and the digits are rewritten together by the one script below.
+
+                The .sr-only label is there because the visible text is bare
+                digits: out of context, a link named "21 3099 1571" says nothing
+                about what it does. It uses contact.phoneLabel, the key Find Us
+                already renders as a visible label, so nothing new is invented
+                and the switch owns both. Prefixed rather than appended, and the
+                visible number stays inside the accessible name either way,
+                which is what WCAG 2.5.3 asks for.
+              */}
+              <a class="contact__note-call" href={`tel:${site.phone.href}`} {...swapAttrs}>
+                <span class="sr-only" data-i18n="contact.phoneLabel">
+                  {t(locale, 'contact.phoneLabel')}
+                </span>
+                <span class="contact__phone-badge">
+                  <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+                  </svg>
+                </span>
+                <span class="contact__phone-number">{site.phone.display}</span>
+              </a>
             </div>
-            <p class="contact__note-text" data-i18n={note.key}>
-              {t(locale, note.key)}
-            </p>
-            {/*
-              The same badge-and-number control the panels carry, so the four
-              cards offer one affordance rather than two. It swaps on the clock
-              like the reservations panel — see the note on NOTES above — and the
-              href and the digits are rewritten together by the one script below.
-
-              The .sr-only label is there because the visible text is bare
-              digits: out of context, a link named "21 3099 1571" says nothing
-              about what it does. It uses contact.phoneLabel, the key Find Us
-              already renders as a visible label, so nothing new is invented and
-              the switch owns both. Prefixed rather than appended, and the
-              visible number stays inside the accessible name either way, which
-              is what WCAG 2.5.3 asks for.
-            */}
-            <a class="contact__note-call" href={`tel:${site.phone.href}`} {...swapAttrs}>
-              <span class="sr-only" data-i18n="contact.phoneLabel">
-                {t(locale, 'contact.phoneLabel')}
-              </span>
-              <span class="contact__phone-badge">
-                <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                  <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
-                </svg>
-              </span>
-              <span class="contact__phone-number">{site.phone.display}</span>
-            </a>
-          </div>
+          </details>
         ))
       }
     </div>
@@ -402,42 +444,4 @@ const notes = NOTES.map(({ id, key, video }) =>
     });
   }
 
-  // The events card's clip: fetched and played once, when the card is nearly on
-  // screen, and never again.
-  //
-  // The markup deliberately carries neither `autoplay` nor `loop`, so
-  // everything here is additive — if this script never runs, the card shows its
-  // poster and is simply a still photograph, which is exactly what the sourcing
-  // card beside it is. Nothing is hidden waiting to be revealed, so there is no
-  // half-loaded state to get stuck in.
-  //
-  // `preload="none"` is the point of doing it here rather than with the
-  // attribute: this band is ~1800px down a page that makes zero JS requests and
-  // whose LCP is the hero image. Letting the browser fetch a video eagerly would
-  // spend that budget on something nobody has scrolled to yet.
-  const clips = document.querySelectorAll<HTMLVideoElement>('[data-autoplay-video]');
-  const stillness = matchMedia('(prefers-reduced-motion: reduce)');
-
-  // Reduced motion keeps the poster and never fetches the video at all — the
-  // still is the whole experience, which is the same call the hero carousel
-  // makes for the same visitor.
-  if (clips.length && !stillness.matches) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const video = entry.target as HTMLVideoElement;
-          observer.unobserve(video);
-          // muted + playsinline is what makes an unattended play() permissible;
-          // if a browser refuses anyway, the poster stays and nothing breaks.
-          video.play().catch(() => {});
-        }
-      },
-      // Start the fetch just before the card arrives, so the first frame is
-      // ready rather than arriving a beat after the card does.
-      { rootMargin: '200px 0px' }
-    );
-
-    clips.forEach((clip) => observer.observe(clip));
-  }
 </script>

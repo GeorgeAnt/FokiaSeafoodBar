@@ -33,7 +33,7 @@
   "nav.menu": "The Menu",
   "nav.team": "The Team",
   "nav.gallery": "Gallery",
-  "nav.contact": "Reserve your spot • Take away",
+  "nav.contact": "Call us",
   "nav.findUs": "Where to Find Us",
 
   "hero.tagline": "seafood bar",
@@ -61,11 +61,13 @@
   "gallery.heading": "Gallery",
   "gallery.intro": "Moments from our table.",
 
-  "contact.heading": "Reserve your spot • Take away",
+  "contact.intro": "A table, take away, an event, or something off-menu — we're on the phone.",
   "contact.reserveTitle": "Reserve your spot",
   "contact.takeawayTitle": "Take away",
   "contact.events": "Call us to plan your own event — a corporate lunch, a party, an opening, an anniversary, a birthday, a name day — with a custom menu built around the quality and the creativity of Fokia Seafood Bar, at your own venue.",
   "contact.sourcing": "Through our suppliers we have access to the finest ingredients on the market. If there is something special you would like to taste and share with your table, get in touch — we will find it and we will cook it for you.",
+  "contact.eventsTitle": "Plan your event",
+  "contact.sourcingTitle": "Off-menu requests",
   "contact.phoneLabel": "Phone",
   "contact.emailLabel": "Email",
 

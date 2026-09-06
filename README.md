@@ -21,12 +21,7 @@ npm run build     # production build into dist/
 npm run preview   # serve the built dist/ locally
 npm run check     # validate the content files (see below)
 npm run favicons  # regenerate the favicons from the logo (only if it changes)
-npm run video     # re-encode the events card's clip (only for a new cut)
 ```
-
-`npm run video` needs ffmpeg, which the others do not: install it once with
-`winget install Gyan.FFmpeg` and open a new terminal. You only need it if the
-client sends a new version of the events video.
 
 Deploy by uploading `dist/` to any static host — Netlify, Vercel, Cloudflare
 Pages, GitHub Pages, or plain nginx. There is no server and no database.
@@ -247,6 +242,20 @@ photo is often 5 MB against the ~200–500 KB the prepared masters run to, and
 nothing warns you. If you do it that way, shrink the file to 2560px on its
 longest edge first, and keep your original somewhere outside the repo (ideally
 in the source folder, so `npm run photos` can reproduce it later).
+
+**One photo on the site is deliberately not in this file.** The picture on the
+events card — the first of the lower pair in the Take away band — is
+`src/assets/photos/sections/sushi-events.jpg`, kept out of `gallery.json` so it
+does **not** appear as a tile on `/gallery`. It needs no description entry:
+all four cards in that band are clickable, and a description on a picture inside
+a button gets read out as part of the button's name, so those four photos are
+marked as decoration instead. The card's title does the describing.
+
+Worth knowing if you ever replace it: **the file the client sent was 68% black
+bars.** It looked like an ordinary widescreen photo but was really a tall phone
+photo with black filling the sides, so it had to be cropped down to the real
+picture before use. Check any replacement for the same thing — the recipe for
+cropping it is written above the photo in `src/lib/photos.ts`.
 
 ### Restaurant details — `src/data/site.json`
 
@@ -471,9 +480,8 @@ forward.
 | `/gallery` | 126 KB raw, **31 KB gzipped** |
 | `/team` | 106 KB raw, **27 KB gzipped** |
 | JavaScript requests | **0** — every script is inlined |
-| Video | 70 KB, fetched only on scroll — see [The events video](#the-events-video) |
 | Fonts | 8 files, 75 KB total (Manrope 400/500/600/700, Greek + Latin) — 6 preloaded |
-| Total `dist/` | 57 MB across 489 files, almost all image variants the browser chooses between |
+| Total `dist/` | 57 MB across 490 files, almost all image variants the browser chooses between |
 
 The Food/Drinks switch, the menu, and the whole page work with JavaScript
 disabled — verified. JavaScript only adds the hero crossfade, the mobile menu
@@ -654,7 +662,8 @@ Several have gone stale before.
 
 ```
 src/
-  assets/photos/      downsampled masters — carousel, gallery, team, backgrounds
+  assets/photos/      downsampled masters — carousel, gallery, team,
+                      backgrounds, sections
   components/         Nav, Hero, Goal, Plates, Menu, MenuCategory, MenuItem,
                       Team, Gallery, Contact, FindUs, Footer
   data/               ← content lives here (menu, team, gallery, site, legal)
@@ -725,31 +734,6 @@ than behind it, precisely so that measurement is not needed: their paragraphs
 are far too long to sit safely over a photograph. They read against a flat
 panel — 6.6:1 on the paragraph and 14.8:1 on the number — and swapping either
 picture cannot change those.
-
-### The events video
-
-The first card of the lower pair plays a short clip instead of showing a photo.
-Things worth knowing if you ever replace it:
-
-- **It plays once and stops, and it must stay that way.** Four seconds, no
-  loop. Anything that moves by itself for more than five seconds has to come
-  with a pause button to meet accessibility rules; under five seconds and
-  played once, it does not. Setting it to loop would break that.
-- **It stops on its last frame**, so that frame is what the card looks like
-  from then on. It is chosen deliberately — the widest shot of the finished
-  trays — not just wherever the clip happens to end.
-- **Nothing downloads until you scroll to it**, and visitors who have asked
-  their device to reduce motion never download it at all; they see the still
-  instead.
-- **The client's file was mostly black.** It arrived as a square video, but the
-  actual picture inside it was a small portrait clip with black bars filling
-  82% of the frame. `npm run video` crops that away — which is also why the
-  finished file is 70 KB instead of 2.2 MB.
-- **It is softer than the photo beside it**, because after cropping, the real
-  picture is only 228 pixels across and the card shows it about twice that
-  size. Nothing in the encoding can fix that. **If you can get the original
-  video off the phone it was filmed on** (before it was exported and padded),
-  it would be sharp — send that and re-run `npm run video`.
 
 `.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
 on purpose — it and the `--wood-pale` accent only make sense together — and is

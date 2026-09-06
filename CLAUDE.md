@@ -110,17 +110,16 @@ from reading as one continuous run of photographs is that the panels are still
 not before. Verified on the rendered page.
 
 **And that boundary is now carrying twice the load, because Take away holds
-four pictures rather than two.** The two service notes became cards with media
-of their own (see below), so the band directly under From the kitchen's four
-plates is itself eight pictures deep. What still keeps the two groups apart is
-the same two things — the hairline, and every one of the eight being inset
-rather than full-bleed — plus two that are new: the two rows of Take away are
-built differently from each other, panels carrying text *over* the picture and
-notes carrying it *under*; and the events card **moves**, which nothing else
-below the hero does. That last one does real work and is worth knowing before
-anyone removes the video: without it the boundary is thinner than it was with
-two cards. **A ninth picture in this neighbourhood is the thing to argue
-about**, not the layout it arrives in.
+four photographs rather than two.** The two service notes became cards with
+pictures of their own (see below), so the band directly under From the
+kitchen's four plates is itself eight photographs deep. What still keeps the
+two groups apart is the same two things — the hairline, and every one of the
+eight being inset rather than full-bleed — plus a third that is new: the two
+rows of Take away are built differently from each other, panels carrying text
+*over* the picture and notes carrying it *under*. That is a thinner distinction
+than a tier change and thinner again than it was with two cards. **A ninth
+photograph in this neighbourhood is the thing to argue about**, not the layout
+it arrives in.
 
 Contrast was re-measured on the new ground rather than carried over, since every
 one of these sections changed tier: headings and CTAs (`--salt`) 13.22:1, body
@@ -152,10 +151,9 @@ order; there are only three tiers and both ends are pinned black.
 **Each section on the homepage uses a different layout — with one deliberate
 pairing.** Hero is a split, Our Goal is the *same* split mirrored, From the
 kitchen is a centred head over a staggered photo row, Take away is a 2x2 block
-of rounded cards — two photo cards that are themselves the call buttons, over
-two cards that are a picture above a paragraph and a call link (the events one
-a short video, the sourcing one a photograph) — Find Us is a centred heading
-over a text column and a photograph.
+of rounded cards, all four the same object — two that dial on tap, and two that
+open onto a film carrying a paragraph and the call — Find Us is a centred
+heading over a text column and a photograph.
 
 **Our Goal deliberately continues the hero's grid, and that is the one place on
 this page where repeating a shape is the point.** Its photo column is the same
@@ -213,9 +211,12 @@ both rules retired together: the copy is ranged left inside the card, and the
 card is the axis. Do not re-centre it to "match" Our Goal — see
 `.contact__notes`.
 
-The cards take the panels' own 56rem cap, gap, 48rem breakpoint and 1.75rem
-radius, so all four land on one 2x2 block. Measured at 1366x768: panels 434x326,
-note cards 434x720, both columns at x=235 and x=697.
+The cards take the panels' own 56rem cap, gap, 48rem breakpoint, 1.75rem radius
+and 4:3 ratio, so all four are now literally the same card. Measured at
+1366x768: panels **434x326**, note cards **434x326**, both columns at x=235 and
+x=697. That equality is the point rather than a coincidence — see the
+`<details>` note further down for what it cost and why the ranged-left copy this
+paragraph describes now lives inside a film.
 
 **Find Us is not a centred stack, and the pressure that made that rule has
 mostly drained away — which is the reason to restate it rather than delete
@@ -229,8 +230,11 @@ just as quietly. Do not simplify Find Us into a centred stack to make it
 "match" something; check what the other bands actually are first, because this
 paragraph has been wrong about that twice.
 
-**The three band headings are one size.** `.goal__heading`, `.plates__head h2`
-and `.find__head h2` are all `--step-2`. None of them uses `.section-head`,
+**The four band headings are one size.** `.goal__heading`, `.plates__head h2`,
+`.contact__head h2` and `.find__head h2` are all `--step-2`. Take away was the
+last band without a visible title and joined them rather than inventing a
+treatment — measured on the rendered page, all three of the others and this one
+compute to 32.368px. None of them uses `.section-head`,
 which is `--step-3`: that class and a per-band override have equal specificity,
 so keeping it would have made each heading's size depend on which rule came
 later in the file. `.section-head` still owns `/menu`, `/gallery` and `/team`,
@@ -271,15 +275,18 @@ split whose height is capped by the viewport rather than set by centred copy —
 that band went 681 to 698 and the page still got *shorter*, because the old
 centred column carried more vertical padding than the split does.
 
-It is **4689px** now, and that one went the other way: giving Take away's two
-service notes photographs of their own took that band from **853 to 1372**, the
-single largest increase any band on this page has had. The cost is entirely the
-1:1 media block — see `.contact__note-media` for why the ratio is not
-negotiable without changing the photographs — and it was accepted knowingly. On
-a 390x844 phone the band is **2099px**, since all four cards stack. Re-measured
-at 1366x768 in Greek, which is the taller of the two locales here (English runs
-the events paragraph one line shorter and the band 1343px); do not assume any
-older figure still holds.
+It is **4294px** now, and Take away is the band that has moved it twice in
+opposite directions. Giving the two service notes photographs of their own took
+that band from **853 to 1372** — the largest single increase any band here has
+had, all of it a 1:1 media block sitting above the copy. Folding the copy into a
+click-revealed film took it back to **978**: the cards became the same 4:3 the
+panels are, and a paragraph that had been setting the card's height stopped
+contributing to it at all.
+
+Re-measured at 1366x768 in Greek. Note the locale caveat that applied to the
+older figure no longer does: the paragraph is inside the film now, so Greek
+running longer than English changes nothing about the band's height. Do not
+assume any older figure still holds.
 
 Before adding a section here, still check what shape its neighbours already
 are. Find Us is once again an image-and-text split, which is the shape Team
@@ -381,9 +388,8 @@ script does not run, and JS only intercepts the click.
 bands are not viewport-sized and cannot be. Re-measured at 1366x768 with Find
 Us in its current shape (text column plus photo) and Our Goal in its new one
 (the hero-matching split): Our Goal **698**, From the kitchen **918**, Take
-away **1372**, Find Us **753**. Three of the four are now taller than the
-screen, and Take away is nearly two of them, which rules `mandatory` out more
-firmly than before rather than less. Our Goal is now the closest of
+away **978**, Find Us **753**. Three of the four are still taller than the
+screen, which rules `mandatory` out on its own. Our Goal is now the closest of
 the four to a viewport, because its height is a vh-derived `min(88vh, 52rem)`
 rather than content plus padding — but "closest" is not "equal", and the other
 three are what decide this. Team was the
@@ -394,9 +400,12 @@ them, and Find Us in particular has now been measured at three different
 heights across three different shapes: 1082 with its original 3:4 portrait,
 542 with no photo at all, 753 in the current text-plus-photo layout — tallest,
 shortest, then in between, in that order. **Take away has swung further than
-any of them**: 232 as a heading and a phone number, 853 with two photo panels,
-1372 with four cards — it was the short-band case that made `.section--tight`
-necessary, and it is the tall-band case now. Re-measure; do not quote these.
+any of them, and in both directions**: 232 as a heading and a phone number, 853
+with two photo panels, 1372 once the two service notes gained photographs of
+their own, and 978 once their copy moved into a film and the cards became one
+uniform 2x2. It was the short-band case that made `.section--tight` necessary
+and briefly the tall-band case; it is neither now. Re-measure; do not quote
+these.
 `mandatory` pulls the reader out of a band they are still reading and gives the
 short band a whole screen for two lines. `proximity` only settles a scroll that
 already ended near a boundary, so tall bands scroll through normally. Snapping is
@@ -549,6 +558,17 @@ dead-key sweep removed it for never being rendered, so rather than re-adding a
 second key holding the same two words, the nav label and the section title share
 one string deliberately.
 
+**Take away now does the same thing, and the second case is what makes it a
+pattern rather than an accident.** Its `<h2>` renders `nav.contact`, and
+`contact.heading` was deleted. That key had held "Κλείστε τη θέση σας • Take
+away" — the combined nav label — while the heading was `.sr-only`, and it could
+never have been shown: it is word for word the two panel titles directly beneath
+it, which is the two-titles-stacked failure this section is about. The client
+supplied "Καλέστε μας" / "Call us" and asked for the nav to match, at which point
+the two strings were identical and one of them had to go. **So: when a band's
+title and its nav label say the same words, they share `nav.*`.** A band whose
+heading genuinely differs from its nav label should still have its own key.
+
 **Our Goal is a photo beside a centred column, and it is the only band with a
 link out of it.** The photo is `.goal__media`, the column is `.goal__col`:
 heading, first paragraph, second paragraph, `.goal__cta` — a "Meet the team"
@@ -617,12 +637,6 @@ npm run photos   # re-run the one-time photo downsample (only for new originals)
                  # size it arrived at — downsample it by hand to 2560px/q88,
                  # which is what the script would have done (see gotchas).
 npm run favicons # regenerate favicons from logo-clean.png (only if it changes)
-npm run video    # re-encode the Take away events clip (only for a new cut)
-                 # NB needs ffmpeg on PATH — `winget install Gyan.FFmpeg`, then
-                 # a new shell. Not a devDependency, because like `photos` it
-                 # reads a SOURCE outside the repo and cannot run on a fresh
-                 # clone anyway. Writes straight into public/, which Astro does
-                 # not hash — see the video note below.
 ```
 
 `npm run check` compares i18n *keys*, not values: it will not notice an
@@ -1373,9 +1387,18 @@ dependency decision, not a styling one.
   whether something has reintroduced a `scroll-margin-top` on top of it.
 
   **It is paired with the bar's height and the two move together.** The bar is
-  `min-height: 6rem` + 1px of border = 97px, and `scroll-padding-top` is
-  `6.0625rem` — 97px, exactly matching, no extra air on top. Change one
-  without the other and every anchored heading goes behind the bar.
+  `min-height: 6rem` + 1px of border = 97px. Change one without the other and
+  every anchored heading goes behind the bar.
+
+  **`scroll-padding-top` is `calc(6.0625rem - 2px)`, not `6.0625rem`, and the
+  2px is deliberate** — see the comment on the rule itself. It overshoots so the
+  section boundary tucks *under* the bar rather than landing on it, which is what
+  stops a fractional device scale factor anti-aliasing the seam into a visible
+  hairline. Measured on the rendered page: every anchor lands the section top
+  2.0–2.4px above the bar's bottom, `#goal` and `#plates` included. This note
+  used to claim the two matched "exactly, no extra air" and that a jump landed
+  "flush at 97px, hairline to hairline"; that was true before the seam fix and
+  is not now. Re-measure before repeating either figure.
 
   **There used to be 19px of extra air (`7.25rem`, 116px) and it was a bug,
   not a margin.** It was carried over from the old alternating-tier homepage,
@@ -1391,8 +1414,8 @@ dependency decision, not a styling one.
   4–8rem of its own top padding before the heading (`--section-y`), so the
   extra offset was never buying any breathing room to begin with; it only had
   a bleed-through cost. Re-verified by jumping to `/#goal`: the bar's bottom is
-  at 97px and the section starts flush at 97px, hairline to hairline, nothing
-  of the hero visible above it.
+  at 97px and the section top lands at 95px — 2px *behind* the bar rather than
+  below it, per the seam fix above — so nothing of the hero is visible.
 - Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
   nav links need `display: block` or the tap targets collapse to ~26px.
 - **`.section--tight` has been removed, and the reason is worth keeping.** It
@@ -1491,25 +1514,27 @@ dependency decision, not a styling one.
   query string is silently ignored. Both together cost a while: `dist/index.html`
   on disk had the new schedule and the DOM did not.
 
-- **The panel photographs carry `alt=""` and the sourcing card's photograph
-  carries the gallery's real alt. That is one rule, not two, and the rule is "is
-  it inside the control".** Everything inside an `<a>` is concatenated into the
-  link's accessible name, so on a panel — where the whole card is the link — the
-  gallery's descriptive alt would prepend a sentence about a table setting to
-  "Κλείστε τη θέση σας 21 3099 1571", the name a screen-reader user hears before
-  deciding whether to place a call. The picture illustrates the title; it does
-  not identify the control. On a note card the anchor is only the small call
-  link, so the media is outside it entirely: there is no name to pollute, the
-  picture is content in an editorial card, and it takes `gallery.${id}.alt` with
-  `data-i18n-alt` the way Goal does. The same photographs keep their real alt on
-  `/gallery` either way.
+- **All four photographs in this band carry `alt=""`, and the rule is "is it
+  inside the control".** Everything inside a control is concatenated into its
+  accessible name, so a descriptive alt would prepend a sentence about a table
+  setting to "Κλείστε τη θέση σας 21 3099 1571" — the name a screen-reader user
+  hears before deciding whether to place a call. The picture illustrates the
+  title; the title identifies the control.
 
-  The events card is the exception and it is a limitation rather than a
-  decision: it is a `<video>` now, `<video>` takes no alt, so it is
-  `aria-hidden`. See the video note above.
+  On the panels the control is the `<a>` and the photograph is inside it. On the
+  note cards it is the `<summary>`, and the photograph is inside that. **This
+  changed once and the history is the useful part**: for one revision the note
+  cards were passive — a photograph stacked over a flat panel, with the call the
+  only control — and their photographs correctly carried real translated alt,
+  `gallery.${id}.alt` for the sourcing one and a standalone `contact.eventsAlt`
+  for the events one. Making the cards into disclosures put both pictures inside
+  a control and the alt had to go. `contact.eventsAlt` went with it; the sourcing
+  photograph keeps its gallery alt on `/gallery`, where it is still content.
 
   Verified in the a11y tree, both locales: the panels are "Κλείστε τη θέση σας
-  21 3099 1571" and "Take away 21 3099 1571", and each note card's link is
+  21 3099 1571" and "Take away 21 3099 1571", the note summaries are exactly
+  their titles — "Διοργανώστε την εκδήλωσή σας" / "Plan your event" and
+  "Παραγγελίες εκτός μενού" / "Off-menu requests" — and each note's call link is
   "Τηλέφωνο 21 3099 1571" / "Phone 21 3099 1571".
 
   **That label is why the note link is not named by bare digits.** Its visible
@@ -1519,108 +1544,117 @@ dependency decision, not a styling one.
   Nothing new was invented, the switch owns both halves, and the visible number
   stays inside the accessible name, which is what WCAG 2.5.3 asks for.
 
-  The panel title is a `<span>`, not an `<h3>`, for the neighbouring reason: a
-  heading inside a link is legal but makes the document outline claim a section
-  where there is a control. The band's `.sr-only` `<h2>` is its heading, and the
-  two panel titles are those links' names. The note cards have no title at all,
-  at the client's request — their paragraph opens the card.
+  Card titles are `<span>`s, not `<h3>`s, for the neighbouring reason: a heading
+  inside a control is legal but makes the document outline claim a section where
+  there is a button. `.contact__head h2` is the band's heading, and the four card
+  titles are the four controls' names.
 
-- **The events card is a video, and the file the client supplied is 82% black
-  bars. Measure any replacement before trusting its dimensions.** `sushi
-  events.mp4` arrives as 720x720 H.264, which looks like a perfect fit for the
-  1:1 media box. It is not: the actual picture is **228x406 at x=246, y=157** —
-  a portrait phone clip pillar- *and* letterboxed into a square. Dropped in
-  uncropped, the card would show a small portrait video floating in a black
-  field.
+  **The note cards had no title for two revisions and now do**, which is a
+  reversal worth recording because the reasoning changed rather than the taste.
+  Titles were declined at the client's request when the paragraph was visible on
+  the card and opened it — a title would have been a second, shorter way of
+  saying what the sentence beneath it already said, which is the two-titles-
+  stacked failure the eyebrow history is about. Folding the paragraph into a film
+  removed that: closed, there is nothing else on the card to say what it is. The
+  client supplied both titles. Note the register — "Διοργανώστε" and the panels'
+  "Κλείστε" are formal plural, while the paragraphs inside are informal singular
+  ("Κάλεσέ μας", "τη δική σου"). The titles match their neighbours on the card
+  face rather than the copy behind it, deliberately.
 
-  **`cropdetect` reports the full frame and is wrong here.** The bars are pure
-  black (luminance 0.0), and at its default threshold cropdetect called the
-  whole 720x720 content; at `limit=16` it reported `720:404:0:158`, a
-  *letterbox* reading that is also wrong. The number that held up was a pixel
-  scan of an extracted frame. Scan, don't trust the filter.
+- **The note cards take `.contact__panel`'s ratio, not their sources'.** Both
+  photographs are portrait — `oysters-on-ice` is 1152x2560 (1:2.22) and
+  `sushi-events.jpg` is 608x1080 (9:16) — so a 4:3 crop is a hard one, and it
+  was checked frame by frame against the masters rather than assumed: the
+  oysters still fill the frame and the events shot arguably reads better tight
+  than square. Neither needs an `object-position` override.
 
-  **The resolution is a ceiling no encoder setting can raise.** The media box
-  renders 432 CSS px at 1366 and 346 at 390, so a 228px source is upscaled
-  **1.89x on desktop and 3.04x on a dpr-2 phone**, and beside the sourcing card
-  — a sharp crop of a 1152x2560 master — it reads visibly soft. That is the
-  known, accepted state. **If a better master ever arrives** (the phone original
-  would be 1080x1920, and this file looks like a Clipchamp re-export), point
-  `SOURCE` at it, re-measure `CONTENT`, and re-run; nothing else changes.
+  **They were `1 / 1` for one revision and that is the thing not to reinstate
+  casually.** The square was chosen to protect those portrait sources, and it
+  was the right call while the cards were photograph-above-text — but it is also
+  what made the lower row a different size and shape from the upper one, which
+  is the complaint this whole revision answers. The ratio is a property of the
+  *pair of rows*, not of the photographs. If a future photograph will not take
+  4:3, crop it or replace it; do not re-ratio the card.
 
-  **It plays once, for 4.0s, and never loops — that is WCAG 2.2.2, not taste.**
-  The rule covers movement that starts automatically, lasts over five seconds
-  and sits alongside other content. Under five seconds it does not apply, so no
-  pause control is needed. Looping would have made the movement indefinite and
-  required one. This site already carries one knowing 2.2.2 failure in the hero
-  carousel; this is deliberately not a second, and **anyone adding `loop` is
-  adding one**.
+  Both are otherwise unused on the homepage. Back when the events card drew
+  from the gallery this took two attempts: `toast-outdoors` is the obvious first
+  choice for it and is already **Our Goal's** photograph, and
+  `sushi-board-overhead` is one of the four plates in the band **directly
+  above**. Check `Goal.astro` and `Plates.astro` before pointing this band at a
+  gallery id.
 
-  **Because it plays once it holds its last frame, so the clip is really a still
-  photograph that happens to be arrived at.** Both ends were chosen by looking
-  at the frames, not by trimming to length: it opens at 0.8s on a gloved hand
-  plating a roll (t=0 is a glitched teal transition) and ends at 4.8s on the
-  widest, densest view of the finished trays. **The source fades to black at the
-  end** — its final frames are literally black — so a window running to 7.4s
-  holds an empty card. Re-pick both ends by eye if the cut ever changes.
+- **The note cards are `<details>` elements and carry no script at all.**
 
-  **`preload="none"` with an IntersectionObserver, and no `autoplay`
-  attribute.** The band sits ~1800px down a page that makes zero JS requests and
-  whose LCP is the hero image; letting the browser fetch eagerly spends that
-  budget on something nobody has scrolled to. Verified: `readyState 0` /
-  `networkState 1` before the scroll, `ended` at 4.0s after it. The script is
-  purely additive — with no JS the card is its poster, which is exactly what the
-  sourcing card beside it is, so nothing is hidden waiting to be revealed.
+  The client's complaint was that the two lower cards read as a different species
+  from the two above. They were: 1:1 against 4:3, no title against a title,
+  photograph-above-text against text-over-photograph. All three followed from one
+  constraint — a ~60-word paragraph cannot sit on `.contact__panel`'s scrim,
+  which is a fixed-length ramp sized for two short bold lines owing 3:1 where
+  body copy owes 4.5:1.
 
-  **`prefers-reduced-motion` never fetches it at all.** Not "pauses it" —
-  the observer is never created, so those visitors pay zero bytes and keep the
-  poster permanently. Verified in a Chrome launched with
-  `--force-prefers-reduced-motion`: `networkState 1` even after scrolling to
-  the card. That is why the poster is the clip's **first** frame rather than its
-  prettiest: a prettier still would jump-cut the moment playback began, and
-  continuity is worth more than the frame.
+  A click-revealed **film** dissolves that rather than fighting it. Closed, the
+  card is the same object as a panel. Open, the film is near-opaque
+  (`--black` at 93%) and *allowed* to hide the photograph, so the paragraph sits
+  on what is effectively a flat surface. Measured worst single pixel, both cards,
+  open: paragraph **5.92 / 5.99:1** at `--step--1` (owes 4.5:1), call **12.90 /
+  13.73:1**. Swapping either photograph cannot move those figures, which is the
+  standing benefit over the scrim.
 
-  **One codec, measured rather than assumed.** The usual advice — VP9 or AV1
-  first, H.264 as fallback — assumes a video big enough for the percentage to
-  pay for a second file. From the same crop and trim: h264 crf26 107 KB against
-  vp9 crf38 96 KB, so VP9 saves ~10 KB at matched quality. That does not buy a
-  second file, a second `<source>` and a second encoder to keep tuned. CRF 28
-  over 26 because the two are indistinguishable once upscaled to 432px — the
-  source's own softness dominates. Do not push past 30: blocking survives an
-  upscale where blur does not. Final: **2.19 MB → 70 KB**, plus a 7 KB poster.
+  **A native disclosure, deliberately, not a button and a class toggle.** The
+  site's other hide-and-reveal is `.has-reveal`, which exists because a rule that
+  hides content must be owned by something that can un-hide it — the failure mode
+  being a dead script leaving the page at `opacity: 0`. `<details>` has no such
+  failure mode: it opens, keyboards and announces its own expanded state with no
+  JS, and the paragraph is real DOM throughout, so the copy is there for search
+  engines and screen readers whether or not anyone clicks. Anything built here
+  with a button and `aria-expanded` would be strictly more code and strictly less
+  robust.
 
-  **`public/` is not content-hashed**, unlike everything `astro:assets` touches.
-  A re-encode reuses the same URL, so a visitor can hold the old file until
-  their cache expires. Bump `NAME` in the script if a change has to reach
-  everyone at once.
+  Three details that cost time:
 
-  **The video is `aria-hidden` and carries no alt**, which is a real if small
-  loss against the `shared-table` photograph it replaced — that one had
-  translated alt from `gallery.json`. A `<video>` takes no alt attribute, and
-  the paragraph beside it already says what the card means. `shared-table` is
-  consequently free again; note it is **not** interchangeable with the clip, one
-  being a portrait master cropped down and the other a 228px clip scaled up.
+  - **The title must be hidden when open.** Kept, it forced the film to reserve
+    5.5rem beneath the paragraph, and the copy plus the call then wanted 356px
+    inside a 326px card — `margin-top: auto` collapsed and the phone number drew
+    straight through the title. The paragraph identifies the card perfectly well
+    on its own.
+  - **The cue crosses to the other corner when open**, because with the title
+    gone it would otherwise sit directly under the call: two discs stacked in one
+    corner. `text-align: right` on the head is the whole mechanism.
+  - **`list-style: none` *and* `::-webkit-details-marker`** are both needed to
+    remove the disclosure triangle; Safari still draws it from the pseudo-element
+    when only the first is set.
 
-- **The note cards' media is `1 / 1`, and the sources decide that rather than
-  the layout.** `oysters-on-ice` is 1152x2560 (1:2.22), so a wide strip would
-  cut it down to a band of crushed ice; a centred square keeps the whole subject
-  and needs no `object-position` override. Checked against the master, not
-  guessed from the id. It is also the ratio `.contact__panel` takes below 48rem,
-  so on a phone all four cards in the band are square — and the events clip is
-  encoded 228x228 to match, so `object-fit` is doing nothing for it today and is
-  kept only to stay honest if a future cut is not square.
+  The arrow in the cue is the glyph an arrow was *removed* from the panels for
+  being — see that note. It is right here for the same reason it was wrong there:
+  these cards go somewhere, and the phone glyph stays on the thing that dials.
 
-  The cost is the band height recorded further up (853 → 1372), and it is
-  **entirely** this block: a 1:1 media is as tall as the card is wide. If that
-  ever has to come back, the ratio and the *sources* move **together** — a
-  landscape crop needs landscape sources, and neither the oysters master nor the
-  clip is one.
+- **The events card's photograph is the one on the site that is deliberately
+  outside `gallery.json`, and the client's file for it is 68% black bars.**
 
-  Ids are picked against the copy and against what the rest of the page already
-  uses, which took two attempts when the events card was still a photograph:
-  `toast-outdoors` is the obvious first choice for it and is already **Our
-  Goal's** photograph, and `sushi-board-overhead` is one of the four plates in
-  the band **directly above**. Check `Goal.astro` and `Plates.astro` before
-  changing an id here.
+  `sushi events.jpg` arrives 1920x1080, which looks like an ordinary landscape
+  photo. It is not: the actual picture is **608x1080 at x=656** — a portrait
+  frame pillarboxed into 16:9, exported from the same portrait phone footage a
+  video of this scene came from. Uncropped, the card would show a narrow strip
+  of food between two black fields. The bars are pure black, so a
+  threshold-based crop detector reports the whole frame — **the number came
+  from a pixel scan**, which is the second time that has been true for this
+  client's media. Scan, don't trust the filter.
+
+  Cropped, it is a good source and that is the difference worth recording: a
+  608px square crop into the card's 432px box is a **0.71x downscale** on
+  desktop and 1.14x on a dpr-2 phone, so it reads sharp beside the oysters
+  master. The video that briefly occupied this card was 228px and 1.89x/3.04x
+  the other way, which is why it read soft and why it is gone.
+
+  **It is a named export in `lib/photos.ts`, not a gallery id**, because the
+  client did not want it as a tile on `/gallery` and every `gallery.json` entry
+  renders there. Dropping it into `gallery/` unlisted was the obvious shortcut
+  and is wrong: `npm run check` walks `gallery/` and `team/` only, and would
+  report it as "not shown on the site", which would be false. It lives in
+  `sections/`, which nothing walks. It carries no alt at all, for the reason in
+  the alt-text note above — it sits inside a `<summary>`. The regeneration
+  recipe is on
+  the export; re-measure the crop box if the client sends a different export.
 
 - **Text over the Take away photos is safe because of the scrim, not the
   photos.** Both images have blown highlights in every third of the frame —
@@ -1701,15 +1735,6 @@ dependency decision, not a styling one.
   panels are side by side and 4:3 is the wider, better frame, so the switch is
   where the column count changes. Both panels move together; see the note on the
   4:3 compromise for why they must.
-- **Video dropped into `src/assets/` is worse than the photo version of this
-  trap, because it does not even render.** `src/assets/sushi events.mp4` was
-  put there while the events clip was being added — 2.19 MB, byte-identical to
-  the original in `Downloads`, referenced by nothing and reaching `dist/` not at
-  all, because Astro has no video pipeline to pick it up. A stray photo at least
-  works, just heavy; a stray video is pure dead weight waiting to be committed.
-  The encoded output lives in `public/video/` and the master stays outside the
-  repo, exactly as `npm run photos` treats its sources.
-
 - **A photo added straight to `src/assets/photos/` never meets the downsample,
   and nothing in the build complains.** `prepare-photos.mjs` walks the SOURCE
   folder outside the repo and writes *into* `src/assets`; it never reads what is
