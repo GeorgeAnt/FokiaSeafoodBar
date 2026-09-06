@@ -584,15 +584,18 @@ while back and nothing had rendered the field since.
   reason, so `npm run check` keeps counting it (1/5); drop the flag when the
   real photo replaces the file. The other four members are complete.
 - **Social links** — hidden while empty.
-- **A cropped or vector logo.** `logo-clean.png` carries the nav, the footer and
-  the favicons. It is the only logo file. One thing would still improve it: the
-  file is 1672×940 around an 888×899 badge — 47% of the width is empty field,
-  which every layout using it has to size around.
+- **A cropped or vector logo.** `logo-clean.png` — the badge — carries the nav,
+  the footer and the favicons. One thing would still improve it: the file is
+  1672×940 around an 888×899 badge — 47% of the width is empty field, which
+  every layout using it has to size around.
 
   The other complaint that used to sit here — that the concrete texture is baked
   *inside* the badge, so on the black hero it read as a pale disc rather than a
   mark on the ground — no longer applies, because the hero no longer shows the
-  badge. The name is set in type there instead.
+  badge. It shows your horizontal wordmark (`LOGO-01.png`) instead, recoloured
+  to the site's stone. That one is not a placeholder: the artwork is white on
+  transparency, so the site paints it rather than using the file's own colour,
+  and changing the stone changes the logo with it.
 
   Not urgent any more. The nav crops the field away with `object-fit: cover` on
   a square box rather than shipping a trimmed copy, so the empty field costs
