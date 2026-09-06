@@ -13,11 +13,26 @@ const { locale = defaultLocale } = Astro.props;
 /*
   Photos are chosen by gallery id, not by filename or position, for the same
   reason Plates does it: gallery.json is ordered for the gallery, and reordering
-  it must not quietly change what the homepage shows.
+  it must not quietly change what the homepage shows. It throws at build time
+  rather than rendering a gap.
 
-  Their alt text is NOT taken from that entry any more — see the note on the
-  markup for why these images are now decorative.
+  Both card sets in this band go through here, but they do **not** treat the alt
+  text the same way, and the difference is not an inconsistency — see the notes
+  on each block of markup. The panels are links, so their photographs are
+  decorative and carry alt=""; the note cards are not, so theirs are content and
+  carry the gallery's real, translated alt.
 */
+function fromGallery(id: string, whose: string) {
+  const image = gallery.images.find((candidate) => candidate.id === id);
+  if (!image) {
+    throw new Error(
+      `${whose} wants the gallery image "${id}", which has no entry in ` +
+        `data/gallery.json. Add one (with alt text in both locales), or point ` +
+        `Contact.astro at an id that exists.`
+    );
+  }
+  return { ...image, src: galleryPhoto(image.file), altKey: `gallery.${image.id}.alt` };
+}
 
 /*
   Each card is one control that places one call.
@@ -39,21 +54,75 @@ const PANELS = [
   { id: 'takeaway-box', titleKey: 'contact.takeawayTitle', swaps: false },
 ];
 
-const panels = PANELS.map(({ id, titleKey, swaps }) => {
-  const image = gallery.images.find((candidate) => candidate.id === id);
-  if (!image) {
-    throw new Error(
-      `Take away wants the gallery image "${id}", which has no entry in ` +
-        `data/gallery.json. Add one (with alt text in both locales), or point ` +
-        `PANELS in Contact.astro at an id that exists.`
-    );
-  }
-  return { ...image, titleKey, swaps, src: galleryPhoto(image.file) };
-});
+const panels = PANELS.map(({ id, titleKey, swaps }) => ({
+  ...fromGallery(id, 'PANELS in Contact.astro'),
+  titleKey,
+  swaps,
+}));
 
 /* The schedule is handed to the client as-is rather than restated, so the
    after-hours swap can never disagree with the hours Find Us renders. */
 const schedule = JSON.stringify(site.hours.entries);
+
+/*
+  Every dialling control that can swap carries the same four attributes, so they
+  are written once here and spread rather than repeated per card. Two kinds of
+  card disagreeing about which number they offer is the worst failure this
+  section can have — it would look perfectly fine on screen — and one object is
+  what makes that impossible rather than merely unlikely.
+*/
+const swapAttrs = {
+  'data-phone-swap': '',
+  'data-hours': schedule,
+  'data-after-href': `tel:${site.phoneAfterHours.href}`,
+  'data-after-display': site.phoneAfterHours.display,
+};
+
+/*
+  The two service notes — private events and special sourcing.
+
+  They swap, and take away still does not, which is the same rule applied to
+  three different cards rather than an inconsistency: take away can only be done
+  during service, so the landline is the only number it could ever want, while a
+  party enquiry or a special order is exactly the kind of call someone makes at
+  midnight. Both of these paragraphs ask to be contacted; neither is bound to a
+  service window.
+
+  The photographs are picked against the copy, not for variety. `shared-table`
+  is a table mid-meal — a reaching hand, a board of rolls, a bowl of noodles, a
+  cocktail — which is what "προγραμματίσουμε τη δική σου εκδήλωση" is offering.
+  `oysters-on-ice` is the client's own request for the sourcing card, and it is
+  the right one: the paragraph is about getting hold of something particular,
+  and oysters are the most legible instance of that on the whole site.
+
+  Neither is used anywhere else on the homepage. `toast-outdoors` was the
+  obvious first pick for events and is already Our Goal's photograph, and
+  `sushi-board-overhead` is one of the four plates directly above this band —
+  check both before changing an id here.
+*/
+/*
+  The events card carries a video where the sourcing card carries a photograph.
+
+  **It is not in `src/assets`, and it cannot be.** Astro processes images only —
+  there is no `<Picture>` for video, no generated variants and no content hash —
+  so the encoded file is served verbatim out of `public/`. `scripts/prepare-video.mjs`
+  is the only record of how it was made, and `npm run video` remakes it.
+
+  It replaced `shared-table`, which is consequently free again. Note the photo
+  and the video are **not** interchangeable: the photo is a portrait master
+  cropped down, the video is a 228x228 clip scaled up.
+*/
+const NOTES = [
+  {
+    key: 'contact.events',
+    video: { src: '/video/sushi-events.mp4', poster: '/video/sushi-events-poster.jpg', w: 228, h: 228 },
+  },
+  { id: 'oysters-on-ice', key: 'contact.sourcing' },
+];
+
+const notes = NOTES.map(({ id, key, video }) =>
+  video ? { key, video } : { ...fromGallery(id!, 'NOTES in Contact.astro'), key }
+);
 ---
 
 {/*
@@ -84,10 +153,7 @@ const schedule = JSON.stringify(site.hours.entries);
           <a
             class="contact__panel"
             href={`tel:${site.phone.href}`}
-            data-phone-swap={panel.swaps ? '' : undefined}
-            data-hours={panel.swaps ? schedule : undefined}
-            data-after-href={panel.swaps ? `tel:${site.phoneAfterHours.href}` : undefined}
-            data-after-display={panel.swaps ? site.phoneAfterHours.display : undefined}
+            {...(panel.swaps ? swapAttrs : {})}
           >
             {/*
               alt="" on purpose, and it is the whole card being a link that makes
@@ -147,9 +213,127 @@ const schedule = JSON.stringify(site.hours.entries);
       }
     </div>
 
+    {/*
+      The two service notes are cards now too, at the client's request that they
+      read as the pair above does. They are deliberately not the *same* card, and
+      every difference is forced rather than chosen.
+
+      **The picture is above the text, not behind it.** .contact__panel carries
+      its title over the photograph on a fixed-length scrim — dense to 8rem,
+      finished by 16rem — sized for two lines of --salt bold owing 3:1. These
+      paragraphs are ~60 words: at --step-0 they run to six or seven lines, so
+      most of the block would sit above 8rem in the thin part of that ramp, and
+      body copy owes 4.5:1 rather than 3:1. The one small tinted line that ever
+      sat on those cards measured 5.19:1 at its best and 3.49:1 at 390px under an
+      earlier ramp — that is the margin this would have been building on. Split
+      into a photograph and a flat --black panel beneath it, the copy is
+      --light-stone on --black at 6.55:1 with no scrim to measure at all.
+
+      **The card is not a link; the call inside it is.** Everything inside an <a>
+      is concatenated into the link's accessible name — the reason the panel
+      photographs carry alt="" — so a 60-word paragraph inside the anchor would
+      be that same problem several times over. The paragraph is read, the badge
+      beneath it is tapped, and the link's name stays "Τηλέφωνο 21 3099 1571".
+
+      **Which is also why these photographs keep their real alt.** They are not
+      inside a control, so there is no name to pollute; they are content in an
+      editorial card, and the gallery entry already has the sentence in both
+      locales. data-i18n-alt hands it to the language switch, same as Goal.
+    */}
     <div class="contact__notes" data-reveal>
-      <p data-i18n="contact.events">{t(locale, 'contact.events')}</p>
-      <p data-i18n="contact.sourcing">{t(locale, 'contact.sourcing')}</p>
+      {
+        notes.map((note) => (
+          <div class="contact__note">
+            {/*
+              Square, and the sources are what decide it: both photographs are
+              portrait (1152x2560 and 1707x2560), so a wide strip would have cut
+              the oysters to a band of ice and taken the noodle bowl off the
+              bottom of the shared table. A centred 1:1 keeps the whole subject
+              of each — verified against both masters — and matches what the
+              panels above already do below 48rem.
+            */}
+            <div class="contact__note-media">
+              {
+                note.video ? (
+                  /*
+                    No `autoplay` and no `loop`, and both omissions are the
+                    feature.
+
+                    `preload="none"` plus the observer below means nothing is
+                    fetched until the card is nearly on screen — this band sits
+                    ~1800px down, and an eager fetch would put the file in front
+                    of the hero's LCP image on a page that otherwise makes zero
+                    JS requests.
+
+                    Playing once, for 4.5s, is what keeps this clear of WCAG
+                    2.2.2: that rule covers movement which starts automatically
+                    and lasts more than five seconds, so a clip trimmed under it
+                    needs no pause control. Looping would have made the movement
+                    indefinite and required one. The site already carries one
+                    knowing 2.2.2 failure in the hero carousel; this is
+                    deliberately not a second.
+
+                    `aria-hidden` because a <video> takes no alt and this one is
+                    illustration — the paragraph beside it says everything the
+                    card means. That is a small loss against the photograph it
+                    replaced, which did carry translated alt text.
+                  */
+                  <video
+                    data-autoplay-video
+                    src={note.video.src}
+                    poster={note.video.poster}
+                    width={note.video.w}
+                    height={note.video.h}
+                    muted
+                    playsinline
+                    preload="none"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Picture
+                    src={note.src}
+                    formats={['avif', 'webp']}
+                    widths={[400, 600, 900]}
+                    sizes="(min-width: 48rem) 26rem, 100vw"
+                    alt={t(locale, note.altKey)}
+                    data-i18n-alt={note.altKey}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )
+              }
+            </div>
+            <p class="contact__note-text" data-i18n={note.key}>
+              {t(locale, note.key)}
+            </p>
+            {/*
+              The same badge-and-number control the panels carry, so the four
+              cards offer one affordance rather than two. It swaps on the clock
+              like the reservations panel — see the note on NOTES above — and the
+              href and the digits are rewritten together by the one script below.
+
+              The .sr-only label is there because the visible text is bare
+              digits: out of context, a link named "21 3099 1571" says nothing
+              about what it does. It uses contact.phoneLabel, the key Find Us
+              already renders as a visible label, so nothing new is invented and
+              the switch owns both. Prefixed rather than appended, and the
+              visible number stays inside the accessible name either way, which
+              is what WCAG 2.5.3 asks for.
+            */}
+            <a class="contact__note-call" href={`tel:${site.phone.href}`} {...swapAttrs}>
+              <span class="sr-only" data-i18n="contact.phoneLabel">
+                {t(locale, 'contact.phoneLabel')}
+              </span>
+              <span class="contact__phone-badge">
+                <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+                </svg>
+              </span>
+              <span class="contact__phone-number">{site.phone.display}</span>
+            </a>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>
@@ -168,10 +352,18 @@ const schedule = JSON.stringify(site.hours.entries);
   // href and the digits together — they must never disagree, since the digits
   // are the only thing a visitor can check before tapping.
   //
-  // It selects on [data-phone-swap], written by the same loop that decides which
-  // cards swap. An earlier version looked for a hand-typed id that had stopped
-  // being rendered, so the swap silently did nothing for weeks and neither
-  // `astro check` nor `npm run check` had anything to catch.
+  // It selects on [data-phone-swap], spread from one object in the frontmatter
+  // onto every dialling control that can swap. An earlier version looked for a
+  // hand-typed id that had stopped being rendered, so the swap silently did
+  // nothing for weeks and neither `astro check` nor `npm run check` had anything
+  // to catch.
+  //
+  // **The attribute belongs on the anchor that dials, never on the card.** On a
+  // panel those are the same element — the whole card is the link. On a note
+  // card they are not: the card is a <div> and the control is the small call
+  // link inside it, so the attribute goes there. That keeps this query's
+  // contract exact — every match is an anchor with an href to rewrite and a
+  // .contact__phone-number inside it — rather than "a card, somehow".
   import { isOpenAt, type HoursEntry } from '../lib/hours';
 
   const cards = document.querySelectorAll<HTMLAnchorElement>('[data-phone-swap]');
@@ -208,5 +400,44 @@ const schedule = JSON.stringify(site.hours.entries);
         // number during service and a working number outside it.
       }
     });
+  }
+
+  // The events card's clip: fetched and played once, when the card is nearly on
+  // screen, and never again.
+  //
+  // The markup deliberately carries neither `autoplay` nor `loop`, so
+  // everything here is additive — if this script never runs, the card shows its
+  // poster and is simply a still photograph, which is exactly what the sourcing
+  // card beside it is. Nothing is hidden waiting to be revealed, so there is no
+  // half-loaded state to get stuck in.
+  //
+  // `preload="none"` is the point of doing it here rather than with the
+  // attribute: this band is ~1800px down a page that makes zero JS requests and
+  // whose LCP is the hero image. Letting the browser fetch a video eagerly would
+  // spend that budget on something nobody has scrolled to yet.
+  const clips = document.querySelectorAll<HTMLVideoElement>('[data-autoplay-video]');
+  const stillness = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Reduced motion keeps the poster and never fetches the video at all — the
+  // still is the whole experience, which is the same call the hero carousel
+  // makes for the same visitor.
+  if (clips.length && !stillness.matches) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const video = entry.target as HTMLVideoElement;
+          observer.unobserve(video);
+          // muted + playsinline is what makes an unattended play() permissible;
+          // if a browser refuses anyway, the poster stays and nothing breaks.
+          video.play().catch(() => {});
+        }
+      },
+      // Start the fetch just before the card arrives, so the first frame is
+      // ready rather than arriving a beat after the card does.
+      { rootMargin: '200px 0px' }
+    );
+
+    clips.forEach((clip) => observer.observe(clip));
   }
 </script>

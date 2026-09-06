@@ -2450,33 +2450,215 @@ main > .section-dark:last-child {
 }
 
 /*
-  The two service notes — private events and sourcing. One centred column, the
-  paragraphs stacked, at the client's request.
+  The two service notes — private events and special sourcing.
 
-  They were two columns from 48rem, which was there to stop either paragraph
-  running well past `--measure` at full width. Centring solves the same problem a
-  different way and matches the cards above, which are now centred in a 56rem
-  cap of their own.
+  They have now been three things: two columns of prose from 48rem, then one
+  centred column capped at 46rem, and now a second row of cards, at the client's
+  request that they read as the pair above does. The centred version's rules are
+  gone rather than adapted, and it is worth knowing which and why, because two of
+  them were load-bearing right up until they weren't:
 
-  **The measure is on the container, not on each `p`** — the opposite of what the
-  two-column version did, and it is what centring requires. Centred lines are
-  read by their middles, so both paragraphs have to share one axis or the block
-  comes apart; a `max-width` per paragraph would give the shorter one its own
-  narrower centre. Same rule and same 46rem as Our Goal, which is deliberately
-  narrower than `--measure` (62ch) because centred text wants a shorter line:
-  there is no fixed left edge for the eye to return to.
+  - **The measure was on the container, not on each `p`.** Centred lines are read
+    by their middles, so two paragraphs sharing one axis was the whole point, and
+    a `max-width` per paragraph would have given the shorter one its own narrower
+    centre. A card is that axis now, so the rule has nothing left to do.
+  - **The copy was centred at 46rem** because a full-width band gives the eye no
+    fixed left edge to return to — the same argument Our Goal still runs on. A
+    card *is* a fixed left edge, so centring inside one buys nothing and costs
+    the ragged right that makes six lines of Greek scannable. It is ranged left.
+
+  What is deliberately shared with the panels: the 56rem cap, the gap, the 48rem
+  breakpoint and the 1.75rem radius. All four cards therefore land on one 2x2
+  block rather than on two unrelated rows.
+
+  What is deliberately *not* shared is where the photograph goes — see
+  .contact__note-media — and that is the difference that tells the rows apart at
+  a glance: the top two are pictures you tap, the bottom two are pictures over
+  something you read that ends in something you tap.
 */
 .contact__notes {
   display: grid;
-  gap: clamp(1rem, 0.7rem + 1.2vw, 2rem);
-  max-width: 46rem;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 0.6rem + 1.6vw, 1.75rem);
+  max-width: 56rem;
   margin-inline: auto;
   margin-bottom: clamp(1.75rem, 1.2rem + 2vw, 3rem);
-  color: var(--text-muted);
-  text-align: center;
 }
-.contact__notes p {
+@media (min-width: 48rem) {
+  .contact__notes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/*
+  A flat panel under a photograph, not a photograph with text on it.
+
+  The constraint is the scrim: .contact__panel::before is a fixed-length ramp
+  sized for two lines of --salt bold owing 3:1, and these paragraphs are ~60
+  words. Most of that block would sit above the ramp's dense 8rem in the thin
+  part of it, and body copy owes 4.5:1 rather than 3:1 — against a margin that
+  has already been measured at 3.49:1 once, on the one small tinted line these
+  cards ever carried. Below the picture instead, the copy is --light-stone on
+  --black at 6.55:1 and there is no scrim in the path at all.
+
+  --black under a --charcoal band is the same step .contact__panel takes for its
+  own background, and the hairline is the same --rule the bands and the nav are
+  drawn apart with, so the card is lifted off the page with vocabulary already in
+  use rather than with a new surface token.
+
+  `overflow: hidden` is what makes the photograph take the card's top corners;
+  the media block below has no radius of its own.
+*/
+.contact__note {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: 1.75rem;
+  background: var(--black);
+}
+
+/*
+  Square, and the sources decide it rather than the layout: both photographs are
+  portrait — oysters 1152x2560 (1:2.22) and the shared table 1707x2560 (2:3) — so
+  a wide strip would have cut the oysters down to a band of crushed ice and taken
+  the noodle bowl off the bottom of the other. A centred 1:1 keeps the whole
+  subject of both, verified against the masters, and needs no object-position
+  override in either case.
+
+  It is also the ratio .contact__panel takes below 48rem, so on a phone all four
+  cards in this band are square and the block stays one idea.
+
+  The cost is height, and it is real: a 1:1 media block is as tall as the card is
+  wide, so the pair adds ~440px at 1366 against the ~150px the two centred
+  paragraphs used to take. If that ever needs to come back, the thing to change
+  is the ratio *and* the photographs together — a landscape crop needs landscape
+  sources, which neither of these is.
+*/
+.contact__note-media {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  /* Dark for the same reason .contact__panel is: this is the placeholder behind
+     a lazy image on a dark band, and a light one flashes before the photo
+     arrives. There is no rounded-clip fringe to worry about here — the corners
+     belong to the card, which is already --black underneath. */
+  background: var(--black);
+}
+/*
+  `video` as well as `img`: the events card carries a clip where the sourcing
+  card carries a photograph, and both fill the same square box the same way.
+  `object-fit` is doing nothing for the video today — it is encoded 1:1 to match
+  this box — but it is what keeps the rule honest if a future cut is not square,
+  and it is why the poster and the first frame line up exactly.
+*/
+.contact__note-media img,
+.contact__note-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+  The padding lives on the text block and the control rather than on the card,
+  because the photograph has to reach the card's edges. Roomier than
+  .contact__panel-body's inset: that block sits over a picture whose own frame is
+  doing some of the work, and this one has only the 1.75rem curve, which eats the
+  corners of a text box at this size.
+*/
+.contact__note-text {
   margin: 0;
+  padding: clamp(1.3rem, 1rem + 1.1vw, 1.8rem) clamp(1.3rem, 1rem + 1.1vw, 1.8rem)
+    clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
+  color: var(--text-muted);
+}
+
+/*
+  `margin-top: auto` rather than a fixed gap: the grid stretches both cards to
+  the taller one's height, and the two paragraphs are not the same length, so
+  without it the badges would sit at different heights and the row would read as
+  two cards that failed to line up.
+
+  `align-self: start` keeps the target the width of its own content — a
+  full-width anchor would put a ~400px hit area under a ~150px control, and a
+  pointer landing in the empty half would dial the restaurant.
+
+  The radius is there so :focus-visible draws a capsule around the pill rather
+  than a rectangle through it, and it brings the tap-highlight opt-out with it:
+  Chrome paints that highlight against the border *box* and ignores
+  border-radius, so without it a tap flashes a hard-edged wood rectangle. It
+  cannot be seen with a mouse and does not show up in a screenshot either.
+*/
+.contact__note-call {
+  display: inline-flex;
+  align-items: center;
+  align-self: start;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding: 0 clamp(1.3rem, 1rem + 1.1vw, 1.8rem) clamp(1.3rem, 1rem + 1.1vw, 1.8rem);
+  border-radius: 999px;
+  color: var(--salt);
+  font-size: var(--step-0);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.contact__note-call .contact__phone-badge {
+  transition: transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+/*
+  Gated, because a touch browser fakes :hover on tap and then leaves it applied —
+  and this control opens the dialer, so the visitor comes back to a card still
+  sitting in its hover state with no pointer left to move away. `pointer: fine`
+  is in the query as well as `hover: hover` because a laptop with a touchscreen
+  reports both, and the pair asks the narrower question. :focus-visible stays
+  outside the gate: a keyboard is not a pointer and does not fire on a tap.
+
+  The lift is the whole signal, and that is a consequence rather than a
+  preference — there is no colour left to brighten. The number is already --salt
+  and the badge is already the site's lightest fill, so the only direction
+  available is darker, which reads as a press rather than as a hover.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .contact__note-call:hover {
+    transform: translateY(-2px);
+  }
+  .contact__note-call:hover .contact__phone-badge {
+    transform: scale(1.08);
+  }
+}
+.contact__note-call:focus-visible {
+  transform: translateY(-2px);
+}
+.contact__note-call:focus-visible .contact__phone-badge {
+  transform: scale(1.08);
+}
+/* A press has to land under the finger, not 200ms after it — same override
+   .contact__panel:active makes, and for the same reason. */
+.contact__note-call:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+.contact__note-call:active .contact__phone-badge {
+  transform: scale(0.96);
+  transition-duration: 0.1s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact__note-call,
+  .contact__note-call .contact__phone-badge {
+    transition: none;
+  }
+  .contact__note-call:hover,
+  .contact__note-call:focus-visible,
+  .contact__note-call:active,
+  .contact__note-call:hover .contact__phone-badge,
+  .contact__note-call:focus-visible .contact__phone-badge,
+  .contact__note-call:active .contact__phone-badge {
+    transform: none;
+  }
 }
 
 /* --------------------------------------------------------------------------

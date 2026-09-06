@@ -21,7 +21,12 @@ npm run build     # production build into dist/
 npm run preview   # serve the built dist/ locally
 npm run check     # validate the content files (see below)
 npm run favicons  # regenerate the favicons from the logo (only if it changes)
+npm run video     # re-encode the events card's clip (only for a new cut)
 ```
+
+`npm run video` needs ffmpeg, which the others do not: install it once with
+`winget install Gyan.FFmpeg` and open a new terminal. You only need it if the
+client sends a new version of the events video.
 
 Deploy by uploading `dist/` to any static host — Netlify, Vercel, Cloudflare
 Pages, GitHub Pages, or plain nginx. There is no server and no database.
@@ -150,21 +155,23 @@ in the menu, the same way it fails on a missing UI string.
 
 `phone` is the landline and `phoneAfterHours` is the mobile.
 
-On the homepage the two "Κλείστε τη θέση σας • Take away" cards **are** buttons:
-tapping one places the call. Each shows the number it will dial, so there is
-something to check first.
+The "Κλείστε τη θέση σας • Take away" band on the homepage is four cards, and
+every one of them places a call. The top two **are** the buttons — tapping the
+photograph dials. The bottom two are a photograph over one of the two service
+paragraphs, with the call as a small button underneath it. All four show the
+number they will dial, so there is always something to check first.
 
-- **Κλείστε τη θέση σας** dials the landline while the restaurant is open and the
-  mobile once it has shut, working that out from `hours.entries` in the same
-  file — so if you change the opening hours, the switch follows automatically and
-  there is nothing else to update.
+- **Κλείστε τη θέση σας**, and both of the service cards below it, dial the
+  landline while the restaurant is open and the mobile once it has shut, working
+  that out from `hours.entries` in the same file — so if you change the opening
+  hours, the switch follows automatically and there is nothing else to update.
 - **Take away** always dials the landline, because take away only runs during
   service.
 
 The time is read on the restaurant's clock (Athens), not the visitor's, so a
 customer abroad still gets the number that will actually be answered. If a
-visitor has JavaScript turned off, both cards show and dial the landline — which
-is the right number during service and a working number outside it.
+visitor has JavaScript turned off, all four cards show and dial the landline —
+which is the right number during service and a working number outside it.
 
 The landline is also the number given to Google in the page's structured data,
 since that is the number for the hours the listing publishes. Editing either
@@ -452,14 +459,21 @@ against the build in `dist/`.
 | Total Blocking Time | 50 ms |
 | First Contentful Paint | 0.9 s |
 
+Re-measured against the current `dist/`. The previous set of numbers here had
+gone stale in two directions at once — the pages had grown and the fonts had
+shrunk to one family — so treat these the same way: re-measure, don't copy
+forward.
+
 | | |
 |---|---|
-| `/` (inc. inlined CSS, structured data) | 81 KB raw, **21 KB gzipped** |
-| `/menu` | 99 KB raw, **24 KB gzipped** |
-| `/gallery` | 86 KB raw, **21 KB gzipped** |
+| `/` (inc. inlined CSS, structured data) | 122 KB raw, **31 KB gzipped** |
+| `/menu` | 147 KB raw, **34 KB gzipped** |
+| `/gallery` | 126 KB raw, **31 KB gzipped** |
+| `/team` | 106 KB raw, **27 KB gzipped** |
 | JavaScript requests | **0** — every script is inlined |
-| Fonts | 10 files, 162 KB total (Greek + Latin, both families) — 6 preloaded |
-| Total `dist/` | 40 MB across 390 files, almost all image variants the browser chooses between |
+| Video | 70 KB, fetched only on scroll — see [The events video](#the-events-video) |
+| Fonts | 8 files, 75 KB total (Manrope 400/500/600/700, Greek + Latin) — 6 preloaded |
+| Total `dist/` | 57 MB across 489 files, almost all image variants the browser chooses between |
 
 The Food/Drinks switch, the menu, and the whole page work with JavaScript
 disabled — verified. JavaScript only adds the hero crossfade, the mobile menu
@@ -698,13 +712,44 @@ full-bleed.
 Text was re-measured on the new ground: headings and buttons 13.2:1, body and
 muted text 5.9:1, eyebrows and the phone number 5.8:1.
 
-The text on the two Take away cards sits over photographs rather than over the
-band, so it is measured against the rendered pixels instead: worst single pixel
-11.8:1 on the titles and 12.7:1 on the numbers, checked at 320, 390, 768, 1024
-and 1366px wide, in both languages, and **with the mouse on the card as well as
-off it** — the picture brightens on hover, so that is the harder case. If those
-two photos are ever swapped, or the cards gain another line, that measurement has
-to be redone — see CLAUDE.md for how.
+The text on the two **top** Take away cards sits over photographs rather than
+over the band, so it is measured against the rendered pixels instead: worst
+single pixel 11.8:1 on the titles and 12.7:1 on the numbers, checked at 320,
+390, 768, 1024 and 1366px wide, in both languages, and **with the mouse on the
+card as well as off it** — the picture brightens on hover, so that is the harder
+case. If those two photos are ever swapped, or the cards gain another line, that
+measurement has to be redone — see CLAUDE.md for how.
+
+The two **service cards** below them put their picture above the text rather
+than behind it, precisely so that measurement is not needed: their paragraphs
+are far too long to sit safely over a photograph. They read against a flat
+panel — 6.6:1 on the paragraph and 14.8:1 on the number — and swapping either
+picture cannot change those.
+
+### The events video
+
+The first card of the lower pair plays a short clip instead of showing a photo.
+Things worth knowing if you ever replace it:
+
+- **It plays once and stops, and it must stay that way.** Four seconds, no
+  loop. Anything that moves by itself for more than five seconds has to come
+  with a pause button to meet accessibility rules; under five seconds and
+  played once, it does not. Setting it to loop would break that.
+- **It stops on its last frame**, so that frame is what the card looks like
+  from then on. It is chosen deliberately — the widest shot of the finished
+  trays — not just wherever the clip happens to end.
+- **Nothing downloads until you scroll to it**, and visitors who have asked
+  their device to reduce motion never download it at all; they see the still
+  instead.
+- **The client's file was mostly black.** It arrived as a square video, but the
+  actual picture inside it was a small portrait clip with black bars filling
+  82% of the frame. `npm run video` crops that away — which is also why the
+  finished file is 70 KB instead of 2.2 MB.
+- **It is softer than the photo beside it**, because after cropping, the real
+  picture is only 228 pixels across and the card shows it about twice that
+  size. Nothing in the encoding can fix that. **If you can get the original
+  video off the phone it was filmed on** (before it was exported and padded),
+  it would be sharp — send that and re-run `npm run video`.
 
 `.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
 on purpose — it and the `--wood-pale` accent only make sense together — and is
