@@ -110,9 +110,9 @@ would hide the bottom of the tall bands and break every `/#anchor`.
 
 **The light neutral is deliberately cold.** `--salt` is the one colour the
 client did not supply. The photos were shot on grey concrete; a warm cream drags
-`--wood` toward terracotta, which is the wrong read. `--wood-light` and
-`--wood-pale` lighten Wood along an oxidation path — dusty and pink, never
-orange. Warming these back up undoes the palette.
+`--wood` toward terracotta, which is the wrong read. `--wood-light` lightens
+Wood along an oxidation path — dusty and pink, never orange. Warming these back
+up undoes the palette.
 
 - Colours on a section come from the tokens its surface tier sets (`--accent`,
   `--text-muted`, `--rule`). **Never reference `--wood` directly for text**: it
@@ -480,8 +480,9 @@ image pipeline). **Not meant to survive in this form.**
   own**, plus an `:active` state to replace the feedback. Chrome paints the
   site-wide highlight against the border *box* and ignores `border-radius`. It
   cannot be seen with a mouse and does not appear in a screenshot. `.btn`,
-  `.lang`, `.contact__panel` and `.contact__note-call` opt out; **`.menu__tab`
-  and `.menu__jump a` still have the gap**, and fixing them is the pair.
+  `.lang`, `.contact__panel`, `.contact__note` and `.contact__note-call` opt
+  out; **`.menu__tab` and `.menu__jump a` still have the gap**, and fixing them
+  is the pair.
 - **A `:hover` on a control a touch user will tap must be gated behind
   `@media (hover: hover) and (pointer: fine)`.** A touch browser fakes `:hover`
   on tap and leaves it applied. `pointer: fine` is in the query because a device
