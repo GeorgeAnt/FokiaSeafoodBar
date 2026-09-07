@@ -10,9 +10,8 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-/* Looked up by filename because that is how this one was chosen. The id is
-   still what drives the alt text, so the caption follows the photo without
-   anything here having to restate it. */
+/* Looked up by filename; the id still drives the alt text, so the caption
+   follows the photo without anything here restating it. */
 const FIND_US_PHOTO = 'dsc-8248.jpg';
 const photo = gallery.images.find((image) => image.file === FIND_US_PHOTO);
 if (!photo) {
@@ -33,13 +32,10 @@ const dayOrder = [
 ] as const;
 
 /**
- * Collapses each entry's days into *contiguous* runs, so the block reads
- * "Τρί – Παρ" on one row instead of four separate rows.
- *
- * The runs are computed rather than taken as each entry's first and last day: an
- * entry listing Tuesday and Thursday would otherwise render as "Τρί – Πέμ" and
- * claim the restaurant is open on a Wednesday it is closed. Non-contiguous days
- * simply become separate rows.
+ * Collapses each entry's days into CONTIGUOUS runs. Computed rather than taken
+ * as an entry's first and last day: an entry listing Tuesday and Thursday would
+ * otherwise render "Tue – Thu" and claim a Wednesday the restaurant is shut.
+ * Non-contiguous days become separate rows.
  */
 function runsOf(days: readonly string[]) {
   const indices = days
@@ -64,17 +60,10 @@ function runsOf(days: readonly string[]) {
 const dayIndex = (day: string) => dayOrder.indexOf(day as (typeof dayOrder)[number]);
 
 /*
-  Every run, open and closed, ordered by the day it starts on — so the list
-  reads Monday first and runs through the week.
-
-  It used to be "the client's open ranges in the order they listed them, then
-  the closed days", which put Monday last because Monday is the closed one. The
-  client asked for it to read as a week instead. Sorting by dayIndex rather than
-  by open-vs-closed is what does it, and it keeps working if the closed day ever
-  moves: nothing here assumes which day is shut.
-
-  A day the restaurant is shut is still listed. It is not a working hour, but
-  dropping it leaves a visitor guessing about Monday.
+  Every run, open and closed, ordered by the day it starts on, so the list reads
+  as a week. Sorting by dayIndex rather than by open-vs-closed is what lets the
+  closed day move — nothing here assumes which day is shut, or that any is. A
+  shut day is still listed; dropping it leaves a visitor guessing.
 */
 const schedule = [
   ...site.hours.entries.flatMap((entry) =>
@@ -84,43 +73,26 @@ const schedule = [
 ].sort((a, b) => dayIndex(a.run.from) - dayIndex(b.run.from));
 ---
 
-<!--
-  Charcoal, like every band below the hero, and the last of them: the hairline
-  closing this band off from the black footer comes from the
-  `main > .section-dark:last-child` rule rather than from this section. See
-  `.section-dark` in global.css for the tokens it re-tints.
--->
 <section class="section section-dark" id="find-us">
   <div class="wrap">
     {/*
-      The heading is centred over the whole band rather than sitting in a
-      column. It used to be inside the grid's first column so the photograph
-      beside it started on the same line as the words; that photograph is gone
-      and the grid is two text columns now, so a heading left in the first one
-      would be centred over half the band and read as a column label instead of
-      as the band's title.
-
-      It carries its own data-reveal, like .plates__head, so the sibling rule in
-      global.css brings the head in a beat ahead of the columns.
+      The heading is centred over the whole band rather than inside a column,
+      where it would read as a column label. Its own data-reveal brings it in a
+      beat ahead of the columns.
     */}
     {/*
-      Not .section-head: that sets --step-3, and this heading is --step-2 to
-      match From the kitchen and Our Goal. Same reasoning as .plates__head —
-      the two rules have equal specificity, so overriding would have meant
-      depending on source order. .section-head--inline existed only for this
-      one header and went with it.
+      Not .section-head: that sets --step-3 and this is --step-2 to match the
+      other band headings. Equal specificity, so overriding would depend on
+      source order.
     */}
     <header class="find__head" data-reveal>
       <h2 data-i18n="findUs.heading">{t(locale, 'findUs.heading')}</h2>
     </header>
 
     {/*
-      One text column — address, hours, phone, email, in that order, the same
-      order the column stacks in below the breakpoint — beside the photograph.
-      It used to be two text columns side by side with no photo at all; the
-      client didn't like the band without one, and asked for the desktop layout
-      to read the way the mobile stack already does, with the picture filling
-      the space that freed up on the right. See .find__col and .find__media.
+      One text column — address, hours, phone, email, the same order it stacks
+      in below the breakpoint — beside the photograph. See .find__col and
+      .find__media.
     */}
     <div class="find__grid" data-reveal>
       <div class="find__col">
@@ -129,27 +101,22 @@ const schedule = [
             {t(locale, 'findUs.addressLabel')}
           </p>
           {/*
-            Street and city only. The postcode and the country are still in the
-            Restaurant JSON-LD, which is what local search reads; on the page
-            they were three lines telling a visitor what one line tells them.
+            Street and city only. The postcode and country are in the Restaurant
+            JSON-LD, which is what local search reads.
           */}
           {/*
-            The address IS the map link now — the separate "view on map" button
-            below it is gone.
+            The address IS the map link; there is no separate "view on map"
+            button (added and removed twice — the affordance it existed for is
+            answered by the underline instead).
 
-            `findUs.viewOnMap` did not go with the button: it is carried as
-            visually hidden text inside the link. That is deliberate rather than
-            tidy-minded. The link has no underline (the client asked for those
-            to go), so nothing on screen says it leads anywhere, and its
-            accessible name would otherwise be a bare street address with no
-            hint that it opens Google Maps in a new tab. Appending rather than
-            using aria-label keeps the visible words *inside* the accessible
-            name, which is what WCAG 2.5.3 (Label in Name) requires — a speech
-            user saying "Laskou 3" still matches the link.
+            findUs.viewOnMap is carried as .sr-only text inside the link rather
+            than as an aria-label, which keeps the visible words inside the
+            accessible name (WCAG 2.5.3 Label in Name) — a speech user saying
+            "Laskou 3" still matches the link.
 
-            The mapUrl guard stays: with no link the address renders as plain
-            text rather than as a control that goes nowhere. See the note in
-            CLAUDE.md about why that URL is a Place ID and must not be edited.
+            The mapUrl guard stays: with no URL the address renders as plain
+            text rather than a control that goes nowhere. That URL is a Place ID
+            and must never be hand-edited — see CLAUDE.md.
           */}
           <address class="find__address">
             {site.mapUrl ? (
@@ -223,16 +190,12 @@ const schedule = [
             {t(locale, 'contact.phoneLabel')}
           </p>
           {/*
-            Icons are inline SVG in the same idiom as SocialLinks — 24x24,
-            fill none, stroke currentColor at 1.6 — rather than Font Awesome.
-            The site ships no icon library and self-hosts everything it renders;
-            three glyphs are not worth a CDN request, a webfont, or FA's CC BY
-            attribution requirement, and inline SVG inherits currentColor so the
-            icons follow the link's hover and focus states for free.
-
-            aria-hidden on every one of them: the link text beside the icon is
-            already the accessible name, and an unlabelled decorative glyph
-            inside a link would either add nothing or duplicate it.
+            Icons are inline SVG in the SocialLinks idiom (24x24, fill none,
+            stroke currentColor at 1.6) rather than Font Awesome: the site
+            self-hosts everything, three glyphs do not justify a webfont, FA Free
+            carries an attribution requirement nothing here satisfies, and inline
+            SVG inherits currentColor. All aria-hidden — the link text is already
+            the accessible name.
           */}
           <p class="find__contact">
             <a href={`tel:${site.phone.href}`}>
@@ -245,13 +208,8 @@ const schedule = [
         </div>
 
         {/*
-          Email is its own .find__block rather than a second label inside the
-          phone block, so every group in the column spaces the same way —
-          `.find__block + .find__block`, 2rem. It used to ride on
-          `.find__label--tight` (1.1rem) back when phone and email were a
-          second column of their own; that rule existed only to level "Email"
-          with "Ώρες λειτουργίας" next door, which stopped being a question the
-          moment there was only one column to level.
+          Email is its own .find__block rather than a second label in the phone
+          block, so every group in the column spaces the same way.
         */}
         <div class="find__block">
           <p class="find__label" data-i18n="contact.emailLabel">
@@ -270,10 +228,9 @@ const schedule = [
       </div>
 
       {/*
-        No fixed aspect ratio here on purpose — see the CSS. The image is meant
-        to match the text column's height exactly, not the other way round,
-        which is what keeps it from dominating the band the way a tall portrait
-        crop did in the very first version of this section.
+        No fixed aspect ratio here on purpose — see the CSS. The image matches
+        the text column's height, not the other way round, which is what keeps
+        it from dominating the band.
       */}
       <div class="find__media">
         <Picture

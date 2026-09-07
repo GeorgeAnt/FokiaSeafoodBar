@@ -10,27 +10,16 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-// TEMP: visual test of the grey concrete texture as the section background.
-// The overlay and the token changes live on .section--concrete-test in
-// global.css; this only hands it the optimised texture, because the source jpg
-// is 9.3MB and has to go through the image pipeline rather than a CSS url().
-//
-// 2560, not the source's native 4666. `background-size: cover` scales by
-// whichever axis needs more stretching, and this list is a portrait-shaped box
-// (it runs to 3249px at 1366x768 — see the layout note above) under a
-// landscape-cropped texture, so *height* dominates: covering this section's
-// own scrolling height would need the texture upscaled ~1.9x, which pixelates.
-// `#team.section--concrete-test { background-attachment: fixed }` in
-// global.css sidesteps that instead of outrunning it with a bigger source —
-// it ties `cover`'s math to the viewport, which is always shorter than this
-// list, so 2560 downscales rather than upscales at any member count.
+// TEMP: same concrete ground as /menu and /gallery — see
+// .section--concrete-test in global.css, which owns the overlay, the token
+// changes and why 2560 is enough (background-attachment: fixed ties cover's
+// math to the viewport rather than to this list's own scrolling height). This
+// only hands it the optimised texture; the source jpg is 9.3MB.
 const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 ---
 
 {/*
-  This renders on /team and nowhere else, which is why the heading is an <h1>:
-  it is that page's only one. It was an <h2> while the section sat on the
-  homepage under the hero logo's h1. See src/pages/team.astro for why it moved.
+  This renders on /team and nowhere else, which is why the heading is an <h1>.
 */}
 <section
   class="section section--concrete-test"
@@ -44,34 +33,24 @@ const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 }
     </header>
 
     <!--
-      One portrait plus a paragraph each, as alternating rows: photo left on odd
-      members, photo right on even ones. The photo column is a fixed 4:5 so row
-      heights stay even from four members to six, and every portrait gets the
-      same crop.
-
-      This is the layout the section had before the portrait grid, restored at
-      the client's request because five columns put the bios in ~220px tracks —
-      about four words a line. The cost is the one the grid was built to avoid:
-      the page runs this composition once per member, and Find Us below is
-      another of the same shape. Revisit if the section grows again.
+      Alternating rows: photo left on odd members, right on even. The photo
+      column is a fixed 4:5 so row heights stay even from four members to six.
+      A portrait grid was tried and reverted — five columns put the bios in
+      ~220px tracks, about four words a line. The cost is page height.
     -->
     <div class="team__list" data-reveal>
       {
         team.members.map((member, index) => (
           <article class="team__member">
             <div class="team__photo">
-              {/* The first row is in the initial viewport at every width this
-                  section supports, so it is eager and high priority — it is
-                  this page's LCP image, and the same call Hero.astro makes for
-                  its first slide. Everything below it stays lazy.
+              {/* The first row is in the initial viewport at every width, so it
+                  is this page's LCP image; everything below stays lazy.
 
-                  Recorded because it is a plausible-sounding wrong answer:
-                  this was changed while chasing "the first team photo doesn't
-                  appear until I scroll", and it did NOT fix that. The cause
-                  was the reveal observer's threshold in Base.astro — the photo
-                  had loaded fine all along (`img.complete === true`) and was
-                  sitting under `opacity: 0`. Eager is still right here on its
-                  own merits, but do not read it as the fix for that bug. */}
+                  Recorded because it is a plausible wrong answer: this was
+                  changed while chasing "the first team photo doesn't appear
+                  until I scroll" and did NOT fix it. The cause was the reveal
+                  observer's threshold in Base.astro — the photo had loaded
+                  (img.complete === true) and was sitting under opacity: 0. */}
               <Picture
                 src={teamPhoto(member.photo)}
                 formats={['avif', 'webp']}

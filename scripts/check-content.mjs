@@ -164,42 +164,28 @@ function outstandingSiteFields(node, trail = []) {
       found.push(`${path} — not set`);
     } else if (path === 'seo.url' && !/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}$/i.test(value)) {
       /*
-        This rule used to read `value.includes('example.com')`, and for months it
-        was the only thing standing between the site and shipping every canonical
-        on a domain someone else owns. It fired the whole time and nobody acted
-        on it, which is the part worth remembering: a `npm run check` line is not
-        a build failure, and nothing else in the pipeline had an opinion.
-
-        Now that the domain is real that test can never fire again, so it is
-        re-aimed at the shape instead of at one known-bad value — https, a bare
-        origin, no trailing slash and no path, which is exactly what
-        `new URL(pathname, origin)` in Base.astro assumes when it builds a
-        canonical.
+        This rule used to test for the literal string example.com, and it fired
+        every run for months while the site shipped canonicals on a domain
+        someone else owns — a check line is not a build failure. It tests the
+        SHAPE now: https, a bare origin, no path, which is what
+        new URL(pathname, origin) in Base.astro assumes.
       */
       found.push(`${path} — not a bare https origin ("${value}")`);
     } else if (path === 'seo.ogImage' && !existsSync(join(root, 'public', value))) {
       /*
-        The share card is the one asset here that no code path can conjure. It
-        is a committed file in public/ because a social crawler runs neither
-        Astro's image pipeline nor any JavaScript — so if it goes missing there
-        is no build error, no broken image on any page, and nothing visible
-        anywhere except a blank box in someone's timeline. Regenerate it with
-        `npm run og`.
+        The share card is the one asset no code path can conjure: it is a
+        committed file, and if it goes missing there is no build error and
+        nothing visible except a blank box in someone's timeline.
       */
       found.push(`${path} — public${value} is missing (run: npm run og)`);
     }
   }
 
   /*
-    A `$comment` saying PLACEHOLDER only counts when nothing beneath it was
-    caught by a rule of its own.
-
-    That is exactly the case the opening hours hit: plausible times that no rule
-    could tell were invented, flagged only in prose — and because this walk used
-    to skip every `$`-prefixed key outright, `npm run check` never mentioned them
-    once, while README had already moved them to "confirmed and in place". Where
-    the data itself trips a rule (geo's nulls, seo's example domain) the note is
-    a duplicate, and the top-level one just describes the convention.
+    A $comment saying PLACEHOLDER only counts when nothing beneath it was caught
+    by a rule of its own. That is the case the opening hours hit: plausible
+    invented times that no rule could catch, while this walk skipped every
+    $-prefixed key outright and README already called them confirmed.
   */
   if (placeholderNote && found.length === 0) {
     found.push(`${placeholderNote} — note says PLACEHOLDER and no field under it is flagged`);

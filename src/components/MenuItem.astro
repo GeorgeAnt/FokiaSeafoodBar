@@ -8,11 +8,9 @@ interface Props {
 }
 const { item, locale = defaultLocale } = Astro.props;
 
-/* description / meta / variants / wine are each pre-joined per locale into one
-   dictionary key in lib/i18n.ts's menuGroupKeys, so a lookup here is enough —
-   see the note there for why. `t()` returns '' for a missing key's locale
-   value only when the key itself is absent from the dictionary, which for an
-   optional field means "this item has none": guard on the field, not on t(). */
+/* description / meta / variants / wine are pre-joined per locale into one
+   dictionary key by lib/i18n.ts's menuGroupKeys, so one lookup is enough.
+   Guard on the field, not on t(): t() returns the key itself when missing. */
 const name = t(locale, `menu.item.${item.id}.name`);
 const description = item.description ? t(locale, `menu.item.${item.id}.description`) : null;
 const meta = item.unit || item.volume ? t(locale, `menu.item.${item.id}.meta`) : null;

@@ -735,7 +735,7 @@ rather than full-bleed** is what keeps the two groups apart. Don't make them
 full-bleed.
 
 Text was re-measured on the new ground: headings and buttons 13.2:1, body and
-muted text 5.9:1, eyebrows and the phone number 5.8:1.
+muted text 5.9:1, and the phone number 5.8:1.
 
 The text on the two **top** Take away cards sits over photographs rather than
 over the band, so it is measured against the rendered pixels instead: worst
@@ -751,9 +751,8 @@ are far too long to sit safely over a photograph. They read against a flat
 panel — 6.6:1 on the paragraph and 14.8:1 on the number — and swapping either
 picture cannot change those.
 
-`.section-stone`, the old mid tier, is now unused. It is kept in the stylesheet
-on purpose — it and the `--wood-pale` accent only make sense together — and is
-labelled as such so nobody removes half of it.
+`.section-stone` and the `--wood-pale` accent, which the old mid tier used, have
+been removed from the stylesheet along with the tier itself.
 
 ### The `--accent` token
 
@@ -764,10 +763,9 @@ single `--accent` token, and no rule references `--wood` directly for text:
 | Tier | `--accent` | Contrast |
 |---|---|---|
 | salt | `--wood` `#813A18` | 6.6:1 |
-| stone | `--wood-pale` `#F0E0D8` | 5.0:1 |
 | dark | `--wood-light` `#C98A76` | 6.4:1 |
 
-Both tints lighten Wood along the oxidation path — weathered rust, dusty and
+The tint lightens Wood along the oxidation path — weathered rust, dusty and
 pink — rather than toward orange, which lands on terracotta.
 
 Team roles, menu subheadings and focus rings read `--accent`, so adding a

@@ -1,14 +1,11 @@
 /**
  * Is the restaurant open at a given moment?
  *
- * Pure and timezone-free on purpose: the caller decides which clock the day and
- * the minutes came from. Contact.astro reads them in Europe/Athens, because the
- * question "is the kitchen open" is about the restaurant's clock and not the
- * visitor's — someone calling from London at 22:00 is calling a place where it
- * is already midnight.
+ * Pure and timezone-free: the caller decides which clock the day and minutes
+ * came from. Contact.astro reads them in Europe/Athens, because the question is
+ * about the restaurant's clock, not the visitor's.
  *
- * Kept here rather than inline in the component so the shipped logic is the
- * logic that gets tested; a copy in a test file would be free to drift.
+ * Kept here rather than inline so the shipped logic is the logic under test.
  */
 
 export type HoursEntry = {

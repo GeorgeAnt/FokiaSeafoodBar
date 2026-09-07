@@ -1,31 +1,19 @@
 /**
- * Bilingual chrome, bilingual content.
+ * Bilingual chrome and bilingual content.
  *
- * Everything on the site is translated now, including the menu: nav, headings,
- * buttons, body copy, alt text, the legal block, team names/roles/bios, and
- * menu category/item names, descriptions, units, variants and wine fields. Keys
- * live in `src/i18n/{el,en}.json`, plus the content keys derived below from
- * locale-keyed JSON (`{ "el": "...", "en": "..." }` per field).
+ * Everything is translated, the menu included: keys live in
+ * src/i18n/{el,en}.json, plus the content keys derived below from locale-keyed
+ * JSON ({ "el": "…", "en": "…" } per field) in team.json, gallery.json,
+ * menu-food.json and menu-drinks.json.
  *
- * The menu used to be the one exception — flat Greek strings in `menu-*.json`
- * that rendered identically in both locales, because the client's menu was
- * Greek as printed and no approved translation existed. The client has since
- * asked for an English menu, so `menu-food.json` / `menu-drinks.json` now carry
- * the same `{el, en}` shape team.json's fields do, and flow through the same
- * mechanism below. A unit or category name the client had written as a dual
- * literal before the site was bilingual ("6 τεμάχια | 6 pieces", "Νερό |
- * Water") is split across locales like any other field now, not carried over
- * as one string in both — the "|" was never a separator worth keeping, just
- * how the client wrote a bilingual label before there was a mechanism for one.
- * A few fields are still deliberately identical across both locales rather
- * than translated: a dish or drink name that is already English or a brand
- * ("Tuna tacos", "Nikka Whisky From The Barrel"), and wine producer/label
- * names, which are transliterated proper nouns rather than translations — the
- * same treatment team.json gives a person's name.
+ * Some values are deliberately identical in both locales rather than
+ * translated: a dish or brand name that is already English ("Tuna tacos"), and
+ * wine producer/label names, which are transliterated proper nouns — the same
+ * treatment team.json gives a person's name.
  *
- * Greek is the default and is what the server renders. The language switcher is a
- * client-side swap over `data-i18n*` attributes, so the page is already correct
- * before any JS runs.
+ * Greek is the default and is what the server renders. The switcher is a
+ * client-side swap over data-i18n* attributes, so the page is correct before
+ * any JS runs.
  */
 import elStrings from '../i18n/el.json';
 import enStrings from '../i18n/en.json';
@@ -49,9 +37,8 @@ function withoutComments(source: Record<string, unknown>): Dict {
 }
 
 /**
- * Locale-keyed *content* (as opposed to UI strings) is flattened into the same
- * dictionary, so the switcher has exactly one mechanism to drive rather than one
- * per section.
+ * Locale-keyed CONTENT is flattened into the same dictionary as the UI strings,
+ * so the switcher has one mechanism to drive rather than one per section.
  */
 function contentKeys(locale: Locale): Dict {
   const out: Dict = {};
@@ -83,11 +70,9 @@ function contentKeys(locale: Locale): Dict {
 }
 
 /**
- * `variants`, `wine` and the `unit`/`volume` pair each combine several fields
- * into one rendered line in MenuItem.astro, so they are pre-joined here into a
- * single key per item rather than one key per field — the same reasoning as
- * `wineLine` used to follow as a plain function, just moved to where the other
- * locale joins already happen.
+ * variants, wine and the unit/volume pair each combine several fields into one
+ * rendered line in MenuItem.astro, so they are pre-joined here into a single
+ * key per item rather than one key per field.
  */
 function menuGroupKeys(locale: Locale, groups: MenuGroup[], out: Dict): void {
   for (const g of groups) {

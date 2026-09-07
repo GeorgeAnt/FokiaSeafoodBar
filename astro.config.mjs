@@ -5,8 +5,8 @@ import site from './src/data/site.json' with { type: 'json' };
 
 // https://astro.build/config
 export default defineConfig({
-  // Drives canonical URLs, Open Graph tags and sitemap.xml.
-  // PLACEHOLDER until the client confirms the production domain — see src/data/site.json.
+  // The production domain, written once. Canonicals, Open Graph and the sitemap
+  // all derive from it — never write it anywhere else.
   site: site.seo.url,
 
   integrations: [sitemap()],

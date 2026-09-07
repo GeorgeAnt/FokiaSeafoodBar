@@ -1,13 +1,10 @@
 /**
  * Menu data access and price formatting.
  *
- * Menu strings are locale-keyed the same way team.json's are — see lib/i18n.ts,
- * which flattens `name` / `description` / `unit` / variants / wine fields into
- * the same dictionary the rest of the site's chrome uses. `volume` is the one
- * field that stays a plain string: "250 ml" reads the same in either language.
- * Only the *formatting* of a price is locale-independent here: Greek convention
- * throughout (comma decimal, trailing euro sign), because the euro sign and the
- * client's own printed prices don't change with the language toggle.
+ * Menu strings are locale-keyed and flattened by lib/i18n.ts. `volume` is the
+ * one field that stays a plain string: "250 ml" reads the same either way.
+ * Price formatting is deliberately locale-independent — Greek convention
+ * throughout, matching the client's printed menu.
  */
 import foodData from '../data/menu-food.json';
 import drinksData from '../data/menu-drinks.json';
@@ -40,7 +37,7 @@ export interface MenuItem {
 export interface MenuGroup {
   id: string;
   name: LocalizedText;
-  /** Applies to every item in the group, e.g. "6 τεμάχια | 6 pieces". */
+  /** Applies to every item in the group, e.g. "6 τεμάχια" / "6 pieces". */
   unit?: LocalizedText;
   items?: MenuItem[];
   subcategories?: MenuGroup[];
@@ -50,10 +47,8 @@ export const foodCategories = foodData.categories as MenuGroup[];
 export const drinkCategories = drinksData.categories as MenuGroup[];
 
 /**
- * Greek price convention: comma as the decimal separator, euro sign after the
- * number. Matches how the client's own menu is written — whole numbers stay
- * whole (9 €, not 9,00 €), and anything with cents keeps both digits
- * (2,50 € and 3,90 €, never 2,5 € or 3,9 €).
+ * Greek convention: comma decimal, euro sign after the number. Whole numbers
+ * stay whole (9 €, not 9,00 €); cents keep both digits (2,50 €, never 2,5 €).
  */
 export function formatPrice(price: number): string {
   const text = Number.isInteger(price) ? String(price) : price.toFixed(2).replace('.', ',');

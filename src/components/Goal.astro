@@ -9,12 +9,8 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-/*
-  Picked by id, never by position — the same rule Plates.astro follows, and for
-  the same reason: gallery.json is ordered for the gallery, so reordering it
-  would otherwise change this band silently. Throwing at build time is better
-  than rendering the column with a hole in it.
-*/
+/* Picked by id, never by position — gallery.json is ordered for the gallery, so
+   reordering it must not change this band silently. Throws at build time. */
 const GOAL_PHOTO_ID = 'toast-outdoors';
 const photo = gallery.images.find((candidate) => candidate.id === GOAL_PHOTO_ID);
 if (!photo) {
@@ -29,60 +25,28 @@ const photoAltKey = `gallery.${photo.id}.alt`;
 ---
 
 {/*
-  Charcoal, like every band below the hero.
-
-  This used to be the mid tier, and the reason was real: the hero above is
-  --black, so a dark Goal ran straight into it and made the top of the page one
-  mass. What changed is that the boundary no longer comes from the tone. Every
-  band is --charcoal now and .section-dark carries a 1px hairline on top, so the
-  hero-to-Goal edge is drawn rather than implied — and --charcoal is a step up
-  from --black besides, so the two are not the same value either.
-*/}
-{/*
-  A split, not a centred band, and it is built to continue the hero's grid.
-
-  The photo column is the same half-width, full-bleed track the carousel sits
-  in directly above it, and takes the same height — so the top of the page
-  reads as one 2x2 block with the picture on a diagonal: copy top-left,
-  carousel top-right, photo bottom-left, copy bottom-right.
-
-  Source order is text then photo, which is both the reading order (the h2
-  opens the band) and the order this stacks in on a phone. `order` moves the
-  photo to the left only once the two are side by side — see .goal__media in
-  global.css for why it stacks *under* the text rather than over it.
+  A split built to continue the hero's grid: the photo column is the same
+  half-width, full-bleed track the carousel sits in directly above, at the same
+  height, so the top of the page reads as one 2x2 with the pictures on a
+  diagonal. Source order is text then photo — that is the reading order and the
+  order it stacks in on a phone; order: -1 moves the photo left only once the
+  two are side by side.
 */}
 <section class="section-dark goal" id="goal">
-  {/* One reveal for the whole band: the heading, the two paragraphs and the
-      button are a single thought, and staggering them made the heading arrive
-      on its own above nothing. */}
+  {/* One reveal for the whole band: staggering made the heading arrive on its
+      own above nothing. */}
   <div class="goal__grid" data-reveal>
     <div class="goal__col">
       {/*
-        The heading names the section, which it did not use to.
-
-        This band carried two stacked titles: a small wood eyebrow reading
-        "Our Goal" and, under it, a --step-2 sentence ("To serve fish with the
-        respect it deserves"). The client asked for one, so the eyebrow's words
-        were promoted into the sentence's size and the sentence itself was cut —
-        `goal.lead` went with it.
-
-        It reads `nav.goal` rather than a heading key of its own, which is what
-        the eyebrow did too. There was a `goal.heading` once and it was deleted
-        in a dead-key sweep for never being rendered; re-adding it would put the
-        same two words in two keys that can drift apart silently. The nav label
-        and the section title should agree, so they share one string.
-
-        This also makes Our Goal the last section to stop carrying an eyebrow —
-        see the note in CLAUDE.md about why they were a bug rather than a device.
+        Renders nav.goal rather than a heading key of its own: goal.heading was
+        deleted in a dead-key sweep for never being rendered, and re-adding it
+        would put the same two words in two keys that can drift.
       */}
       <h2 class="goal__heading" data-i18n="nav.goal">{t(locale, 'nav.goal')}</h2>
 
       {/*
-        Heading, first paragraph, second, button — still one stack, and still
-        centred, but now centred inside its own half of the band rather than
-        across the whole of it. The measure stays on .goal__body rather than on
-        each paragraph: centred lines are read by their middles, so the two
-        paragraphs have to share one axis or the block comes apart.
+        The measure stays on .goal__body rather than on each paragraph: centred
+        lines are read by their middles, so the two must share one axis.
       */}
       <div class="goal__body">
         <p data-i18n="goal.body">{t(locale, 'goal.body')}</p>
@@ -94,11 +58,9 @@ const photoAltKey = `gallery.${photo.id}.alt`;
     </div>
 
     {/*
-      Widths mirror the hero carousel's, because the column is the same size:
-      half the viewport above 60rem, the full width stacked below it.
-
-      It keeps its real alt — unlike the Take away cards, nothing here is a
-      link, so the picture is content rather than part of a control's name.
+      Widths mirror the hero carousel's, because the column is the same size. It
+      keeps its real alt — nothing here is a link, so the picture is content
+      rather than part of a control's name.
     */}
     <div class="goal__media">
       <Picture

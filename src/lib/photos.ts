@@ -48,38 +48,23 @@ export const carouselPhotos: ImageMetadata[] = Object.keys(carousel)
 /**
  * The photograph on the Take away band's events card.
  *
- * **Deliberately not in gallery/ and not in gallery.json**, which is why it is
- * a named export rather than a `galleryPhoto()` lookup like every other
- * photograph on the site. It is used in exactly one place and the client did
- * not want it as a gallery tile — and a file sitting in `gallery/` without a
- * JSON entry would be reported by `npm run check` as "not shown on the site",
- * which would be false. `sections/` is walked by nothing, so the report stays
- * honest.
+ * Deliberately NOT in gallery/ or gallery.json: it is used in one place, the
+ * client did not want it as a gallery tile, and a file in gallery/ without a
+ * JSON entry would be reported by npm run check as "not shown on the site",
+ * which would be false. sections/ is walked by nothing.
  *
- * It carries **no alt text anywhere**, and that is not an oversight: the note
- * cards became `<details>` controls, so the photograph now sits inside a
- * `<summary>` and any alt would be read out as part of the control's name. It
- * is `alt=""` for exactly the reason the Take away panels' photographs are.
- * There was a `contact.eventsAlt` key for the one revision this picture was
- * passive content; it went with that revision.
+ * It carries no alt anywhere: the note cards are <details>, so this sits inside
+ * a <summary> and any alt would be read as part of the control's name.
  *
- * **The client's file is 68% black bars and this is the trimmed derivative.**
- * `sushi events.jpg` arrives 1920x1080, which looks like an ordinary landscape
- * photo; the actual picture is a 608x1080 portrait frame pillarboxed into 16:9,
- * exported from portrait phone footage. Uncropped it would show a narrow strip
- * of food between two black fields. Measured by pixel scan — the bars are pure
- * black, so a threshold-based crop detector reports the whole frame.
- *
- * Regenerate from the client's original with, from the repo root:
+ * The client's file is 68% black bars. "sushi events.jpg" arrives 1920x1080 but
+ * the picture is a 608x1080 portrait frame pillarboxed into 16:9. Measured by
+ * pixel scan — the bars are pure black, so a threshold-based crop detector
+ * reports the whole frame. Regenerate from the original with:
  *   sharp('<original>')
  *     .rotate()
  *     .extract({ left: 656, top: 0, width: 608, height: 1080 })
  *     .resize(2560, 2560, { fit: 'inside', withoutEnlargement: true })
  *     .jpeg({ quality: 88, mozjpeg: true })
- *
- * That is prepare-photos.mjs's own treatment with the crop in front of it; the
- * resize is a no-op at this size and is kept so the recipe stays the same one.
- * Re-measure the crop box if the client ever sends a different export.
  */
 export { default as sushiEvents } from '../assets/photos/sections/sushi-events.jpg';
 
@@ -91,21 +76,18 @@ export { default as sushiEvents } from '../assets/photos/sections/sushi-events.j
 export { default as logoClean } from '../assets/photos/backgrounds/logo-clean.png';
 
 /**
- * The horizontal wordmark lockup — "fokia" with the wave motif, SEAFOOD BAR
- * under it — used as the hero's h1.
+ * The horizontal wordmark lockup, used as the hero's h1.
  *
- * Derived from the client's LOGO-01.png, which is a 4725x4725 canvas holding a
- * 4725x2770 mark: trimmed to the artwork and resized to 600px wide. The trim is
- * the point. The hero renders this as a CSS *mask* so the colour comes from
- * --light-stone rather than from the file, and a mask sized `contain` would
- * otherwise fit the square canvas and leave ~41% of the box as empty field
- * above and below the mark.
+ * Derived from the client's LOGO-01.png, a 4725x4725 canvas holding a 4725x2770
+ * mark: trimmed to the artwork and resized to 600px wide. THE TRIM IS THE POINT
+ * — the hero renders this as a CSS mask, and a mask sized contain would fit the
+ * square canvas and leave ~41% of the box as empty field.
  *
  * Regenerate with, from the repo root:
  *   sharp('src/assets/photos/backgrounds/LOGO-01.png')
  *     .trim({ threshold: 1 }).resize({ width: 600 }).png()
  *
- * The artwork is pure white (255,255,255) on transparency, so the shape lives
- * entirely in the alpha channel — which is exactly what a mask reads.
+ * The artwork is pure white on transparency, so the shape is entirely in the
+ * alpha channel — which is what a mask reads.
  */
 export { default as logoWordmark } from '../assets/photos/backgrounds/logo-wordmark.png';

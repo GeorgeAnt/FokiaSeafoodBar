@@ -11,27 +11,16 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 /*
-  One large variant per photo, built once at build time.
-
-  It does double duty: it is what the lightbox loads, and it is the href the
-  grid link points at. That is what keeps the grid honest without JavaScript —
-  the link still goes somewhere real (the photo itself) rather than being a
-  control that does nothing, so the tiles need no <template> treatment. Only the
-  lightbox does.
-
-  The masters are 1707x2560, so 1400 never upscales.
+  One large variant per photo, built once. It is what the lightbox loads AND the
+  href the grid link points at, which is what keeps the grid honest without JS —
+  the tile still goes somewhere real, so it needs no <template> treatment. The
+  masters are 1707x2560, so 1400 never upscales.
 */
 const FULL_WIDTH = 1400;
 
-// TEMP: same concrete ground under test on /team and /menu — see
-// .section--concrete-test in global.css, which owns the overlay and the token
-// changes. This only hands it the optimised texture; the source jpg is 9.3MB.
-//
-// 2560, not the source's native 4666, works here because
-// `#gallery.section--concrete-test { background-attachment: fixed }` in
-// global.css ties `cover`'s scaling to the viewport rather than to this page's
-// own scrolling height, which grows with the photo count — see the width note
-// in Team.astro for the underlying math.
+// TEMP: same concrete ground as /team and /menu — see .section--concrete-test
+// in global.css, which owns the overlay, the token changes and why 2560 is
+// enough. This only hands it the optimised texture; the source jpg is 9.3MB.
 const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 
 const items = await Promise.all(
@@ -39,9 +28,8 @@ const items = await Promise.all(
     const src = galleryPhoto(image.file);
     const full = await getImage({ src, format: 'webp', width: FULL_WIDTH });
     /* Carried onto the link so the lightbox can size its <img> before the photo
-       arrives. The set is not all one shape, so it is per-photo rather than one
-       constant: an <img> whose src is swapped with no dimensions collapses to
-       zero height and then jumps, on every next/previous. */
+       arrives: an <img> whose src is swapped with no dimensions collapses to
+       zero height and then jumps. Per-photo, since the set is not one shape. */
     const fullHeight = Math.round((FULL_WIDTH * src.height) / src.width);
     return {
       ...image,
@@ -96,13 +84,9 @@ const items = await Promise.all(
     </div>
 
     {/*
-      The lightbox is useless without JavaScript, so it is cloned from here at
-      runtime rather than sitting in the DOM. Its labels are still rendered by
-      Astro in the current locale and keep data-i18n-label, so the language
-      switch reaches them after cloning.
-
-      The counter needs no data-i18n-n: unlike the hero dots it is digits only
-      ("3 / 23"), with no translatable word around the number.
+      Useless without JS, so it is cloned from here at runtime. Labels are still
+      Astro-rendered in the current locale and keep data-i18n-label. The counter
+      needs no data-i18n-n: it is digits only, with no translatable word.
     */}
     <template id="lightbox-template">
       <dialog
@@ -144,8 +128,7 @@ const items = await Promise.all(
 
         {/*
           Announced, because moving between photos changes nothing else a screen
-          reader would notice except the alt — and the arrow keys make that a
-          silent change. aria-atomic so "4 / 23" is read as one string.
+          reader would notice. aria-atomic so "4 / 23" is read as one string.
         */}
         <p class="lightbox__counter" data-lb-counter aria-live="polite" aria-atomic="true"></p>
       </dialog>
@@ -155,11 +138,8 @@ const items = await Promise.all(
 
 <script>
   /*
-    Click a tile to open it large, then move through the rest.
-
     Built on <dialog>.showModal(), which gives the focus trap, the Escape
-    handler and the inert background for free — all of which a hand-rolled
-    overlay has to reimplement and usually gets wrong.
+    handler and the inert background for free.
   */
   const grid = document.getElementById('gallery-grid');
   const template = document.querySelector<HTMLTemplateElement>('#lightbox-template');

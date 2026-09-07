@@ -1,635 +1,16 @@
 # fokia — seafood bar
 
-Astro marketing site for a Greek seafood restaurant: a scrolling homepage plus
-dedicated `/menu` and `/gallery` pages. See `README.md` for how to run it and
-how a non-developer edits the content.
-
-## Rules that are easy to break
-
-**The menu is bilingual now — it used to be the one thing on the site that
-wasn't.** `name`, `description`, `unit`, `variants` and the `wine` fields in
-`src/data/menu-food.json` and `menu-drinks.json` are locale-keyed
-(`{ "el": "…", "en": "…" }`), the same shape `team.json` uses for a person's
-bio, and flow through the same mechanism in `src/lib/i18n.ts`
-(`menuGroupKeys`) that the rest of the site's content keys do. `el` is the
-client's menu exactly as printed and is the source of truth; `en` is a
-translation of it, never a different dish. `volume` (`"250 ml"`) stays a plain
-string — it reads the same in either language.
-
-A unit or category name the client had written as a dual literal before the
-site was bilingual — `"6 τεμάχια | 6 pieces"`, `"Νερό | Water"` — is **split**
-across locales like any other field (`el: "6 τεμάχια"`, `en: "6 pieces"`), not
-carried over as one string in both. The "|" was how the client wrote a
-bilingual label before the site had a translation mechanism of its own; it is
-not a separator worth preserving now that one exists.
-
-Some strings genuinely are identical across both locales rather than
-translated, and that is not a bug:
-
-- A dish or drink name that is already English or a brand ("Tuna tacos", "Bao
-  buns", "Nikka Whisky From The Barrel") — render verbatim in both, never
-  transliterate.
-- Wine producer/label names ("Κτήμα Ζαφειράκη" → "Zafeirakis Estate") are
-  transliterated proper nouns, not translations of meaning — the same
-  treatment `team.json` gives a person's name.
-
-The menu section no longer forces `lang="el"` — it takes `lang={locale}` like
-the rest of the page, since its content now genuinely differs by locale.
-
-**The menu content is real client data.** Never invent a dish or a price. An
-English *translation* of an existing dish is expected now (the client asked for
-it) — what stays off-limits is inventing a dish, a price, or a translation that
-changes what's actually being served. Nine items have `"price": null` because
-the client has not priced them; they must still render, with an em dash.
-
-**The legal block is legally required.** `src/data/legal.json` always renders
-under the menu, never collapsed, never shortened.
-
-**Content changes go in JSON, not components.** `src/data/` and `src/i18n/` only.
-
-**Update `README.md` and `CLAUDE.md` in the same change, not afterwards.** They
-are the only description of *why* this site is the way it is, and every rule and
-gotcha below was written because someone had already been caught by it. When you
-change behaviour, structure, tokens, copy or the content model, update the docs
-in the same pass.
-
-- `README.md` is for the person editing content and deploying: what to edit,
-  what the numbers are, what is still outstanding before launch.
-- `CLAUDE.md` is for whoever works on the code next: rules that are easy to
-  break, and gotchas that cost time once already.
-- `AGENTS.md` is a byte-identical copy of `CLAUDE.md`. Edit `CLAUDE.md`, then
-  `cp CLAUDE.md AGENTS.md` — never hand-edit both, they drift.
-
-Check the claim before writing it down. Several notes in here went stale because
-the code moved and the prose did not: measured figures (contrast ratios, nav
-clearance, page weights) should be re-measured, not copied forward, and a removed
-feature means removing its rule too.
-
-**The light neutral is deliberately cold.** `--salt` is the one colour the client
-did not supply, so it is the one that drifts. It is cool on purpose: the photos
-were shot on grey concrete and stone, and matching them sets the photography into
-the page. A warm cream also drags `--wood` toward terracotta, which is the wrong
-read — the shopfront sign in the team photos is rusted metal. `--wood-light` and
-`--wood-pale` lighten Wood along that oxidation path, dusty and pink, never
-toward orange. Warming any of these four back up undoes the palette.
-
-**The homepage is one ground with drawn edges. It used to be alternating tiers,
-and the older rule is gone — do not reinstate it piecemeal.**
-
-Every band below the hero is `--charcoal` (#221f1f): Our Goal, From the kitchen,
-Take away and Find Us. The hero, the nav and the footer stay `--black`
-(#181414), one step darker, so the page reads as a single dark ground with its
-two ends pinned slightly deeper. Measured on the rendered page: bands
-`rgb(34,31,31)`, hero and footer `rgb(24,20,20)`.
-
-**What separates one band from the next is now a line, not a tone.**
-`.section-dark` carries `border-top: 1px solid var(--rule)` — Light Stone at
-30%, the same hairline the nav has always carried under itself — and
-`main > .section-dark:last-child` adds a matching bottom edge so the run closes
-against the footer rather than stopping short of it. Four boundaries, one
-construction. If you remove that border you do not get a subtler page, you get
-one undifferentiated column: the tone step that used to do the work is not
-there any more to fall back on.
-
-The rule this replaced was **"no two bands in a row share a background"**, and
-the whole tier system existed to serve it — `.section-stone` was invented so the
-page could step light / mid / dark instead of slamming salt into black, and Our
-Goal sat on the mid tier *because* the hero above it is black. None of that
-applies now. `.section-stone` is consequently unused; it is kept, with a note on
-the rule saying so, because it and `--wood-pale` only make sense together and
-would have to be reinvented as a pair.
-
-**Take away was the band that rule cost the most, and it is worth knowing what
-was traded.** It was light *specifically* to keep two photo bands apart: From
-the kitchen sits directly above it as four plates on a dark ground, and the
-strip of light around Take away's two inset panels was the boundary between the
-two photo groups. That strip is gone and the hairline does the job instead,
-which is a thinner boundary than a whole tier change. What keeps the two groups
-from reading as one continuous run of photographs is that the panels are still
-**inset, not full-bleed** — so that part is load-bearing now in a way it was
-not before. Verified on the rendered page.
-
-**And that boundary is now carrying twice the load, because Take away holds
-four photographs rather than two.** The two service notes became cards with
-pictures of their own (see below), so the band directly under From the
-kitchen's four plates is itself eight photographs deep. What still keeps the
-two groups apart is the same two things — the hairline, and every one of the
-eight being inset rather than full-bleed — plus a third that is new: the two
-rows of Take away are built differently from each other, panels carrying text
-*over* the picture and notes carrying it *under*. That is a thinner distinction
-than a tier change and thinner again than it was with two cards. **A ninth
-photograph in this neighbourhood is the thing to argue about**, not the layout
-it arrives in.
-
-Contrast was re-measured on the new ground rather than carried over, since every
-one of these sections changed tier: headings and CTAs (`--salt`) 13.22:1, body
-and muted text (`--light-stone`) 5.86:1, eyebrows and the phone number
-(`--wood-light`) 5.75:1. All comfortably over. The hairline itself composites to
-about 1.7:1 against the band — it is a decorative divider, not a control or
-meaningful graphic, so no non-text minimum applies to it, but it *is* faint by
-design and that is the look that was asked for.
-
-**The nav was the first thing to solve this, and the bands now copy it.** It is
-black and sticky, so it could never re-tier itself the way sections could, and
-it passes over dark ground the whole way down. What keeps it a bar is
-`border-bottom: 1px solid var(--rule)`, which on the bar's own dark tokens is
-Light Stone at 30%: the only thing between the bar and the hero directly beneath
-it, both `--black`. Removing that hairline does not look like removing a border,
-it looks like the nav disappearing into the hero. Do not "tidy" it.
-
-**History, kept because the reasoning was sound and may be needed again if the
-page ever goes back to tiers.** Tiers were a consequence of the *order*, not a
-property of each section, so moving one re-tiered its neighbours. When From the
-kitchen moved below Team it landed directly above Take away and both were black.
-Of the two, **the photographs kept the dark ground and the text-only band gave
-way**: food needs black and has nowhere else to go, while a heading and a phone
-number read on any
-tier — which is the same logic that put Our Goal and Find Us on stone. So Take
-away is now a light band. Work the sequence out in full before changing an
-order; there are only three tiers and both ends are pinned black.
-
-**Each section on the homepage uses a different layout — with one deliberate
-pairing.** Hero is a split, Our Goal is the *same* split mirrored, From the
-kitchen is a centred head over a staggered photo row, Take away is a 2x2 block
-of rounded cards, all four the same object — two that dial on tap, and two that
-open onto a film carrying a paragraph and the call — Find Us is a centred
-heading over a text column and a photograph.
-
-**Our Goal deliberately continues the hero's grid, and that is the one place on
-this page where repeating a shape is the point.** Its photo column is the same
-half-width full-bleed track the carousel occupies, at the same
-`min(88vh, 52rem)` height and switching at the same 60rem breakpoint, but on the
-opposite side — so the two bands together read as one 2x2 block with the
-pictures on a diagonal: copy top-left, carousel top-right, photo bottom-left,
-copy bottom-right. Measured: carousel 683x704 at x=683, Goal photo 683x704 at
-x=0. If the hero's breakpoint, `min-height` or column split changes, this band
-has to move with it or the diagonal stops lining up — they are one composition
-written in two files.
-
-**This does put two image-and-text splits on the page**, since Find Us is one
-too, and the rest of this file is emphatic about that failure mode. The
-distinction being relied on: Goal is *full-bleed and locked to the hero's
-columns*, a continuation of the band above it, while Find Us is a contained
-split inside the wrap whose photo takes its height from the text beside it.
-They are the same idea at different scales rather than the same shape twice —
-which is a finer distinction than "no two bands share a composition", so it is
-worth re-reading the Team-and-Find-Us history below before adding a third.
-
-**Find Us has had three different shapes in the space of one project, and the
-history is worth keeping because the same request keeps nearly repeating.**
-
-1. Originally a text-and-image split — a centred text column beside a 3:4
-   portrait, `1fr 1.15fr`, photo in the wider track.
-2. The client removed the photo. What was left was the text column sitting in
-   the narrow half of that grid, centred over 46% of the band with the other
-   half empty charcoal — a layout with something missing rather than a layout —
-   so it was rebuilt as **two** text columns: address and opening hours on the
-   left, phone and email on the right, both capped at 46rem and centred as a
-   pair.
-3. The client didn't like the band without a photo either, and asked for the
-   desktop layout to read the way the two-column version already stacked on
-   mobile — one column, address → hours → phone → email — with the picture
-   filling the space that freed up on the right. That is the current shape.
-
-Two things carried across all three: the grouping **address+hours** then
-**phone+email** (state 2's column split, state 3's single-column order — the
-grouping survives even though the columns that expressed it did not), and the
-constraint that the photo must never read as visually bigger than the
-information beside it. State 1 didn't satisfy that constraint — a fixed 3:4 crop
-in the wider track was taller than the text next to it — and state 3 is built
-specifically to fix it; see `.find__media` for how.
-
-**Take away's own notes are cards now, and the centred stack they replaced is
-worth recording because two of its rules were load-bearing right up until they
-weren't.** They were two columns of prose from 48rem, then one centred column
-capped at 46rem — the measure on the container rather than on each paragraph,
-because centred lines are read by their middles and a per-paragraph `max-width`
-would have given the shorter one its own narrower centre; and centred at all
-because a full-width band gives the eye no fixed left edge to return to, which
-is the same argument Our Goal still runs on. **A card is that left edge**, so
-both rules retired together: the copy is ranged left inside the card, and the
-card is the axis. Do not re-centre it to "match" Our Goal — see
-`.contact__notes`.
-
-The cards take the panels' own 56rem cap, gap, 48rem breakpoint, 1.75rem radius
-and 4:3 ratio, so all four are now literally the same card. Measured at
-1366x768: panels **434x326**, note cards **434x326**, both columns at x=235 and
-x=697. That equality is the point rather than a coincidence — see the
-`<details>` note further down for what it cost and why the ranged-left copy this
-paragraph describes now lives inside a film.
-
-**Find Us is not a centred stack, and the pressure that made that rule has
-mostly drained away — which is the reason to restate it rather than delete
-it.** There used to be three centred compositions below the hero; Our Goal
-became a split, Take away's notes became ranged-left cards, and **From the
-kitchen's centred head over photographs is the only one left**. So Find Us
-being a text-column-plus-photo split is no longer holding back a page of
-centred stacks — but the count has now gone 3 → 2 → 1 in three changes, each
-of which looked locally right, and nothing stops it going back the other way
-just as quietly. Do not simplify Find Us into a centred stack to make it
-"match" something; check what the other bands actually are first, because this
-paragraph has been wrong about that twice.
-
-**The four band headings are one size.** `.goal__heading`, `.plates__head h2`,
-`.contact__head h2` and `.find__head h2` are all `--step-2`. Take away was the
-last band without a visible title and joined them rather than inventing a
-treatment — measured on the rendered page, all three of the others and this one
-compute to 32.368px. None of them uses `.section-head`,
-which is `--step-3`: that class and a per-band override have equal specificity,
-so keeping it would have made each heading's size depend on which rule came
-later in the file. `.section-head` still owns `/menu`, `/gallery` and `/team`,
-where `--step-3` is a page title rather than a band label.
-`.section-head--inline` existed only for Find Us and went with the change.
-
-Our Goal and From the kitchen used to share a composition on purpose — both a
-centred heading at --step-2 over body copy at --step-0 and a centred
-.btn--primary on the same 46rem axis, the client having asked for the second to
-match the first. That rhyme is **gone**, because Goal is a split now. Its
-heading, copy and button are still centred and still share the 46rem measure,
-but inside a half-width column rather than across the band, so the two no longer
-read as the same object at the same scale. Nothing was lost that the file was
-worried about: the note that used to sit here warned a *third* centred stack
-would be too many, and this change took the count down rather than up.
-
-**That rule was being broken by Team, and moving Team to `/team` is what fixed
-it** — worth recording, because the repetition problem was live for a long time
-and two different attempts were made on it. As alternating rows the section ran
-the same image-and-text composition once per member, and Find Us below was
-another of the same shape, so at five people the homepage ran that composition
-six times and **Team and Find Us were no longer distinguishable shapes**.
-(Find Us has since lost its photograph, so that composition is not on the
-homepage at all any more — but the history is what the rule is made of.) The
-first attempt was a portrait grid, which held the section to 1030px and did
-break the repetition — and was reverted, because five equal columns are ~220px
-and set a bio about four words to the line. The client chose the measure over
-the page length.
-
-The second attempt is the page. The rows keep their full width, the homepage
-loses the repetition, and neither had to be traded for the other. The numbers:
-Team was **3249px** at 1366x768, 4.2 viewports in one band, and 4507px on a
-390x844 phone. The homepage went from ~7786px to **4537px** — it lost 42% of its
-height to one move. It has since been **4058px**, while Find Us had no
-photograph, was **4269px** once Find Us had one again (text column plus photo,
-not the alternating rows Team used), then **4170px** once Our Goal became a
-split whose height is capped by the viewport rather than set by centred copy —
-that band went 681 to 698 and the page still got *shorter*, because the old
-centred column carried more vertical padding than the split does.
-
-It is **4428px** now, and Take away is the band that has moved it three times,
-twice in opposite directions. Giving the two service notes photographs of their
-own took that band from **853 to 1372** — the largest single increase any band
-here has had, all of it a 1:1 media block sitting above the copy. Folding the
-copy into a click-revealed film took it back to **978**: the cards became the
-same 4:3 the panels are, and a paragraph that had been setting the card's height
-stopped contributing to it at all. Giving the band a visible heading and an
-intro line then put it at **1111**, which is the current figure.
-
-That last 133px is the whole of the difference between this page number and the
-4294 recorded before the heading, and it is worth noting the *cards* have not
-moved a pixel through any of the changes since: the ratio is fixed, so putting
-the title and the cue on one line, or swapping the cue's glyph, changes nothing
-about the band's height.
-
-Re-measured at 1366x768 in Greek. Note the locale caveat that applied to the
-older figure no longer does: the paragraph is inside the film now, so Greek
-running longer than English changes nothing about the band's height. Do not
-assume any older figure still holds.
-
-Before adding a section here, still check what shape its neighbours already
-are. Find Us is once again an image-and-text split, which is the shape Team
-used to share with it — so that composition is **in use** on the homepage
-again, and a new band reaching for it would recreate the exact repetition this
-history is about.
-
-**From the kitchen is not in the nav, and the question of whether a seventh
-label "fits" in the bar no longer applies to anything.** This used to be a long
-running argument about clearance at 1025px and 1201px, a moving breakpoint
-(64rem, then 75rem), and re-measuring `scrollWidth` every time the logo or the
-language control changed size — because the link list used to render inline in
-the bar above that breakpoint, and every label added to it spent real width.
-
-**The nav no longer shows the link list inline at any viewport width.** The
-client asked for the burger toggle to be the only way into the links, always,
-so the bar itself is now just the logo, the social icons, the language button
-and the toggle — see the note on `.nav__inner` in `global.css`. Adding a
-seventh link (or an eighth) costs the bar nothing any more; it is one more row
-in the dropdown panel. The old clearance/`scrollWidth` measuring discipline is
-kept here only as history, in case the bar ever grows a second inline element
-that isn't the link list and the same kind of budget question comes back.
-
-**Controls that only work with JS live in a `<template>`.** The hero carousel
-controls are cloned from `#hero-controls-template` at runtime, and the gallery
-lightbox from `#lightbox-template`, so a visitor without JS is never shown a
-button that does nothing. The hero has no prev/next arrows — they were added and
-then reverted to the original bare dashes; see the trade-off note on
-`.hero__dots` in `global.css`. Never build such a control's label as a string
-inside the script: render it with `t(locale, …)` in the template and keep
-`data-i18n-label` on it, or the language switch cannot reach it. A label that
-counts something also needs `data-i18n-n`, which is what fills the `{n}` in
-`a11y.heroGoTo`.
-
-**A cloned control must be handed to `window.fokiaI18n` or its labels stay
-Greek.** Template content is a separate document fragment, so the language
-switcher's `document.querySelectorAll` pass never sees inside it — and that pass
-has already run by the time an ES-module section script clones anything. For
-about as long as the templates have existed, a visitor on English got Greek
-labels on all four hero dots and every lightbox control. Base's inline script now
-exposes two methods, and both template-cloning section scripts call the first
-one immediately after putting the clone in the page:
-
-- `refresh()` — re-apply the current locale over the whole document, clones
-  included. Call it right after `append`.
-- `setLabelKey(el, key)` — for a control whose label changes with its *state*.
-  The nav toggle is the only caller now that the hero stop button is gone; the
-  API stays because it is the only sanctioned way for a script to change an
-  `aria-label`. The script picks the key; the string still comes from the
-  dictionary, so the switch keeps working on it afterwards.
-**Both take a key, never a string, and `dict` being private to the closure is
-what enforces it.** A script that wrote the words itself would have to hard-code
-both locales, and would go stale the moment the copy moved. Re-aiming the
-attribute is also what keeps the language switch working afterwards: `apply()`
-re-reads `data-i18n` off the DOM.
-
-There has twice been a third, `setTextKey`, the same idea for *visible* text:
-added for the after-hours phone swap and removed with it, then added for Find
-Us's open/closed pill and removed with that. **Both times it was four lines and
-both times it left with its only caller**, which is the argument for keeping this
-note rather than the code — the shape is the reusable part. If visible text has
-to change with state a third time, write it again, and it must still take a key,
-for the reason above.
-
-Both are called with `?.` — the section scripts are modules and run after the
-inline one, but a control still has to work if it never loaded. The type lives in
-`src/env.d.ts`.
-
-**The hero carousel has no stop button any more, and that is a known WCAG 2.2.2
-failure the client accepted.** This section used to say the button was required,
-because it is. Recording what changed rather than deleting the rule:
-
-The slides advance every **3s** (was 6s) and never stop on their own. WCAG 2.2.2
-requires that anything moving automatically for more than five seconds can be
-paused, stopped or hidden. `.hero__pause` — bottom-right of the hero, its own
-`<template>` child, a scrimmed disc — was that mechanism, and it was removed on
-request along with the `stopped` flag and the `a11y.heroPause` /
-`a11y.heroPlay` keys.
-
-What is left is **not** a substitute, and neither half of it ever was:
-
-- The `pointerenter`/`focusin` hold is a convenience. A touch visitor has no
-  hover, and the hold ends the moment the pointer leaves. That is precisely why
-  the button existed; `start()` now bails on `hovering` alone.
-- The dots jump between slides. They do not stop the timer.
-- `prefers-reduced-motion` skips the whole block, so that visitor gets a still
-  hero. It covers the vestibular case, not 2.2.2, which is about control.
-
-Shortening the interval does not help either: 2.2.2 counts the total duration of
-the movement, not the gap between steps. Restoring compliance means putting a
-stop control back — and if one returns, it returns with its scrim, for the
-reason in the note on the dashes below.
-
-The gallery *tiles* are the deliberate exception and stay in the page: each is an
-`<a>` pointing at the full-size photo, so it still goes somewhere real when the
-script does not run, and JS only intercepts the click.
-
-**Scroll-snap is `proximity`, and making it `mandatory` breaks the page.** The
-bands are not viewport-sized and cannot be. Re-measured at 1366x768 with Find
-Us in its current shape (text column plus photo) and Our Goal in its new one
-(the hero-matching split): Our Goal **698**, From the kitchen **918**, Take
-away **1111**, Find Us **753**. Three of the four are still taller than the
-screen, which rules `mandatory` out on its own. Our Goal is now the closest of
-the four to a viewport, because its height is a vh-derived `min(88vh, 52rem)`
-rather than content plus padding — but "closest" is not "equal", and the other
-three are what decide this. Team was the
-extreme case at **3249px**, 4.2 viewports, and it is gone from this page.
-
-Note that the figures move a lot and the *identity* of the tall band moves with
-them, and Find Us in particular has now been measured at three different
-heights across three different shapes: 1082 with its original 3:4 portrait,
-542 with no photo at all, 753 in the current text-plus-photo layout — tallest,
-shortest, then in between, in that order. **Take away has swung further than
-any of them, and in both directions**: 232 as a heading and a phone number, 853
-with two photo panels, 1372 once the two service notes gained photographs of
-their own, 978 once their copy moved into a film and the cards became one
-uniform 2x2, and 1111 once the band gained a visible heading. It was the
-short-band case that made `.section--tight` necessary
-and briefly the tall-band case; it is neither now. Re-measure; do not quote
-these.
-`mandatory` pulls the reader out of a band they are still reading and gives the
-short band a whole screen for two lines. `proximity` only settles a scroll that
-already ended near a boundary, so tall bands scroll through normally. Snapping is
-gated at 48rem (below it there is nothing to settle onto) and on
-`prefers-reduced-motion` (it moves the page without being asked). This is also
-why full scroll-hijacking — one wheel tick per section — is not on the table:
-it would hide the bottom of From the kitchen and Take away and break every
-`/#anchor` in the nav.
-
-**A rule that hides content must be owned by the script that can un-hide it.**
-`[data-reveal]` blocks are invisible only under `.has-reveal`, and that class is
-added by the inline script in `Base.astro`'s head — which adds it *after*
-checking both `prefers-reduced-motion` and `IntersectionObserver`, and which
-collects its targets on `DOMContentLoaded` in the same script. Deliberately one
-inline script, not a deferred module: a module that failed to load would leave
-half the homepage at `opacity: 0` with nothing left to reveal it. Inline also
-means the class lands before first paint, so nothing shows and then hides. Keep
-that contract if you add reveal targets — never add `.has-reveal` from anywhere
-else.
-
-**That observer's `threshold` must stay 0, and a non-zero one silently hides
-tall content.** An IntersectionObserver threshold is a fraction of the
-*target's own area*, not of the viewport, so the taller the target the more of
-the screen it has to fill before it fires — and a target taller than the
-viewport may be unable to reach the number at all. It was `0.08`, and
-`.team__list` is a single ~2863px target holding every member: at a 600px
-viewport only ~150px of it can ever be showing, which is 5.2%, so `/team`
-loaded with the entire list at `opacity: 0` until the visitor scrolled. On a
-390px phone the list is 4435px and it is worse. Holding a band back until it is
-properly on screen is `rootMargin`'s job (`0px 0px -10% 0px`), and that one is
-height-independent; verified after the change that the homepage bands still
-reveal progressively on scroll rather than all at once.
-
-Two things about how this was found are worth keeping. It cleared 8% at a
-768px viewport by **0.07 of a percentage point**, which is why it tested fine
-and shipped broken — a reveal bug that depends on viewport height will not
-show up at one viewport height. And the first fix attempted was making the
-first `/team` photo `loading="eager"`, which was a plausible story (an
-above-the-fold lazy image) and was **wrong**: `img.complete` was already
-`true`. Check whether the pixels are loaded or merely transparent before
-touching the loading strategy — `getComputedStyle(el).opacity` answers it in
-one line.
-
-**The hero wordmark is the client's own logo artwork, and it is painted by a
-CSS mask rather than placed as an `<img>`.** `.hero__wordmark-mark` is an empty
-span whose `background` is `--light-stone` and whose shape is
-`mask-image: var(--wordmark)` — the URL handed in from `Hero.astro`, because a
-build-hashed asset path cannot be written in a stylesheet.
-
-**The mask is what keeps the colour a token.** The artwork (`LOGO-01.png`) is
-pure white on transparency, so its shape is entirely in the alpha channel and
-its colour is not in the file at all. Masked, the element's own background is
-the colour, so "recolour the logo" is a token change and not a new asset. The
-alternative — tinting the PNG to `--light-stone` at build time and shipping it
-as an `<img>` — bakes a palette value into a binary that then has to be
-regenerated by hand whenever the palette moves, which is the failure this
-codebase already avoids everywhere else it names a colour.
-
-Three things about it are load-bearing:
-
-- **The asset is trimmed, and that is not tidying.** `LOGO-01.png` is a
-  4725×4725 canvas holding a 4725×2770 mark — a third of its height is empty
-  field. `mask-size: contain` fits the *file*, so the untrimmed asset would
-  scale the mark to 59% of its box and leave the rest as air. `logo-wordmark.png`
-  is the trimmed, 600px-wide derivative; `lib/photos.ts` carries the command
-  that regenerates it.
-- **The fill sits behind `@supports`.** The rule fails *open*: a browser that
-  paints backgrounds but cannot mask shows a solid stone rectangle across the
-  hero. Gated, it shows nothing and the `.sr-only` text still names the `h1`.
-- **The size was carried over, not chosen.** The typeset lockup measured
-  191×114 at 1366 and 145×76 at 390; the clamp lands 191×112 and 145×85, so the
-  mark occupies the same footprint. Height comes from `aspect-ratio: 1.705` —
-  a mask contributes no intrinsic size, so without it the box collapses.
-
-**History, because this replaced a typeset lockup and the reasoning still
-matters.** For a long stretch the `h1` was two spans of real text — `site.name`
-at `clamp(3rem, 1.8rem + 5.5vw, 5.5rem)` (88px at 1366) over a widely tracked
-tagline — and it existed because the only logo file then available was the
-badge, whose concrete texture is baked *inside* the disc: on the black hero it
-read as a pale circle with a word in it rather than as a mark on the ground.
-Type was the fix available at the time. `LOGO-01.png` is the fix that was
-actually wanted, and it arrived later. The site consequently has **no display
-type any more** — nothing is set above `--step-3`'s 47px ceiling — so if a
-heading ever needs to be larger, that is a fresh decision and not a precedent
-this file already set.
-
-The badge did not go anywhere: it still carries the nav, the footer and the
-favicons, where a disc is what is wanted.
-
-**Stone on the hero means `--light-stone`, never `--stone`.** The wordmark (as
-the mask's fill) and the `.btn--primary` fill are both `--light-stone` at
-6.55:1 on the hero's Deep Black, measured on the rendered page. `--stone` is 2.9:1 there —
-under even the 3:1 large-text floor, so it fails as a heading colour and fails
-much harder as a button label. The CTA's hover therefore goes *lighter*, to
-`--salt` (14.8:1 under a black label), rather than darkening the way the old
-`--wood` fill did: mixing black into a mid stone walks the label back toward the
-2.9:1 that ruled `--stone` out to begin with.
-
-**`.btn--primary` is now every button on the site.** It was the hero CTA
-alone, with From the kitchen and Find Us outlined as `.btn--ghost` against it;
-the client asked for all three to match, so the ghosts went. One pair of numbers
-covers the set now: the fill is 6.55:1 on the hero's Deep Black and 5.86:1 on the
-charcoal bands, both well over the 3:1 a control's boundary needs, and the black
-label is 6.55:1 on the fill in every case. Measured on the rendered page.
-
-`.btn--ghost` is consequently unused. It is kept, and flagged as such in the
-stylesheet, because it is the only consumer of `--ghost-hover-bg` /
-`--ghost-hover-fg` and those are declared on eight surfaces — the rule and the
-tokens have to go together or not at all. This is the second kept-but-unused
-block, after `.section-stone`; both are labelled, neither is an oversight.
-
-`--wood` is still a surface on `/menu`, where the selected menu tab uses it.
-
-**Section eyebrows were a bug, not a device. There are no section eyebrows, and
-the one eyebrow on the site earned its place by passing the test that killed the
-rest.** Every section used to render one from its `nav.*` key, which in five of
-six cases was the heading verbatim — two identical titles stacked. Our Goal was
-the last holdout, kept because its heading was a *sentence* ("To serve fish with
-the respect it deserves") and the eyebrow was the only thing naming the section.
-That stopped being true when the client asked for one title instead of two: the
-eyebrow's words were promoted to the heading at the sentence's size, the
-sentence was cut, and `goal.lead` was deleted with it. Do not add eyebrows back
-per-section without new copy that says something the heading does not.
-
-The Take away cards are the case history, and there is no eyebrow left on them
-either. Four passes, all decided by the same question — *does this label
-distinguish anything?*
-
-1. "Κράτηση" above "Κλείστε τη θέση σας" — the two-titles-stacked failure
-   exactly. Rejected before shipping.
-2. A single "Εντός ωραρίου" above the title. It passed: it said *when the number
-   answers*, which the title cannot. But it only worked while a card had one
-   number.
-3. Two numbers per card, so the label moved down beside the number it described —
-   and came off take away entirely, which had one number and no choice to
-   describe.
-4. The cards became buttons, the clock reduced each to one number again, and the
-   label went with the choice it existed to explain.
-
-So the rule has removed a label three times and kept it twice, always on the same
-question, and the answer changed every time the *layout* changed rather than the
-copy. Before adding one back, ask what on screen it tells apart.
-
-Two consequences worth knowing. `.eyebrow` still matches no markup — it is kept
-because `.section-head p:not(.eyebrow)` still names it, and that guard should
-stay defensive whether or not an eyebrow exists today (see the specificity note
-further down for what happens without it). And Our Goal's heading reads
-`nav.goal`, not a heading key of its own: there was a `goal.heading` once and a
-dead-key sweep removed it for never being rendered, so rather than re-adding a
-second key holding the same two words, the nav label and the section title share
-one string deliberately.
-
-**Take away now does the same thing, and the second case is what makes it a
-pattern rather than an accident.** Its `<h2>` renders `nav.contact`, and
-`contact.heading` was deleted. That key had held "Κλείστε τη θέση σας • Take
-away" — the combined nav label — while the heading was `.sr-only`, and it could
-never have been shown: it is word for word the two panel titles directly beneath
-it, which is the two-titles-stacked failure this section is about. The client
-supplied "Καλέστε μας" / "Call us" and asked for the nav to match, at which point
-the two strings were identical and one of them had to go. **So: when a band's
-title and its nav label say the same words, they share `nav.*`.** A band whose
-heading genuinely differs from its nav label should still have its own key.
-
-**Our Goal is a photo beside a centred column, and it is the only band with a
-link out of it.** The photo is `.goal__media`, the column is `.goal__col`:
-heading, first paragraph, second paragraph, `.goal__cta` — a "Meet the team"
-button pointing at `/team`, added when Team moved off the homepage so the
-section describing how the place works still leads somewhere.
-
-The measure sits on `.goal__body`, not on each paragraph, which is what centring
-requires: centred lines are read by their middles, so both paragraphs have to
-share one axis or the block comes apart. 46rem is deliberately narrower than
-`--measure` (62ch), because centred text wants a shorter line — there is no
-fixed left edge for the eye to return to. Inside a half-width column it now
-rarely reaches that cap, so the number is a ceiling rather than the working
-width; it is kept because the column is the full band below 60rem, where it
-does still bite.
-
-**The band carries no `.wrap` and no `.section`.** The photo column has to
-reach the viewport edge to line up with the carousel's, which a wrap would
-prevent, and the vertical rhythm `--section-y` would supply is carried by
-`.goal__col`'s own padding instead. `.section-dark` is still on the section, so
-the hairline that separates it from the hero is unchanged.
-
-**The band has been a two-column grid before, and this is not a return to it.**
-The old grid was two columns *of text* inside the wrap, with the button pinned
-to the end of the second so it sat on the same vertical line as `.plates__cta`
-below. That alignment is still gone and is not worth chasing: the button is
-centred in a half-width column now, which puts it at the three-quarter line of
-the page rather than the middle or the edge. Do not reinstate the old
-`margin-inline-start: auto` media query — it was written for a text column that
-no longer exists.
-
-And the first paragraph is ~60 words, which is long for centred setting — more
-noticeable now that it sets in a half-width column and runs to more lines. The
-client asked for centred copy with that pointed out. If it ever reads badly the
-fix is to range the paragraphs left inside the same column — drop `text-align`
-from the `p` rule — rather than to widen it.
-
-**Four pages.** `/` is the scrolling homepage; `/menu` is the menu and its
-legal block; `/gallery` is the photographs; `/team` is the five member rows,
-moved off the homepage for its height. Nav links to homepage sections must stay
-rooted (`/#goal`) so they work from the other three — only two of the six nav
-entries are anchors now, the rest are pages. The `Restaurant` JSON-LD
-lives on `/` with `hasMenu` pointing at `/menu`; the `Menu` graph is emitted
-only on `/menu` via Base's `menuSchema` prop. `/team` adds no graph of its own.
-Each page needs exactly one `h1` — Gallery's and Team's section headings are
-`h1`s (Team's was an `h2` while it sat on the homepage, and its member names
-went `h3` -> `h2` with it, so the page does not skip a level), and on the homepage the `h1` is the hero
-wordmark, which is the client's logo drawn as a **CSS mask** — so it has no
-`alt` to carry a name, and no rendered text either. The name comes from
-`.sr-only` text inside the `h1`, with the mask span `aria-hidden` so it is not
-announced twice. It computes as "fokia seafood bar" in both locales, and the
-tagline half still carries `data-i18n` so the language switch owns it even
-though the visible words are inside the artwork. Verified after the change, and
-re-verified across a language switch.
+Astro marketing site for a Greek seafood restaurant. Four pages: `/` (scrolling
+homepage), `/menu`, `/gallery`, `/team`. `README.md` is for the person editing
+content and deploying; this file is for whoever works on the code next.
+
+This file is **rules and traps**, not history. Every entry is here because
+someone was caught by it once. Check a claim before repeating it — measured
+figures (contrast ratios, page heights, clearances) should be re-measured, not
+copied forward, and a removed feature means removing its rule too.
+
+`AGENTS.md` is a byte-identical copy: edit `CLAUDE.md`, then `cp CLAUDE.md
+AGENTS.md`. Never hand-edit both.
 
 ## Commands
 
@@ -640,1423 +21,559 @@ npm run preview  # serve dist/ on :4321 (astro preview stop / status / logs)
 npm run check    # content validation + what is still missing from the client
 npx astro check  # type check (should stay at 0 errors)
 npm run photos   # re-run the one-time photo downsample (only for new originals)
-                 # NB: it reads the SOURCE folder only. A file dropped straight
-                 # into src/assets/photos/ is invisible to it and keeps whatever
-                 # size it arrived at — downsample it by hand to 2560px/q88,
-                 # which is what the script would have done (see gotchas).
 npm run favicons # regenerate favicons from logo-clean.png (only if it changes)
 npm run og       # regenerate public/og-image.jpg (only if its photo changes)
 NOINDEX=1 npm run build   # a build that must not be indexed (preview / staging)
 ```
 
-`npm run check` compares i18n *keys*, not values: it will not notice an
-English string sitting in `el.json`. That has already happened once, by
-accident. Read the diff on a locale file. The one deliberate exception is
-`footer.rights`, which the client asked to be the same English line in both
-locales — leave it alone; `el.json`'s `$comment` says so too.
-
-Node is installed but **not on the shell PATH**; prepend it first:
+Node is installed but **not on the shell PATH**:
 `$env:Path = "$env:ProgramFiles\nodejs;" + $env:Path`
 
-**The production domain is written once, in `site.seo.url`, and everything else
-derives from it.** `astro.config.mjs` hands it to `Astro.site`; Base.astro builds
-the canonical, `og:url` and the `og:image` URL from that; `@astrojs/sitemap` and
-`src/pages/robots.txt.ts` take it from the same place. Never write
-`fokiaseafoodbar.gr` anywhere else.
+## Content rules
 
-**It was `https://example.com` for months, and how that survived is the useful
-part.** Astro's own placeholder sat in `site.seo.url`, so every page carried
-`<link rel="canonical" href="https://example.com/...">` — an instruction to
-Google that the real version of these pages lives on a domain someone else owns.
-Nothing caught it: it is a well-formed URL, a static build never throws,
-`astro check` has no opinion about string contents, and the sitemap was
-internally consistent with it. `npm run check` *did* flag it, every single run,
-under "still needed from the client" — and it read as a to-do rather than a
-defect, for as long as the domain was genuinely unknown. The lesson is not "add
-a check"; the check existed. It is that a checker line is not a build failure,
-and a placeholder indistinguishable from a real value will be treated as one.
+- **Content changes go in JSON, not components** — `src/data/` and `src/i18n/`.
+- **The menu is real client data.** Never invent a dish, a price, or a
+  translation that changes what is served. Items with `"price": null` are
+  unpriced by the client and must still render, with an em dash.
+- **The menu is bilingual.** `name`, `description`, `unit`, `variants` and the
+  `wine` fields in `menu-food.json` / `menu-drinks.json` are locale-keyed
+  (`{ "el": "…", "en": "…" }`), like `team.json`, and flow through
+  `menuGroupKeys` in `src/lib/i18n.ts`. `el` is the printed menu and is the
+  source of truth. `volume` (`"250 ml"`) stays a plain string.
+  - A dual literal the client wrote before the site was bilingual
+    (`"6 τεμάχια | 6 pieces"`) is **split** across locales, never carried over
+    as one string in both.
+  - Some strings are legitimately identical in both locales: names already
+    English or brand names ("Tuna tacos", "Nikka Whisky From The Barrel"), and
+    wine producer/label names, which are transliterated proper nouns.
+- **`src/data/legal.json` is legally required.** It always renders under the
+  menu, never collapsed, never shortened.
+- **`npm run check` compares i18n *keys*, not values.** It will not notice an
+  English string sitting in `el.json` — that has happened once. Read the diff on
+  a locale file. `footer.rights` is deliberately the same English line in both.
+- **Update `README.md` and `CLAUDE.md` in the same change**, not afterwards.
 
-Two things went with the fix, both aimed at that same failure mode:
+## The homepage is one ground with drawn edges
 
-- **`robots.txt` is an endpoint (`src/pages/robots.txt.ts`), not a file in
-  `public/`.** The static copy hard-coded `https://example.com/sitemap-index.xml`
-  and was still saying it long after everything else derived from the JSON,
-  because nothing points at a file in `public/` and nothing checks it. Anything
-  in `public/` that needs to know the domain has this problem; make it an
-  endpoint.
-- **Base.astro's `Astro.site ?? …` fallback names the production domain**, not
-  `example.com`. It is unreachable — `Astro.site` is always set — and exists only
-  to keep the type `URL` rather than `URL | undefined`. Pointing an unreachable
-  fallback at a placeholder is how the placeholder came to be in the file twice.
+Every band below the hero is `--charcoal`; the hero, nav and footer are
+`--black`. What separates one band from the next is a **line, not a tone**:
+`.section-dark` carries `border-top: 1px solid var(--rule)`, and
+`main > .section-dark:last-child` closes the run against the footer. Remove that
+border and you do not get a subtler page, you get one undifferentiated column —
+the tone step that used to do the work is gone.
 
-The checker's `seo.url` rule was re-aimed at the same time. It tested for the
-literal string `example.com`, which can now never fire, so it tests the *shape*
-instead — https, a bare origin, no path — which is what `new URL(pathname,
-origin)` in Base.astro assumes.
+The older rule was "no two bands in a row share a background", and the whole
+alternating-tier system existed to serve it. **Do not reinstate it piecemeal.**
+`.section-stone`, `.btn--ghost`, `--wood-pale`, `.wrap--narrow` and
+`.section--tight` are all gone from the stylesheet; do not re-add one to
+"restore" a tier.
 
-**`og:image` is a committed file in `public/`, and it cannot be an Astro image.**
-`public/og-image.jpg` is generated by `npm run og`
-(`scripts/prepare-og-image.mjs`) and checked in, like the favicons. A social
-crawler runs no JavaScript and does not participate in Astro's image pipeline,
-so a `<Picture />` variant — content-hashed and format-negotiated — is
-unreachable to it. The URL must also be **absolute**: Facebook and LinkedIn drop
-a relative `og:image` silently. `site.seo.ogImage` therefore stores a *path* and
-Base.astro resolves it against the origin, so the domain is still written once.
+**Each band uses a different layout, with one deliberate pairing.** Hero is a
+split; Our Goal is the same split mirrored; From the kitchen is a centred head
+over a staggered photo row; Take away is a 2x2 of rounded cards (two dial on
+tap, two open onto a film); Find Us is a centred heading over a text column and
+a photograph. Before adding a band, check what shape its neighbours already are
+— Find Us is an image-and-text split again, so that composition is in use.
 
-One card for the whole site and both locales. `og:title` and `og:description`
-already differ per page and per language; a per-page card would need the whole
-set regenerated whenever a photograph moved.
+**Our Goal continues the hero's grid on purpose.** Its photo column is the same
+half-width full-bleed track the carousel occupies, at the same
+`min(88vh, 52rem)`, switching at the same 60rem breakpoint, on the opposite
+side — the two bands read as one 2x2 with the pictures on a diagonal. If the
+hero's breakpoint, `min-height` or column split changes, this band moves with
+it: they are one composition in two files.
 
-**The card is a contrast problem wearing a photograph, and the script measures
-it rather than assuming.** It is the hero's own construction at 1200x630 — a
-carousel frame, a bottom-weighted scrim, and the wordmark painted from the same
-trimmed `logo-wordmark.png` the hero masks, tinted by giving a flat rectangle
-the artwork's alpha channel so the colour stays a token and is never baked into
-a binary.
+**The four band headings are one size** (`--step-2`): `.goal__heading`,
+`.plates__head h2`, `.contact__head h2`, `.find__head h2`. None uses
+`.section-head` (`--step-3`) — that class and a per-band override have equal
+specificity, so the size would depend on source order. `.section-head` owns
+`/menu`, `/gallery` and `/team`, where `--step-3` is a page title.
 
-Two findings worth not rediscovering:
+**There are no section eyebrows.** Every section used to render one from its
+`nav.*` key, which in five of six cases was the heading verbatim — two titles
+stacked. Do not add one back without new copy that says something the heading
+does not; the test is *does this label distinguish anything?* `.eyebrow` still
+exists in the CSS and matches no markup, because
+`.section-head p:not(.eyebrow)` needs it (see the specificity gotcha below).
 
-- **The mark is `--salt`, not the `--light-stone` the hero paints it.** The hero
-  sets it on `--black`, where light stone is 6.55:1. Here it sits on a
-  photograph, and light stone is a mid grey — so is a concrete tabletop. Worst
-  single pixel measured **1.35:1**. Salt is what this site already uses for text
-  over a photograph (the Take away panels), and measures 4.41:1 here.
-- **`dsc-2857` was the first pick and puts a blown-white cocktail behind the
-  "k".** `dsc-2900` is used instead, chosen for being the darkest of the four
-  carousel frames rather than the best photograph.
+**When a band's title and its nav label say the same words, they share
+`nav.*`.** Our Goal renders `nav.goal` and Take away renders `nav.contact`;
+`goal.heading` and `contact.heading` were both deleted rather than kept holding
+identical text. A band whose heading genuinely differs keeps its own key.
 
-The script prints the worst single pixel behind the mark's opaque pixels and
-warns under 3:1 — the same "sample every pixel the text covers, never the mean"
-rule the Take away scrim is measured by. `og:image` owes WCAG nothing, being a
-picture rather than an interface, but a wordmark nobody can read in a timeline
-defeats the point of the card. **Re-run `npm run og` and read the number** if
-either the photograph or the palette moves.
+**Scroll-snap is `proximity`, and `mandatory` breaks the page.** Three of the
+four bands are taller than the viewport, so `mandatory` pulls the reader out of
+a band mid-read and gives a short band a whole screen. Gated at 48rem and on
+`prefers-reduced-motion`. Full scroll-hijacking is not on the table either: it
+would hide the bottom of the tall bands and break every `/#anchor`.
 
-Two sharp edges in `sharp` cost time here and are not obvious from its docs:
-`composite()` **mutates** the pipeline it is called on and `clone()` copies the
-mutation, so the photo is a factory (`photo()`) rather than a shared instance;
-and `extract` is applied **before** `composite` regardless of call order, so
-scrim-then-crop has to be two passes through a buffer.
+## Palette
 
-**Preview deployments are kept out of search by `NOINDEX=1`, and it is an env
-var because there is no request to read.** This is a static build, so nothing at
-build time knows which host will serve the output — only whatever runs the build
-does. `src/lib/indexable.ts` reads it; `robots.txt` becomes `Disallow: /` and
-Base.astro emits `<meta name="robots" content="noindex, nofollow">`. **Both are
-needed**: `robots.txt` stops the crawl, but a disallowed URL reached from an
-inbound link can still be listed without a snippet, and only the meta tag stops
-that. Production sets nothing and is indexable — the default is the safer of the
-two to get wrong.
+**The light neutral is deliberately cold.** `--salt` is the one colour the
+client did not supply. The photos were shot on grey concrete; a warm cream drags
+`--wood` toward terracotta, which is the wrong read. `--wood-light` and
+`--wood-pale` lighten Wood along an oxidation path — dusty and pink, never
+orange. Warming these back up undoes the palette.
 
-**Three things an SEO review flagged that are correct as they are, recorded so
-they are not "fixed" into bugs.**
+- Colours on a section come from the tokens its surface tier sets (`--accent`,
+  `--text-muted`, `--rule`). **Never reference `--wood` directly for text**: it
+  is 2.3:1 on Deep Black. `--wood` survives as a *surface* only on `/menu`'s
+  selected tab.
+- **"Stone" on a dark ground always means `--light-stone`, never `--stone`**,
+  which measures 2.6-2.9:1 there and fails outright.
+- `.btn--primary` is every button on the site (three CTAs, all on the homepage).
+  Its hover goes *lighter*, to `--salt`; darkening a mid stone walks the label
+  back toward the 2.9:1 that ruled `--stone` out.
+- **A dark surface inside the light tier must carry the dark tier's tokens
+  itself** — `.nav`, `.section-dark` and `.lightbox` all do. Painting the
+  background without them leaves links at `--stone` and hover at `--wood`. A
+  `<dialog>` appended to `<body>` inherits the *light* tier, which is why
+  `.lightbox` re-tints `--accent`.
 
-- **The hero photographs and the nav logo carry `alt=""` deliberately.** The nav
-  mark sits inside a link that already has an accessible name, and on the
-  homepage the same badge is the `h1`; the hero carousel's name is the
-  `.sr-only` text in that `h1`. Filling these in makes the mark announce twice.
-  See the comments on `.nav__logo` and in `Hero.astro`.
-- **The `Restaurant` JSON-LD exists** — address, hours, phone, `servesCuisine`,
-  `priceRange`, `acceptsReservations`, `geo`, `sameAs`, `hasMenu` — on every
-  page, with the `Menu` graph on `/menu` only. A reviewer reading rendered text
-  will not see it; read Base.astro.
-- **The language button renders "ENEN" to a text scraper and correctly to a
-  reader.** `.lang__name` and `.lang__code` are both in the DOM and
-  `.lang__code` is `display: none`, which hides it from assistive technology
-  too. Only a naive HTML-to-text pass sees both. The markup is kept for the
-  width-swap it once drove — see the note on `.lang` above.
+## Nav
 
-**The one real structural limit: English is not indexable.** Both locales share
-one URL and the switch is client-side, so what a crawler gets is always the
-Greek server render. The three `hreflang` tags all point at that same URL, which
-is self-consistent and harmless but conveys nothing, and `hreflang="en"` names a
-URL that serves Greek. Fixing it properly means locale-routed pages
-(`/en/...`), which is a real change to the routing, the switcher and the nav —
-not a meta-tag edit. Do not "correct" the hreflang block on its own; it is not
-where the problem is.
+**The link list is never shown inline, at any viewport width** — the burger
+toggle is the only way in, on desktop as much as on a phone. Adding a seventh
+link costs the bar nothing; it is one more row in the panel. The bar is a
+three-track grid (logo / social icons / utilities), and the panel spans all
+three. `1fr auto 1fr` on a phone (icons centred), `1fr auto auto` from 48rem
+(icons rejoin the utilities); only `.nav__social`'s `justify-self` flips.
 
-## Gotchas hit while building this
+- **A grid, not a flex row, because a grid cannot wrap.** The old row overflowed
+  a 320px bar and dropped the toggle onto a second line — reported from a
+  device. **`scrollWidth` is the wrong test for a wrapping row** and passed
+  while the bar was broken: compare `.nav__toggle`'s `top` against
+  `.nav__logo`'s `bottom` instead.
+- **The bar's `min-height` (6rem) + 1px border = 97px, and `scroll-padding-top`
+  on `<html>` must match it.** Change one without the other and every anchored
+  heading goes behind the bar. It is `calc(6.0625rem - 2px)`: the overshoot
+  tucks the section boundary *under* the bar so a fractional device scale cannot
+  anti-alias the seam into a hairline.
+- **`scroll-padding-top` is the ONLY offset.** A `scroll-margin-top` on a target
+  stacks with it rather than replacing it — that double-count once landed
+  sections 100px low.
+- The current-page marker keeps a `--accent` underline while hover is `--salt`,
+  deliberately: "the page you are on" must not look like "the link under your
+  pointer". The focus ring is `--accent` for the same reason.
+- `.nav__logo` shows the badge by cropping (`object-fit: cover`) rather than
+  with a second asset. `logo-clean.png` is 1672x940 with the 888x899 badge
+  centred, so 47% of its width is empty field. **This works only because the
+  badge is horizontally centred** — a replacement logo that is off-centre crops
+  wrong, silently. It is also why `Nav.astro` passes `sizes="142px"` rather than
+  the box's own 80px: srcset picks from layout width, and cover throws away 47%.
+- `.lang` and `.social a` are a deliberate 32px, under this site's usual 44px
+  target and over the 24px WCAG 2.5.8 floor — same exception the hero dots take.
 
-- Fonts are **static** builds, one file per weight per script, not variable.
-  Google's variable fonts are unhinted and looked blocky on Windows. The site
-  renders exactly Manrope 400/500/600/700 and only those ship.
-  `font-synthesis: none` means an unshipped weight is not faked — it falls back
-  — so adding a weight in CSS means adding its files too.
+## i18n
 
-- **One family, and the client asked for it that way.** Manrope carries
-  everything; `--font-body` and `--font-display` both resolve to it. They stay
-  two tokens so a display face can be reintroduced by editing one line rather
-  than by working out which of ~20 `font-family` declarations meant "heading".
-  Headings are 700 against the 600 that labels and buttons use — with a single
-  family the weight is the only thing separating a heading from the text under
-  it, where the old serif could sit at 600 and still read as another voice.
-  Headings also carry `letter-spacing: -0.02em`: a geometric sans reads loose at
-  default tracking once it is set large. The largest heading on the site is 47px
-  — `--step-3` at its ceiling, measured on the rendered page. `--step-4` exists
-  in the scale but nothing uses it, so it is not the number to quote. Body copy
-  deliberately keeps the default tracking.
+Greek is server-rendered; the switcher is a client-side swap over `data-i18n*`
+attributes, so the page is correct before any JS runs. English is therefore
+**not indexable** — both locales share one URL, and the three `hreflang` tags
+all point at it. Fixing that means locale-routed pages (`/en/...`), a real
+change to routing, the switcher and the nav. Do not "correct" the hreflang block
+on its own.
 
-- **Manrope ships no italic, in any weight, so `font-synthesis` is off for style
-  too.** Left on, the browser shears an upright into a fake oblique, and
-  mechanically slanted Greek is conspicuously wrong — Greek italics are a
-  different construction, not the upright at an angle. Consequence:
-  `font-style: italic` anywhere in this codebase now renders as plain upright,
-  silently. The one place that used a real italic — `.menu__item-wine`, the
-  producer line on /menu — carries its distinction with weight 500 instead,
-  which matters because upright it would be identical to `.menu__item-desc`,
-  the one thing it has to be told apart from.
+- **Keys are built at runtime from data and will not grep**: `team.${id}.name`,
+  `gallery.${id}.alt`, `legal.${id}`, `hours.${day}`, and from a locale code —
+  `lang.${other}`, `lang.short.${other}`, `a11y.lang.${other}`. Deleting one
+  breaks a page silently; `npm run check` never asks whether a key is *used*.
+  Classes too: `.menu__panel--food` / `--drinks` exist only as
+  `menu__panel--${view.id}`. A mention inside a comment is not a use.
+- `lang.el` / `lang.en` and `lang.short.*` are autonyms and are **identical in
+  both locale files** on purpose. `a11y.lang.*` are sentences and do differ.
+- Day names are `hours.<Day>`, written out in full. There is no abbreviated set;
+  do not reintroduce one for a narrow layout — check the measure first.
 
-- **Manrope covers Greek, which is why this swap was possible at all.** Not a
-  given for a geometric sans — check `unicode.json` in the `@fontsource` package
-  before agreeing to any future face. A Latin-only family would leave the whole
-  Greek site on a fallback and split mixed-script dish names across two
-  typefaces mid-line.
-- `<picture>` must stay `display: contents` (set in `global.css`). It is inline by
-  default, which silently breaks `height: 100%` on the `<img>` inside it.
-- `<figure>` has a default `margin: 1em 40px`; the reset zeroes it. Without that,
-  gallery images render narrower than their column.
-- Team lives on `/team` and is **alternating photo-and-text rows**, and the type
-  is sized for that:
-  `.team__name` is `--step-2` and the bio takes `--measure` rather than the
-  `--step-1`/`--step--1` pair the ~285px grid column needed. If it ever goes
-  back to a grid, both move again — they are a property of the column width, not
-  of the section.
+**Controls that only work with JS live in a `<template>`** (`#hero-controls-template`,
+`#lightbox-template`), so a visitor without JS is never shown a dead control.
+The gallery *tiles* are the deliberate exception: each is an `<a>` to the
+full-size photo, so it still goes somewhere real.
 
-  **The reversal brought its gotcha back with it: reversing a row needs the
-  track sizes swapped as well as `order`.** `.team__member:nth-child(even)`
-  flips `grid-template-columns` from `4fr 8fr` to `8fr 4fr` *and* sets
-  `order: 2` on the photo. Setting `order` alone drops the portrait into the
-  wide track, which at 4:5 doubles that row's height and pushes the next member
-  off screen. Verified after the restore: the photo measures 402px and the text
-  804px on every row, odd and even alike.
+**A cloned control must be handed to `window.fokiaI18n` or its labels stay
+Greek.** Template content is a separate document fragment, so the switcher's
+`querySelectorAll` pass never sees inside it. Base's inline script exposes:
 
-  The member count is otherwise free — rows stack, so five or six need no CSS
-  change. The cost is page height; see the layout note above.
-- `.section-head p:not(.eyebrow)` — the `:not()` is load-bearing. `.section-head p`
-  is (0,1,1) and `.eyebrow` is (0,1,0), so without it the paragraph rule wins and
-  an eyebrow inside a section head silently renders at heading size in the muted
-  tone instead of small in the accent. That is what made five sections look like
-  they had two titles rather than a label and a title.
+- `refresh()` — re-apply the current locale over the whole document, clones
+  included. Call it right after `append`.
+- `setLabelKey(el, key)` — for a control whose label changes with its *state*
+  (the nav toggle is the only caller). It is the only sanctioned way for a
+  script to change an `aria-label`.
+
+**Both take a key, never a string** — `dict` is private to the closure, and a
+script writing the words itself would hard-code both locales and go stale. A
+`setTextKey` (the same idea for visible text) has been written and deleted twice,
+each time with its only caller; if it is needed again, write it again, still
+taking a key. Both are called with `?.`; the type lives in `src/env.d.ts`.
+
+## Take away (Contact)
+
+**Each card is one control that places one call, and the clock picks the
+number.** The whole panel is an `<a href="tel:…">`, so it must commit to one
+number before the tap. `site.json` holds `phone` (landline) and
+`phoneAfterHours` (mobile); the server renders the landline everywhere and the
+script swaps it when the restaurant is shut.
+
+- **Three of the four swap; take away does not.** Take away can only happen
+  during service. A reservation, a party enquiry and a special order are all
+  things people ring about at midnight. Ask what the call is *for*, not which
+  row the card is in.
+- The four attributes that drive it are spread from **one `swapAttrs` object**.
+  Two card types disagreeing about which number they offer would look perfectly
+  fine on screen.
+- **The `href` and the visible digits are rewritten together and must never
+  disagree.** The digits are the only thing a visitor can check before tapping.
+- Evaluated in **Europe/Athens** via `Intl`, so no offset is hard-coded and DST
+  needs no thought. The schedule is passed from `site.hours.entries` rather than
+  restated. The decision itself is `isOpenAt` in `src/lib/hours.ts`, so the
+  shipped logic is the logic under test. `closes: "00:00"` means the *end* of the
+  day; an overnight range (20:00–02:00) is handled but unused.
+- **The selector is `[data-phone-swap]`, never a hand-typed id.** An earlier
+  version selected `#contact-phone`, which had stopped being rendered; the swap
+  silently did nothing and nothing caught it. The attribute belongs on the
+  **anchor that dials**, never on the card — on a panel they are the same
+  element, on a note card they are not.
+- **Verify the open path by editing the schedule, not by waiting**, then revert.
+  Restart the preview server and reopen the browser between runs: `astro
+  preview` serves a stale `dist/`, and `playwright-cli navigate` re-opens the
+  session's stored URL rather than the one passed to it.
+
+**All four photographs carry `alt=""`.** The rule is *is it inside the
+control*: everything inside an `<a>` or a `<summary>` is concatenated into the
+accessible name, so a descriptive alt would prepend a sentence about a table
+setting to the name a screen-reader user hears before placing a call. Card
+titles are `<span>`s, not `<h3>`s, for the neighbouring reason. The note's call
+link is prefixed with `.sr-only` `contact.phoneLabel`, because bare digits say
+nothing out of context (WCAG 2.5.3 wants the visible words inside the name).
+
+**The note cards are `<details>` with no script at all.** A native disclosure
+opens, keyboards and announces its state with no JS, and the paragraph is real
+DOM throughout. Do not "upgrade" it to a button and `aria-expanded`.
+
+**Text over these photos is safe because of the scrim, not the photos.** Both
+images have blown highlights in every third of the frame.
+
+- Verify by hiding the text, screenshotting the rendered panel and sampling
+  **every pixel the line occupies — worst single pixel, never the mean.**
+- **Sample the hovered state too.** The wash (`::after`) fades out on hover, so
+  hovered is the contrast floor and at-rest is the best case. Measuring only at
+  rest is how a total failure of the scrim went unnoticed for a revision.
+- **The darkening is two layers and only one may move.** `::before` is the
+  scrim: it carries the text, it is what the measured ratios describe, and it is
+  static. `::after` is the wash, flat, and the thing that animates. Animating the
+  scrim walks text contrast to nothing on every hover. **Halve the wash to
+  brighten a photograph; touch the scrim only with a pixel scan open.**
+- **The gradient stops are lengths (`rem`), not percentages.** The text block is
+  a fixed number of pixels tall whatever the card is; a percentage ramp scales
+  with the card and pushed the same text into a thinner part of it (3.49:1 at
+  390px, a fail at one width only). Re-measure the block and move the stops
+  whenever a line is added or removed.
+- **The scrim carries two short bold lines and is not a general-purpose text
+  background.** Anything longer, smaller or lighter goes on a flat surface
+  instead — which is why the note cards put their picture above the copy, and
+  why the open card's film is near-opaque.
+- The note cards' scrim is shorter than the panels' (6.5rem/12rem vs 8/16) and
+  the amount was **measured, not halved**: the Greek title wraps to two lines, so
+  the two blocks are the same height. A true halving measured 2.73:1.
+- **The card keeps its ratio when open.** Putting the film in flow shrinks it;
+  `display: grid` holds the floor but not the ceiling. A card that grew would
+  break the uniform 2x2, which is the point of the layout.
+- **`left: auto` on the open card's head is load-bearing**, not a way of aligning
+  the cue right: the head spans the whole card at `z-index: 4` and swallowed
+  every click on the call link, so the tap closed the card instead of dialling. A
+  screenshot cannot see this — test with `elementFromPoint` at the badge and at
+  the digits, and the answer must be the anchor.
+- The cue is **two glyphs swapped by `display`**, not one glyph rotated: a
+  chevron turned 90° points *down*, which is what a **closed** disclosure wears.
+- The events photograph is a named export in `lib/photos.ts`, not a gallery id,
+  because the client did not want it on `/gallery` and `npm run check` would
+  report an unlisted file in `gallery/` as unused. Its source is **68% black
+  bars** — the real picture is 608x1080 pillarboxed into 16:9, found by pixel
+  scan, because the bars are pure black and defeat a threshold crop detector.
+
+## Find Us
+
+The blocks are one column beside the photograph, in the order address →
+opening hours → phone → email. The grouping is "where and when" then "how to
+reach us", and it is the one thing that has survived every layout this band has
+had. Below 55rem the photo stacks under the column, so there is only one order.
+
+- **The breakpoint is 55rem, not the site's usual 48rem**, because
+  `.find__hours` is a fixed-width block of rows and needs the room.
+- **`.find__media` is sized so it can never read as bigger than the text
+  column.** Above the breakpoint it has no `aspect-ratio` and its `<img>` is
+  `position: absolute; inset: 0`, so it contributes no height and the row is
+  sized by `.find__col` alone. `min-height` is a floor for an edge case, not the
+  working height. Below the breakpoint it is an ordinary 4:5 frame.
+- **`.find__hours` is `width: fit-content`; 22rem is a ceiling, not the width.**
+  A fixed width plus `space-between` is a distributed layout wearing a table's
+  clothes: the surplus went into the gap and pinned days and times to their own
+  axis while everything above centred on another.
+- **The address, phone and email are underlined at rest**, which reverses a
+  client request after two rounds of review objected that they read as static
+  text. They are the body colour and weight, so colour cannot mark them. **The
+  underline goes on the inner `<span>`, never on the anchor** — the anchors are
+  `inline-flex` and a decoration on a flex container propagates to its items,
+  drawing a line under the icons too.
+- **The address IS the map link.** A separate "view on map" button has been
+  added and removed twice; the band has no `.btn`. `findUs.viewOnMap` is not a
+  dead key — it is `.sr-only` text inside the link, appended rather than an
+  `aria-label` so the visible words stay in the accessible name (WCAG 2.5.3).
+  The `site.mapUrl` guard stays, so no URL renders plain text rather than a
+  control that goes nowhere.
+- **`mapUrl` addresses the place by Place ID.** A `/maps/place/…` URL ends in a
+  length-prefixed `data=` blob (`!4m6` declares six tokens), so removing a token
+  that looks redundant leaves the counts short and Google silently falls back to
+  a name search on the wrong pin. It shipped once. If a long place URL is ever
+  put back: **paste it whole, never edit it.** Verifying from here is impossible
+  (Google 302s to a consent page) — a human clicks it once. `geo` is deliberately
+  *not* reconciled with Google's marker; the client supplied it.
+- Opening hours render as **contiguous runs**, computed rather than taken from
+  each entry's first and last day. A day in `hours.closed` is still listed as
+  closed. That array is currently empty (open seven days) — keep the key.
+- **There is no "open now" indicator.** One was built and removed. If one comes
+  back it must be client-side: a static build bakes in the status as of the last
+  deploy, with the real schedule beneath it to contradict.
+- The address/phone/email icons are inline SVG in the `SocialLinks` idiom, not
+  Font Awesome: the site self-hosts everything, three glyphs do not justify a
+  webfont, FA Free's CC BY attribution is unsatisfied here, and inline SVG
+  inherits `currentColor`.
+
+## Hero
+
+**The wordmark is the client's logo painted by a CSS mask**, not an `<img>`.
+The artwork is white on transparency, so the element's own background is the
+colour — recolouring the logo is a token change, not a new asset.
+
+- **The asset is trimmed and that is not tidying.** `LOGO-01.png` is a 4725x4725
+  canvas holding a 4725x2770 mark; `mask-size: contain` fits the *file*, so the
+  untrimmed asset would leave a third of the box as air. `logo-wordmark.png` is
+  the trimmed derivative; `lib/photos.ts` carries the regeneration command.
+- **The fill sits behind `@supports`** because the rule fails *open*: a browser
+  that paints backgrounds but cannot mask would show a solid stone rectangle.
+- `aspect-ratio` is required — a mask contributes no intrinsic size.
+- The `h1`'s name comes from `.sr-only` text with the mask span `aria-hidden`.
+  The site consequently has **no display type**: nothing is set above
+  `--step-3`'s 47px ceiling.
+
+**KNOWN WCAG 2.2.2 FAILURE, accepted by the client.** The slides advance every
+3s and never stop. `.hero__pause` was the stop control and was removed on
+request. What is left is not a substitute: the `pointerenter`/`focusin` hold
+ends when the pointer leaves and a touch visitor has no hover; the dots jump
+between slides without stopping the timer; `prefers-reduced-motion` covers the
+vestibular case, not control. Shortening the interval does not help — 2.2.2
+counts total duration. Restoring compliance means putting a stop control back,
+**with its scrim**.
+
+**Anything drawn over a photo needs its own backing, not a tint on the image.**
+The hero photos are mid-grey exactly where the controls sit, so the carousel
+dashes measure 1.7-2.3:1 — a **recorded trade-off**, reverted from a scrim pill
+for the lighter look. It does not extend to other controls: a *position
+indicator* can carry this, a control someone must find on every slide cannot.
+The lightbox arrows use a two-triangle construction (light arrowhead over a
+larger dark one) for the same reason.
+
+## SEO / build
+
+**The production domain is written once, in `site.seo.url`**, and everything
+derives from it: `astro.config.mjs` → `Astro.site` → Base's canonical, `og:url`
+and `og:image`, plus `@astrojs/sitemap` and `src/pages/robots.txt.ts`. Never
+write `fokiaseafoodbar.gr` anywhere else.
+
+It was `https://example.com` for months and nothing caught it — a well-formed
+URL, a static build that never throws, and `npm run check` flagging it every run
+under "still needed from the client", where it read as a to-do. **A checker line
+is not a build failure, and a placeholder indistinguishable from a real value
+will be treated as one.** Two consequences:
+
+- **`robots.txt` is an endpoint, not a file in `public/`.** Nothing points at a
+  file in `public/` and nothing checks it, so its hard-coded domain went stale
+  in silence. Anything in `public/` that needs the domain has this problem.
+- **Base's `Astro.site ?? …` fallback names the production domain.** It is
+  unreachable and exists only to keep the type `URL`.
+
+**`og:image` is a committed file in `public/` and cannot be an Astro image** — a
+social crawler runs no JS and no image pipeline. The URL must be absolute;
+Facebook and LinkedIn drop a relative one silently. One card for the whole site
+and both locales. It is generated by `npm run og`, which **prints the worst
+single pixel behind the mark and warns under 3:1** — re-run it and read the
+number if the photograph or the palette moves. The mark is `--salt` there, not
+the `--light-stone` the hero uses: on a photograph light stone measured 1.35:1.
+
+Two sharp edges in `sharp`: `composite()` **mutates** the pipeline it is called
+on and `clone()` copies the mutation (hence the `photo()` factory), and
+`extract` is applied **before** `composite` regardless of call order.
+
+**`NOINDEX=1` keeps preview deployments out of search.** It is an env var
+because a static build has no request to read a Host header from. **Both halves
+are needed**: `robots.txt` stops the crawl, and only the meta tag stops a
+disallowed URL reached from an inbound link being listed without a snippet.
+Production sets nothing and is indexable — the safer default to get wrong.
+
+**Three things an SEO review flagged that are correct as they are:** the hero
+photographs and the nav logo carry `alt=""` deliberately (the link and the `h1`
+already name them); the `Restaurant` JSON-LD does exist on every page, with the
+`Menu` graph on `/menu` only; and the language button renders "ENEN" only to a
+naive HTML-to-text pass, because `.lang__code` is `display: none`.
+
+Each page needs exactly one `h1`. Nav links to homepage sections must stay
+rooted (`/#goal`) so they work from the other three pages.
+
+## TEMP: the concrete ground
+
+`/menu`, `/gallery` and `/team` are under test with a concrete texture
+background (`.section--concrete-test` in `global.css`, `--bg-texture` handed in
+from each component because the source jpg is 9.3MB and has to go through the
+image pipeline). **Not meant to survive in this form.**
+
+- The overlay **lightens** (`--salt` at 28%): the texture's mean luma is 146.6
+  and the logo badge's concrete is ~170, so no amount of black could reach it.
+- That makes it a light ground, so those pages keep the light tier — except
+  `--text-muted`, which is `--black` there: `--stone` measured 1.80:1 at the
+  texture's darkest patches.
+- **Still outstanding:** `--accent` (`--wood`) is 2.32:1 at the worst patches
+  against the 4.5 its small uppercase owes — the team role labels and the menu
+  subheads.
+- `background-attachment: fixed` ties `cover`'s scaling to the viewport rather
+  than to each page's own growing height, so one 2560px source stays sharp. It
+  works only because nothing between those sections and the viewport carries a
+  `transform`.
+
+## Gotchas
+
+**Layout / CSS**
+
+- `<picture>` must stay `display: contents`. It is inline by default, which
+  silently breaks `height: 100%` on the `<img>` inside.
+- `<figure>` has a default `margin: 1em 40px`; the reset zeroes it.
 - A `<dialog>` must not be given `display` unconditionally. The UA hides a closed
-  one with `dialog:not([open]) { display: none }`, and **any** author `display`
-  beats it — declaring it on `.lightbox` itself left a full-viewport dark block
-  in the page after the footer, adding 100dvh to the document. It goes on
-  `.lightbox[open]`.
-- Never use `background: currentColor` in a block that also sets `color`.
-  `currentColor` resolves against that element's own computed `color`, so the
-  fill and the text come out identical and the control disappears. Ghost buttons
-  use the explicit `--ghost-hover-bg` / `--ghost-hover-fg` tokens instead.
-- Colours on a section come from tokens the surface tier sets (`--accent`,
-  `--text-muted`, `--ghost-hover-*`). Don't reference `--wood` directly for
-  text: it is 2.3:1 on Deep Black and 1.3:1 on Stone.
-- **The nav shows no links inline any more, at any viewport width — the burger
-  toggle is the only way into them, on desktop as much as on a phone.** The bar
-  is logo, social icons, then `.nav__utils` (language button and toggle), laid
-  out as a **three-track grid**; the link list is a full-width panel spanning
-  all three tracks, shown only while `.nav__inner[data-open='true']`. See
-  `.nav__inner` in `global.css`.
+  one with `dialog:not([open]) { display: none }` and **any** author `display`
+  beats it — that left a full-viewport block in the page, adding 100dvh.
+- Never use `background: currentColor` in a block that also sets `color`: fill
+  and text come out identical and the control disappears.
+- `border-radius` in a `:focus-visible` rule applies to the *element*, not the
+  ring; browsers already follow the element's corners.
+- `.section-head p:not(.eyebrow)` — the `:not()` is load-bearing. `.section-head p`
+  is (0,1,1) and `.eyebrow` is (0,1,0), so without it an eyebrow renders at
+  heading size in the muted tone. That is what made five sections look like they
+  had two titles.
+- **Selectors drift away from markup silently.** `.menu__legal h3` matched
+  nothing for as long as the block has rendered an `<h2>`. Grep the tag, not just
+  the class, when a rule looks inert.
+- Vertical padding on an inline `<a>` does not grow its row — the stacked nav
+  links need `display: block` or the tap targets collapse to ~26px.
+- An **image frame's own `background` paints in the anti-aliased fringe of a
+  rounded clip**, so on dark ground it must be dark. It needs a large radius, a
+  transform and a light background together, and it takes a pixel scan to see —
+  one or two pixels on a curve, only while hovered.
+- A **`transform` on a child silently reorders painting**: a transformed element
+  is painted with positioned descendants at `z-index: auto`, in DOM order, so a
+  hovered `<img>` painted over its own scrim. Give every layer in such a card an
+  explicit `z-index`.
+- An **inset shadow paints before the element's content**, so a ring meant to
+  cover an image must go on a pseudo-element above it, not on the element.
+- Reproduce fractional-pixel artefacts at the right device scale: launch Chrome
+  with `--force-device-scale-factor=1.25`, its own `--remote-debugging-port` and
+  `--user-data-dir`, then `npx playwright-cli attach --cdp=http://localhost:<port>`.
 
-  **The social icons are centred in the bar on a phone and ranged right from
-  48rem, and that one difference is the only thing the breakpoint changes.**
-  The tracks go `1fr auto 1fr` → `1fr auto auto`, so the empty right-hand
-  track collapses and the icons land beside the language button as one group
-  again — the arrangement the bar had before the client asked for centring on
-  mobile. Every item keeps its track and its `justify-self` at both sizes;
-  `.nav__social`'s `justify-self` is the single declaration that flips.
-
-  **The grid replaced a wrapping flex row and fixed a real bug doing it.** The
-  flex row paid two 1rem gaps plus 1.1rem inside `.nav__utils`, which at 320px
-  came to 281.6px of row inside a 280px wrap, and the toggle wrapped onto a
-  second line — the failure the entry below *claims* a `max-width: 22.5rem`
-  block was handling. There was no such block in the stylesheet; the note
-  outlived the code, which is exactly what the top of this file warns about.
-  A grid cannot wrap, so the failure mode is gone by construction rather than
-  by a narrow-width rule that has to be re-measured whenever a control resizes.
-
-  What it costs is symmetry: `1fr auto 1fr` centres the icons against the
-  *bar*, so both side tracks take the width of the wider one, and that is the
-  language-plus-toggle group (~92px), not the 80px logo. Measured at 320px:
-  92 + 68 + 92 and two 0.5rem gaps = 268px inside 280px, icons centred to
-  0.00px of the viewport centre, bar 97px, nothing wrapped. The gap opens to
-  1rem from 30rem and 1.1rem from 48rem. Verified at 320, 360, 390, 414, 767,
-  768, 1024 and 1366: one line at every width, and from 768 the icons sit
-  17.6px from the language button.
-
-  **History, kept because a future redesign might want it back and would
-  otherwise re-discover all of this from nothing.** The bar used to render the
-  links inline above a 75rem breakpoint, and getting that to hold cost a great
-  deal of the effort this file used to document: a `1fr auto 1fr` grid so the
-  link list could centre against the container rather than against its
-  neighbours (centring a flex child by `position: absolute` had already been
-  tried and reverted, because it took the logo out of flow and forced the links
-  into two balanced groups either side of it); a clearance measurement at
-  1201px that had to be re-taken every time the logo, the font or the language
-  control changed size, because each of those spent real width against a bar
-  that had none to spare; and a breakpoint that itself had moved once already
-  (64rem → 75rem) when the logo grew. None of that mechanism exists any more —
-  removing the inline links removed the width budget it was all protecting.
-
-  The language button no longer takes 44px from `min-height`; see the note
-  further down on `.lang` and `.social a` for the current, smaller sizing.
-
-- **The nav is a dark surface inside the light tier, so it carries the dark
-  tier's tokens itself.** `.nav` sets `--text`, `--text-muted`, `--accent`,
-  `--ghost-hover-*` and `--rule` the same way `.section-dark` and `.lightbox` do.
-  Painting the background black without them leaves the links at `--stone` and
-  the hover at `--wood` (2.3:1 on Deep Black) — the background is the easy half.
-  Measured on the rendered bar: links and social icons are 6.55:1 at rest and
-  **14.77:1 hovered**, and the language button's stone fill is 6.55:1 against the
-  bar with its black label at 6.55:1 on the fill.
-
-  **Hover in the bar is white, not wood.** Nav links and social icons both go to
-  `--salt` on `:hover` and `:focus-visible`, matching the Find Us links and the
-  lift `.btn--primary` makes. On a nav link the label and the rule under it move
-  together — `--text-muted` to salt, transparent border to salt — so the target
-  reads as one lit object rather than a grey word with a bright line beneath it.
-
-  **The one wood tint left in the bar is the current-page marker**, and it is left
-  there on purpose. `[aria-current='page']` keeps a `--accent` underline while
-  hover is salt; if it went salt too, "the page you are on" and "the link under
-  your pointer" would look identical. The global focus ring is also still
-  `--accent`, which is wanted for the same reason — a focus indicator should not
-  be mistakable for a hover.
-
-  **The wood tint that used to fill that pill is gone, and so is the reason for
-  it.** It was a two-segment control and the fill marked *which segment was
-  selected* — `--wood` at 6.6:1 on the old salt bar, then `--wood-light` at
-  6.4:1 once the bar went black, because `--wood` there is 2.2:1 and the
-  selection stopped reading as a selection. There is one button now and it
-  reports no state, so the fill is not marking anything; it is simply the site's
-  second filled control, and it matches the first (the hero CTA) at
-  `--light-stone` under a `--black` label. That leaves `/menu`'s selected tab as
-  the only place a wood tint is still a *surface* rather than text.
-- Anything drawn over a photo needs its own backing, not a tint on the image.
-  The hero photos are mid-grey exactly where the controls sit, so the carousel
-  dashes measure 1.7-2.3:1 against them — under the 3:1 WCAG minimum for a
-  control, on every slide. That one is a **recorded trade-off**: the dashes were
-  given a scrim pill and it was reverted for the lighter look, so they stay as
-  they are. It does not extend to the other controls over those photos. The
-  lightbox arrows use the reference gallery's two-triangle construction, a light
-  arrowhead over a larger dark one, which does the same job as a scrim.
-  `.hero__pause` used to be the other example and is gone, but the principle it
-  illustrated is the one to keep: a *position indicator* can carry a contrast
-  trade-off, a control someone has to find on every slide cannot. Any control
-  put back over these photos gets a backing. If the dashes' contrast is ever
-  raised, put the surface back rather than
-  only darkening the dash — the photo underneath changes on every slide.
-- A `<dialog>` appended to `<body>` inherits the **light** tier's tokens, not
-  the dark surface it paints itself. `:focus-visible` draws its ring in
-  `--accent`, which meant the lightbox's focus indicator was `--wood` at 2.3:1
-  against its own near-black scrim. `.lightbox` sets `--accent: var(--wood-light)`
-  for itself. Anything else moved out to the body needs the same treatment.
-- `{x?.length && <p/>}` renders the text **"0"** when `x` is `[]`. `undefined`
-  short-circuits to nothing, so this only shows up on data the client can
-  actually produce — emptying a category's `items` in the JSON. Use a ternary.
-  The menu renderers were all three written the unsafe way.
-- `border-radius` in the `:focus-visible` rule applies to the *element*, not to
-  the ring; browsers already follow the element's own corners. It was rounding
-  whatever had focus, most visibly the square gallery tiles. The pill buttons
-  are the same mechanism seen from the other side — their focus ring is a
-  rounded capsule without the rule knowing anything about it.
+**Touch**
 
 - **A rounded control needs `-webkit-tap-highlight-color: transparent` of its
-  own.** `html` sets a site-wide tap highlight — `--wood` at 20%, chosen over
-  the UA's blue-grey wash. Chrome paints that highlight against the element's
-  border *box* and ignores `border-radius`, so on the 999px `.btn` pill a tap
-  flashed a hard-edged wood rectangle around a round button. It was reported
-  from a device, not caught here: it cannot be seen with a mouse, and it does
-  not show up in a screenshot either, because the highlight is a compositor
-  effect. `.btn` opts out and defines `:active` states instead, which follow
-  the pill. The wash stays on `html` for ordinary links, where a rectangle is
-  the right shape. Any future rounded control needs the same pair.
-
-  **`.lang` is the case that sentence predicted, and it took a year to arrive.**
-  The language switch became a 999px pill when the two-segment control collapsed
-  into one button — and the opt-out did not come with the radius, so a tap
-  flashed the wood rectangle exactly as `.btn` once did. Reported from a device,
-  again. It now carries `-webkit-tap-highlight-color: transparent` and keeps its
-  `:active` fill.
-
-  **Two rounded controls still have the gap**, both on `/menu` and both
-  tappable: `.menu__tab` and `.menu__jump a`. Neither has an `:active` state
-  either, so fixing them is the *pair* — opting out of the highlight on its own
-  would leave a tap with no feedback at all, which is worse than a wrong-shaped
-  one. `.menu__tablist`, `.menu__tag` and `.lightbox__counter` are also 999px and
-  do not need it: none of them is interactive.
-
-- **A `:hover` state on a control a touch user will tap must be gated behind
+  own**, plus an `:active` state to replace the feedback. Chrome paints the
+  site-wide highlight against the border *box* and ignores `border-radius`. It
+  cannot be seen with a mouse and does not appear in a screenshot. `.btn`,
+  `.lang`, `.contact__panel` and `.contact__note-call` opt out; **`.menu__tab`
+  and `.menu__jump a` still have the gap**, and fixing them is the pair.
+- **A `:hover` on a control a touch user will tap must be gated behind
   `@media (hover: hover) and (pointer: fine)`.** A touch browser fakes `:hover`
-  on tap and then leaves it applied — there is no pointer to move away, so
-  nothing clears it. The Take away cards are `tel:` links, so a tap opens the
-  dialer, and on returning the card was still sitting in its hover state, lifted
-  and zoomed, until something else was tapped. It was reported from a device as
-  the effect "going away" when you come back, which is what a stuck state looks
-  like at the moment it finally clears — the same shape of bug as the tap
-  highlight above, and equally impossible to see with a mouse.
-
-  Two things about the fix are worth copying rather than rederiving. `pointer:
-  fine` is in the query as well as `hover: hover` because a device can report
-  both — a laptop with a touchscreen, a phone with a mouse attached — and the
-  pair asks the narrower question: is there a pointer that can hover *and* aim
-  precisely. And `:focus-visible` stays **outside** the gate: it is the
-  keyboard's affordance, a keyboard is not a pointer, and it does not fire on a
-  tap. Gate the hover, duplicate the declarations onto `:focus-visible`, and let
-  `:active` be the whole of the touch feedback — it lasts exactly as long as the
-  finger is down and leaves no state behind.
-
-  **`.lang` hit this next, and it is the clearest case on the site.** Tapping the
-  language button does not navigate anywhere — the language switches in place and
-  the button stays under the finger — so it sat lit at `--salt` until something
-  else was tapped, and was reported as the button "remaining white instead of the
-  stone colour". Its `:hover` is gated now; `:active` still fills salt.
-
-  Note what the gate does and does not do. On an emulated phone the button still
-  reports `matches(':hover') === true` after a tap — the browser's emulation is
-  not something CSS can switch off. What the media query removes is any *styling*
-  hung off it, which is the whole of the visible symptom.
-
-  **`.contact__note-call` was built with the gate from the start**, and it is
-  the worked example rather than another entry on the list below: hover inside
-  `@media (hover: hover) and (pointer: fine)`, the identical declarations
-  duplicated onto `:focus-visible` outside it, `:active` overriding to 0.1s, and
-  the `-webkit-tap-highlight-color` opt-out that its 999px radius requires. It
-  is a `tel:` link that opens the dialer, so it is exactly the case that made
-  this rule — copy it rather than the ones below.
-
-  **Still ungated, all with the same latent bug**, listed so the next person does
-  not have to re-derive the set: `.nav__links a`, `.social a`, `.menu__tab`,
-  `.menu__jump a`, `.gallery__item`, `.btn--primary`, `.find__contact a`,
-  `.find__map`, `.lightbox__arrow`, `.lightbox__close`. They vary in how visible
-  it is — a nav link that navigates away takes its stuck state with it, while a
-  `tel:` link in Find Us or a `/menu` tab leaves the visitor looking at it. Each
-  needs an `:active` state as part of the fix, which is why they were not swept
-  in one pass.
-
-- **A `transform` on a child silently reorders painting, and it took out the
-  scrim.** `.contact__panel:hover img` scales the photograph, and a transformed
-  element creates a stacking context painted in the same pass as positioned
-  descendants with `z-index: auto`, in DOM order. The `<img>` comes after
-  `::before` in that order, so hovering painted the photograph *over* the scrim
-  and the text protection disappeared for exactly as long as the pointer was on
-  the card — title contrast measured **1.00:1** in that state, against 11.78:1 at
-  rest.
-
-  It shipped because every contrast sweep had been taken at rest. Two rules out
-  of it: give every layer in a card like this an explicit `z-index` rather than
-  relying on DOM order (img 0, scrim 1, wash 2, text 3), and **sample the hovered
-  state as well as the resting one** whenever a hover changes anything behind
-  text. A screenshot of either end state on its own looks perfectly fine.
-
-- **An image frame's own `background` paints in the anti-aliased fringe of a
-  rounded clip, so on dark ground it must be dark.** `.contact__panel` used
-  `--salt-deep` like the site's other image frames, and it showed as a pale
-  hairline tracing the card's 1.75rem corner — reported from a device as "a white
-  line below the card on hover". Hover is where it becomes obvious rather than
-  where it starts: the wash that had been dimming the fringe fades out, so the
-  same artifact roughly doubles in brightness. Measured on the bottom-left curve,
-  hovered: brightest fringe pixel **72 → 44** once the background went `--black`,
-  against a card interior of 27 and a band of 31.
-
-  It needed all three of a large radius, a transform, and a light background, so
-  `.team__photo` is not affected — it is `--radius` (2px) and is not transformed.
-  It does still flash a light block while its lazy image loads on a dark band,
-  which is the same choice made worse in a different direction, and is worth
-  fixing if anyone notices. `.find__media` was the other example here and is gone
-  with the Find Us photograph; the rule was never about that band specifically.
-
-  Measuring this needs a pixel scan, not a screenshot: it is one or two pixels on
-  a curve, and it is only there while the pointer is on the card.
-
-  **Fixing the background was not the whole of it.** A second, larger source of
-  the same hairline is the photograph itself: both images run bright right up to
-  the card's boundary — concrete along the top and left of the table setting —
-  and a near-white pixel anti-aliased against `--charcoal` is a light line. That
-  one is not a bug and not device-specific; hover simply makes it obvious,
-  because the wash that had been dimming it fades out. `.contact__panel::before`
-  carries a 2px inset dark ring for it.
-
-  Three things about that ring cost time and are worth not rediscovering:
-
-  - **It must be on `::before`, not on `.contact__panel`.** An inset shadow is
-    painted immediately after the element's own background and *before* its
-    content, so on the card the `<img>` covered it completely — applied,
-    computed, and doing nothing. `::before` is above the image in the stack and
-    has no content of its own to hide it.
-  - **2px, not 1px**, because at a 125% display scale the card's edges land on
-    half-device-pixel boundaries and a 1px ring only partly covers the outermost
-    row. 1px fixed the left edge (157 → 52) and barely touched the top (145 →
-    126); 2px brought all four sides to 35-59 against a band of 31.
-  - **Reproduce at the right device scale.** None of this is visible at dpr 1.
-    Launch a dedicated Chrome with `--force-device-scale-factor=1.25`, its own
-    `--remote-debugging-port` and `--user-data-dir`, then
-    `npx playwright-cli attach --cdp=http://localhost:<port>` — and stop only
-    that pid afterwards, never by image name.
-
-- **The darkening on these cards is two layers, and only one of them may move.**
-  `::before` is the scrim: it carries the title and number over blown highlights,
-  it is what the measured ratios describe, and it is static. `::after` is the
-  wash — a flat black over the whole card that fades to 0 on hover and comes
-  back over 1.2s when the pointer leaves. Animating the scrim itself would walk
-  the text contrast to nothing on every hover.
-
-  **The wash is 30% on the panels and 15% on the note cards**, and that split is
-  where a client request to "reduce the film by half" was actually paid. It is
-  the layer that can absorb a change like that for nothing: it only ever adds
-  darkness, so hovered — wash fully gone — is already the measured floor, and
-  lightening it moves the resting state *towards* that floor rather than past
-  it. It is also flat and covers the whole card, so it is the only thing dimming
-  the top of the picture, where there is no scrim at all. Halve the wash to
-  brighten a photograph; touch the scrim only with the pixel scan open.
-
-  Because the wash only ever *adds* darkness, hovered — wash fully gone — is the
-  contrast floor, and no state in the animation is worse than the table above.
-  Flat rather than a gradient on purpose: the bottom of the card is already at
-  90-94% black from the scrim, so a flat wash adds almost nothing there and
-  almost all of its effect where the picture is clean, which is why the card
-  reads as lighting up from the top down rather than the text flickering.
-
-  **The note cards' scrim is shorter than the panels' — 6.5rem dense, out by
-  12rem, against 8rem and 16rem — and the amount was measured, not halved.** The
-  request was to cut it on the grounds that these cards carry one line where the
-  panels carry two, which is right about the copy and wrong about the geometry:
-  the note title is `--step-1` and the Greek "Διοργανώστε την εκδήλωσή σας"
-  **wraps to two lines**, so its block reaches 6.08rem off the card's bottom
-  against the panels' 6.04rem. The two blocks are the same height.
-
-  A true halving (4rem / 5.5 / 6.75 / 8) was built and measured before being
-  rejected, and the numbers are the reason this paragraph exists: **English
-  passed at 12.08:1 or better at every width, and Greek card 0 measured 2.73:1
-  at 1366 and 4.47:1 at 768** — a fail under even the 3:1 a large bold line owes,
-  visible in one locale, on one of the two cards, at some widths only. At
-  6.5rem the same worst pixel is 11.76:1 and reads `rgb(45,40,38)`, which is
-  essentially the scrim alone: the photograph is not contributing, so swapping
-  either picture cannot move the figure. 5.5rem was also measured, at 8.08:1 —
-  still ample, but its worst pixel is `rgb(72,65,62)`, i.e. the photograph *is*
-  showing through, and a blown-white highlight there computes to about 3.8:1.
-  Photo-independence is why 6.5 was kept over 5.5.
-
-  Worst single pixel, hovered, both locales, at 320, 390, 768, 1024 and 1366:
-  **11.76:1** (Greek, card 0, 768 and 1366), against the 3:1 a bold `--step-1`
-  line owes.
-
-  The two durations are asymmetric and that is deliberate: a transition belongs
-  to the state being *entered*, so the 0.8s lives on `:hover::after` (the fade
-  out) and the 1.2s on the base rule (the return). The picture comes up promptly
-  under the pointer and settles back at its own pace.
-
-- **A big surface needs a slower transition than a small one, and `ease` is the
-  wrong curve for it.** The cards moved on 0.2s `ease` and read as a snap: `ease`
-  is front-loaded, so most of the travel happened in the first third and the
-  settle was invisible. They are 0.45s on `cubic-bezier(0.22, 0.61, 0.36, 1)`, a
-  decelerate — quick to commit, long to arrive — with the photograph inside them
-  at 0.8s, deliberately lagging the card, because the lift is the response and
-  the drift behind it is the depth. The one exception is `:active`, which
-  overrides to 0.1s: a press has to land under the finger, not half a second
-  after it.
-
-- **`.btn` is fully round (999px); `--radius` (2px) is still everything else.**
-  The site's default is near-square and that is still right for rectangular
-  surfaces — inputs, image frames. **The language switch is no longer one of
-  them:** it stopped being a two-segment box that needed a frame around it and
-  became a lone control, so it is a pill too, written as the same literal 999px.
-  It is not a `.btn` and does not want to be — it carries its own smaller type
-  and its own `min-height`.
-
-  `.btn` itself is three places and all three are on the homepage: the hero CTA,
-  the From the kitchen CTA and the Our Goal "meet the team" button. Find Us had a
-  fourth for one revision and it was removed again — see the note on the address
-  above. All are `.btn--primary` since the client asked for them to match, so the
-  pill, the fill and the label are one style rather than two. Nothing on /menu,
-  /gallery or /team uses `.btn`, so that change could not leak.
-
-  Written as a literal `999px` to match every other pill already in the file
-  (the menu tab group, the jump chips, the tags) rather than adding a second
-  radius token for one rule — the menu page was already round, so this brought
-  the two into line rather than apart. Horizontal padding went 1.6rem → 2rem
-  with it: at that radius the curve eats the corners of the text box, and
-  uppercase at 0.08em tracking has no side bearings left to give.
-- The `button` reset does not clear the UA's `padding: 1px 6px`. A carousel dash
-  set to `width: 100%` inside a 2rem button is therefore 20px, not 32px — worth
-  knowing before "fixing" a measurement that looks 12px short.
-- **The collapsed bar's width budget went away with the inline link list, and
-  so did the word/code swap it used to force.** `.lang__name` / `.lang__code`
-  and the narrow-phone breakpoint that swapped between them (`.lang` showing
-  "English" normally, its two-letter code below 22.5rem) existed because the
-  logo, the language button and the social icons together used to come within
-  a few pixels of overflowing a 320px bar. Shrinking both controls bought that
-  back, so the swap went. `.lang__code` is now unconditionally hidden and
-  `.lang__name` always shows — see the comment on the two spans in `Nav.astro`
-  before reintroducing a swap, since the markup and the `data-i18n` plumbing
-  for it are still there.
-
-  **The budget itself did not go away, and it came back within one change.**
-  Widening the utilities' group gap from 0.5rem to 1.1rem spent ~10px the
-  320px bar did not have: groups 250px + two 1rem gaps = 282px against 280px,
-  and the toggle wrapped onto a second line.
-
-  **This paragraph used to claim a `max-width: 22.5rem` block was handling
-  that, and no such block existed** — the bar was shipping broken at 320px
-  and was reported from a device. It is a grid now (see the nav entry above),
-  which cannot wrap at all. The lesson about the budget still holds and is why
-  the grid needs measuring rather than trusting: the logo staying 5rem at every
-  width is 80px of a 280px row, the single largest thing in it, and anything
-  else that grows is spending against it.
-
-  **`scrollWidth` is the wrong test for a wrapping row and it passed while the
-  bar was broken.** A wrapped row is not an overflowing one, so `scrollWidth`
-  still equals the viewport, and the bar does not get taller either — two ~40px
-  rows still fit inside its 6rem min-height. The reading that shows it is
-  `.nav__toggle`'s `top` against `.nav__logo`'s `bottom`, which is what
-  confirmed the grid: every item tops out at 28-32px in one row. `scrollWidth`
-  was the right test for the *old* inline link list, which really did overrun,
-  and it is the right test again now that the row cannot wrap — it only fails
-  in between, on a row whose items are allowed to wrap.
-- **`.lang` and `.social a` are both a deliberate step down from the 44px
-  target this file otherwise holds every tappable control to, and the two are
-  now sized to align rather than to each hit their own floor.** `.social a` is
-  a 2rem (32px) box; `.lang` takes the same 2rem as its `min-height`, so the
-  two utility controls share one line height rather than one looking taller
-  than the other. Width is the other axis, and it moves independently:
-  `.lang`'s `min-width` (2.75rem) and horizontal padding (0.5rem) are pared
-  down separately from its height, at the client's request that the button in
-  particular read narrower, now that removing the inline link list means the
-  nav's utility row isn't fighting anything for width. 32px is still over the
-  24px WCAG 2.5.8 *minimum*, though a step down from this site's usual
-  generous 44px target — the same trade-off already made once for the hero
-  dots (2rem × 2.75rem), recorded here rather than quietly narrowed back the
-  next time someone re-reads the touch-target rule below and assumes it has
-  no exceptions.
-
-  **Two gaps, not one, and the difference is what groups them.** `.social`
-  spaces its own two icons at 0.25rem; the icon pair is set apart from the
-  language button at 1.1rem, at the client's request for air between the two.
-  Once all three controls are the same height, one even gap would set them out
-  as four peers in a row instead of a pair and a button — so if the utility row
-  is ever re-spaced, the *ratio* between those two numbers is the part doing
-  the work, not either value on its own.
-
-  **That 1.1rem moved out of `.nav__utils` and onto the grid when the icons
-  left the group**, and it now exists only from 48rem, in `.nav__inner`'s
-  media query — below that the icons are centred in their own track and there
-  is no gap to be the group boundary. `.nav__utils` keeps a plain 0.5rem for
-  the two unlike controls it still holds, a filled pill and a bare glyph,
-  which need less air between them than two groups did.
-
-  `.social svg` is the same 2rem as its box for a reason that is easy to
-  mistake for an oversight; the rule carries the explanation.
-- Touch targets are 44px except where noted above, and the hero dots are the
-  other deliberate exception:
-  the box is 2rem wide because `::after` is `width: 100%`, so widening the target
-  widens the dash and spreads the strip, which is the whole of that control's
-  design. They are 2rem × 2.75rem — over the 24px WCAG 2.5.8 floor, and adjacent,
-  so the row is one continuous target. When the hit box grew, `.hero__dots`
-  `bottom` dropped from 1.25rem to 0.875rem to leave the dashes on the same line.
-- `theme-color` is the **nav** (`--black`), and this one has now been correct in
-  both directions. It paints the browser's own chrome and the overscroll gutter.
-  While the bar was translucent salt, a black value stranded a dark strip above
-  a light page on every route except the top of the homepage — so it was salt.
-  The bar going black inverts that exactly: salt now strands a *light* strip
-  above a black bar, everywhere, at every scroll position. Both ends of the
-  document are black (bar above, footer below), so the gutter agrees at both.
-  The rule is "match what the chrome actually butts against", not "match
-  `body`" — and what it butts against is the sticky bar.
-- **Dead code has been swept once; here is what the sweep could not see.** A
-  grep for a class or a key gives false answers in both directions in this
-  codebase, so anything removed has to be checked by hand first:
-
-  - Keys are **built at runtime** from data — `team.${id}.name`,
-    `gallery.${id}.alt`, `legal.${id}`, `hours.${day}` — and, since the
-    language switcher became one button, from a *locale code*: `lang.${other}`,
-    `lang.short.${other}` and `a11y.lang.${other}`, built in both Nav.astro and
-    Base's inline script. That is six more keys, none of which appear literally
-    anywhere. Deleting one breaks a page silently, because `npm run check`
-    compares el.json against en.json and never asks whether a key is *used*.
-
-    `lang.el` / `lang.en` and `lang.short.*` are **identical in both locale
-    files** and are meant to be: they are autonyms, and a language names itself
-    the same way whoever is reading — the same deliberate exception
-    `footer.rights` gets. `a11y.lang.*` are sentences and do differ.
-    `a11y.languageSwitcher` went with the `role="group"` wrapper it labelled.
-  - Classes are built the same way: `.menu__panel--food` and
-    `.menu__panel--drinks` exist only as `menu__panel--${view.id}`.
-  - A mention inside a comment is not a use. The first pass of the sweep counted
-    prose and reported three dead classes where there was one.
-
-  What actually went: `goal.heading` (Our Goal's eyebrow is `nav.goal`; the
-  heading key was never rendered), the seven long-form `hours.<Day>` names (only
-  `hours.short.*` reached the page *at the time* — the client has since asked for
-  full day names, so `hours.short.*` was renamed back to `hours.<Day>` and the
-  Greek values written out in full; there is no short set now, which is why that
-  sweep's reasoning is worth reading rather than its conclusion),
-  `.wrap--narrow`, and three lib functions
-  nothing imported — `missingKeys()`, `flattenItems()`, `unpricedItems()`.
-
-  Later, and by the same rule: `contact.callUs`, and the `.contact__call` /
-  `.contact__call-label` pair, when the numbers moved onto the two panels and the
-  single centred block beneath them went. Worth noting because the *script*
-  pointed at that same removed markup and nothing failed — see the phone-numbers
-  entry below. `src/lib/hours.ts` went the same way when the clock-driven swap
-  was dropped: `isOpenAt` was its only export and Contact.astro its only caller,
-  so the file had no reader left — **and it came back one change later**, when
-  the cards became buttons and something had to choose the number again. It was
-  restored from git rather than rewritten, which is the point: a correct, tested
-  module with no caller is dead code and should go, but the sweep is cheap to
-  undo and guessing the logic a second time would not have been. The keys
-  `contact.duringHours` / `contact.afterHours` were deleted twice for the same
-  reason and are not expected back.
-
-  The last two are the interesting ones: both carried doc comments saying they
-  were used by `npm run check`, and the checker had its own copy of each walk.
-  A docstring is not evidence that a function is called.
-
-- Selectors drift away from the markup silently. `.menu__legal h3` matched
-  nothing for as long as the block has rendered an `<h2>`, which left the one
-  legally required heading on the site at default Garamond `h2` size instead of
-  the small uppercase label it is written to be. Grep the tag, not just the
-  class, when a rule looks like it is not doing anything.
-- **The address in Find Us *is* the map link, and the separate button has now
-been added and removed twice.** The history is the useful part, because the same
-argument keeps being made and keeps losing:
-
-  1. There was a "view on map" button under the address. The client asked for it
-     to go and the street line took over its `href`, with `findUs.viewOnMap`
-     carried on as `.sr-only` text inside the link.
-  2. A review objected that the band promises "where to find us" and nothing on
-     screen offers directions. The button came back at band level, centred.
-  3. It was removed again on request, and `findUs.viewOnMap` went back to being
-     sr-only text inside the address link.
-
-  So the band has **no `.btn` of any kind**, and `.btn--primary` is back to three
-  instances, all on the homepage's other bands. What answered the review's
-  underlying complaint instead was underlining the links — see below. Before
-  proposing the button a third time, note that the affordance problem it existed
-  to solve has since been solved another way.
-
-- `findUs.viewOnMap` is **not** a dead key. It is rendered inside the address
-  link as `.sr-only` text, so the accessible name is "Λάσκου 3 Ελευσίνα Δείτε
-  στον χάρτη" — verified in the a11y tree, and re-verified in English as
-  "Laskou 3 Elefsína View on map". Appending rather than using `aria-label` keeps
-  the visible words inside the accessible name, which WCAG 2.5.3 (Label in Name)
-  requires: a speech-input user saying "Λάσκου 3" still matches the link. The
-  underline now says the address *is* a link; this text is what says where it
-  goes.
-
-- The `site.mapUrl` guard stays. With no URL the address renders as plain text
-  rather than as a control that goes nowhere — the same rule the button had.
-- **The address, phone and email are underlined at rest, and this reverses a
-  client request on purpose.** The client had asked for the underlines to go from
-  the phone, the email and the hours rows. Two separate rounds of review then
-  objected that the three read as static text: they are the body colour and the
-  body weight, so colour cannot mark them and nothing else did. The client's
-  removal was re-confirmed once and overridden the second time. The hours rows
-  stay un-ruled — they are not links, and the rules between them were a table
-  treatment rather than an affordance.
-
-  **The underline goes on the inner `<span>`, never on the anchor**, and that is
-  load-bearing rather than fussy. `.find__contact a` and `.find__map` are
-  `inline-flex`, and a text decoration set on a flex container propagates into
-  its flex items — the icon is one — so an underline on the anchor draws a line
-  under the pin, phone and envelope glyphs as well as the words. That is the
-  "border under the whole box" look the decoration was chosen over in the first
-  place. On the span it follows the text and clears descenders, which matters
-  most on the email address. Verified: `textDecorationLine` is `underline` on
-  each span and `none` on every anchor and every `svg`.
-
-  Hover and focus therefore only change *colour* now (to `--salt`); the underline
-  is permanent, so the old `text-decoration: underline` in the hover rule was
-  doing nothing and went.
-
-
-**Find Us runs a three-step ramp, and the emphasis is inverted from where it
-started.** Heading `--step-2` salt, label `--step-1` salt bold, value
-`--step-0` `--light-stone` — measured 32.4 / 23.4 / 18.1px at 1366. Labels
-began as `--step--1` uppercase wood over `--step-1` values, i.e. small quiet
-label over large value; the client asked for the opposite, so the block reads
-label-first now.
-
-Two things inside that are worth keeping:
-
-- The strings were already sentence case in the locale files ("Ώρες
-  λειτουργίας", "Opening hours"), so dropping `text-transform` was the whole of
-  that change. The 0.16em tracking went with it — that is a caps measurement,
-  and on lowercase it reads as letters drifting apart.
-- "Stone" in this section is always `--light-stone` (5.86:1 on charcoal), never
-  `--stone`, which measures **2.6:1** there and fails outright. Same call as the
-  hero wordmark and the CTA fill. The day names took the same muted stone the
-  times already had, and the rules between rows went with the underlines.
-
-**The blocks are in one column now — address, opening hours, phone, email, in
-that order — beside the photograph, and the ordering is the one thing that
-survived every layout this band has had.** The grouping is "where and when"
-(address, hours) then "how to reach us" (phone, email), which is why hours
-comes second rather than last despite an earlier request that it read Address,
-Phone, Email, Opening hours last; the client asked for these two groupings
-instead, and grouping "where and when" against "how to reach us" puts hours
-second. Below the 55rem breakpoint the column is the whole band (the photo just
-stacks below it), so the same order is what a phone visitor reads too — there
-is now only one order to keep straight, where the two-column version had to
-keep a column's internal order and the stacked order in agreement.
-
-The Monday-first part is a sort, not a reordering of the data: every run, open
-and closed, is ordered by `dayIndex(run.from)`. It used to be the open ranges in
-the order the client listed them followed by the closed days, which put Monday
-last precisely because Monday was the closed one. **It no longer is — the
-restaurant opens seven days — and the sort is why that change needed no code**:
-nothing here assumes which day is shut, or that any day is.
-
-**There is no "open now / closed now" indicator, and one was built and removed.**
-It rendered from `isOpenAt` in Europe/Athens, cloned out of a `<template>` so a
-build-time value could never be shown as a live one, and it worked — both paths
-verified. It was removed on request. Two things are worth keeping from it:
-
-- The reason it had to be client-side is not the usual "a control that would do
-  nothing without JS". It is that a static site renders at *build* time, so a
-  status baked into the HTML reports the restaurant as of the last deploy, with
-  the real schedule directly beneath it to contradict. Any future live indicator
-  on this site has the same constraint.
-- `setTextKey` came back for it and went away with it — the second such round
-  trip. See the note in `Base.astro`.
-
-The schedule rows are the whole of what the band says about hours, which is the
-state this section has been in for most of its life.
-
-**Day names are written out in full, and there is no abbreviated set any more.**
-The keys are `hours.<Day>` — "Δευτέρα", "Παρασκευή" — read as
-`` t(locale, `hours.${run.from}`) ``. They were `hours.short.*` and the Greek
-values were three-letter clips ("Δευ", "Παρ") while English was already spelled
-out, so the two locales disagreed about what "short" meant; the client asked for
-full names and the key lost the word with the abbreviation. Do not reintroduce a
-parallel short set for one narrow layout — the measure is the thing to check
-first. Both locales still fit at every width this band uses; re-measured below.
-
-**The text column is centred, and it is no longer capped to bring it closer to
-a second column of text — there is no second column of text any more.** Two
-turns of this band's history live in that one sentence and both are worth
-knowing before "fixing" the current width:
-
-1. With two text columns side by side, `.find__grid` had `max-width: 46rem` so
-   the pair would centre close together rather than spreading to the wrap's
-   full 1248px, where the two centred axes landed ~650px apart with a band of
-   empty charcoal between them.
-2. That cap is gone now that the second column is a photograph rather than
-   text. `.find__grid` is `grid-template-columns: 1fr 1fr` with no `max-width`,
-   filling the wrap the way `.find__media` needs to — see below for why the
-   photo's size, not the text column's, is what this layout is actually built
-   to constrain.
-
-`.find__col` still carries `text-align: center`, unchanged by any of this — the
-text inside the column has been centred since the very first two-column
-version and staying centred was never in question.
-
-**The floor on how narrow this column can go is still the hours list**, which
-is the widest object in it. Its longest row is 163px of days + 24px gap + 110px
-of times = 297px at 1366px (154 + 104 within a narrower cap at 880px), so a
-column under ~300px starts wrapping the schedule. At the current `1fr 1fr`
-split the column measures 596px at 1366 and 389px at the 880px breakpoint —
-comfortably clear in both locales, Greek being the longer of the two. Verified
-at 1366, 880, 768, 390 and 320: every hours row is one line, nothing overflows.
-
-The heading sits **above** the grid with its own `text-align: center`, not
-inside the column. It was inside the column, back when the column was the
-band's only content and a photo (if any) sat beside it at the same starting
-line; with the column no longer spanning the whole band's meaning on its own, a
-heading inside it would be centred over half the band and read as a column
-label rather than the band's title.
-
-**The breakpoint stays `55rem`, not the `48rem` the rest of the site uses, and
-`.find__hours` is still why** — a fixed-width block of rows needs more room
-than most of this site's breakpoints assume. Below it the grid has no
-`grid-template-columns` of its own, so it collapses to a single implicit
-column and the photograph stacks after the text — see `.find__media` for what
-changes in its own sizing at the same breakpoint.
-
-The hours list needs its own centring on top of `text-align` because it is a
-block of rows rather than a run of text, so the auto margins sit on the `<ul>`,
-where they have a width to act on. `align-content: start` on `.find__col` is
-defensive rather than load-bearing now — it mattered when a taller sibling
-`.find__col` could stretch a shorter one's grid row and this kept the shorter
-one's content hugging the top rather than centring in the extra space. There is
-one `.find__col` now, beside `.find__media`, and `.find__media` is built to
-take its height *from* the column rather than stretch it — so in the normal
-case this rule does nothing. It stays in case that ever stops being true.
-
-**`.find__hours` is `width: fit-content`, and 22rem is a ceiling rather than the
-width — a fix worth understanding before anyone "tidies" it away.** It was a
-flat 22rem (352px) with its rows laid out `space-between`, wider than the rows
-actually need, so the surplus went into the gap and pinned the days and times to
-fixed x-positions while every label and value above them centred on a different
-axis. **Three alignment axes in one centred column**, which a review caught.
-Shrinking the box to its content leaves one axis for the whole column.
-`space-between` stays and now does its actual job — the shorter row's time is
-still pushed to the block's right edge, so the times right-align with each
-other and the schedule reads as a schedule rather than as rows whose columns
-wander. The lesson generalises: **a fixed width plus `space-between` is a
-distributed layout wearing a table's clothes**, and it only looks aligned while
-the content happens to fill the box.
-
-Email being its own `.find__block` (rather than a second label folded into the
-phone block) is left over from when phone and email were a second column that
-had to level its rows against the first — it doesn't do that job any more with
-one column, but splitting it out costs nothing and un-splitting it would just be
-churn.
-
-**`.find__media` is sized so it can never read as bigger than the text column,
-and that constraint is closer to the point of this layout than any particular
-width.** There is deliberately no `aspect-ratio` on it at this breakpoint.
-Instead its `<img>` is `position: absolute; inset: 0`, which takes the image out
-of normal flow entirely — an out-of-flow element contributes nothing to its
-parent's content size, so `.find__media` has no natural height of its own for
-the grid's `auto` row-track sizing to measure. The row's height is set by
-`.find__col` alone, `.find__media` stretches to match it (grid's default
-`align-items: stretch`), and the image fills that exact box via
-`object-fit: cover`. Verified at both 1366 and the 880px breakpoint:
-`.find__media`'s rendered height equals `.find__col`'s exactly, to the pixel,
-at both widths. `min-height: 20rem` is a floor for the case the text column is
-unusually short, not the usual operating height.
-
-Below 55rem this reverses: the photo stacks under the text as a normal photo
-frame with a fixed `aspect-ratio: 4/5` and an in-flow `<img>`, the same idiom as
-`.team__photo`. There is nothing to match at that width — the two are stacked,
-not side by side — so a fixed ratio is the simpler, more predictable choice
-there.
-
-**The address, phone and email icons are inline SVG, not Font Awesome.** The
-client asked for "fa icons"; what shipped is three glyphs in the same idiom as
-`SocialLinks` — 24x24, `fill: none`, `stroke: currentColor` at 1.6 — for
-reasons that would apply to any icon set: this site self-hosts everything it
-renders and tracks its page weight, three glyphs do not justify a CDN request or
-a webfont, and Font Awesome Free is CC BY 4.0, which carries an attribution
-requirement nothing on the page currently satisfies. Inline SVG also inherits
-`currentColor`, so the icons follow each link's hover and focus states without a
-second rule. Every one is `aria-hidden` — the text beside it is already the
-link's accessible name. If real Font Awesome is ever wanted, that is a
-dependency decision, not a styling one.
-
-**`mapUrl` addresses the place by Place ID, and that is a deliberate retreat
-  from the browser's own URL.** A `/maps/place/…` URL ends in a `data=` blob
-  that is length-prefixed — `!4m6` declares six following tokens, `!3m5`
-  declares five — so removing one that looks redundant (`!16s`, a
-  knowledge-graph id already implied by the `!1s` feature id) leaves the counts
-  short and Google falls back to a name search on the wrong pin. The failure is
-  silent in every way that matters: the URL stays well-formed, the button still
-  opens Maps, `astro check` and `npm run check` both pass. It shipped, and it
-  took the client to catch it.
-
-  `https://www.google.com/maps/place/?q=place_id:<id>` is Google's documented
-  form and has no such structure — one opaque string, nothing prunable. If
-  someone ever puts a long place URL back, the rule is: paste it whole, never
-  edit it. **Verifying a map link from here is not possible** — Google 302s to
-  a consent page — so the check that actually counts is a human clicking the
-  button once. What *can* be checked offline is identity: a `ChIJ…` Place ID
-  base64-decodes to the two 64-bit ids in a place URL's `!1s` field, which is
-  how this one was confirmed to be the same listing.
-
-  `geo` is deliberately *not* kept in sync with the coordinates Google holds for
-  the place: the client supplied `geo` themselves and it sits 1.3m off Google's
-  marker. Both are right about different things — don't reconcile them.
-- Opening hours are rendered as *contiguous* runs of days, not each entry's first
-  and last. An entry listing Tuesday and Thursday must not render "Tue – Thu" and
-  claim a Wednesday the restaurant is shut. Non-contiguous days become separate
-  rows. Any day in `hours.closed` is still listed on the page as closed rather
-  than dropped — a shut day is not a working hour, but omitting it leaves a
-  visitor guessing. That array is **empty** at the moment: the schedule is
-  Mon–Sat 18:00–00:00 and Sun 16:00–00:00, so nothing is shut. Keep the key
-  rather than deleting it; `FindUs.astro` and the JSON-LD both read it, and the
-  renderer handles an empty list without special-casing.
+  on tap and leaves it applied. `pointer: fine` is in the query because a device
+  can report both. **`:focus-visible` stays outside the gate** — a keyboard is
+  not a pointer — and `:active` is the whole of the touch feedback. Copy
+  `.contact__note-call`, which was built with all of this. Still ungated:
+  `.nav__links a`, `.social a`, `.menu__tab`, `.menu__jump a`, `.gallery__item`,
+  `.btn--primary`, `.find__contact a`, `.find__map`, `.lightbox__arrow`,
+  `.lightbox__close`.
+- Touch targets are 44px except the documented 32px exceptions (`.lang`,
+  `.social a`, the hero dots).
+- `theme-color` matches **what the chrome butts against** — the nav (`--black`)
+  — not `body`. This has now been wrong in both directions.
+
+**Type**
+
+- Fonts are **static** builds, one file per weight per script. `font-synthesis:
+  none` means an unshipped weight is not faked, so adding a weight in CSS means
+  adding its files.
+- **Manrope ships no italic**, so `font-style: italic` renders as plain upright,
+  silently. `.menu__item-wine` carries its distinction with weight 500 instead —
+  which matters, because upright it would be identical to `.menu__item-desc`.
+- One family; `--font-body` and `--font-display` both resolve to Manrope and stay
+  two tokens so a display face could return in one line. Headings are 700 with
+  `letter-spacing: -0.02em`.
+- Manrope covers Greek — not a given for a geometric sans. Check `unicode.json`
+  in the `@fontsource` package before agreeing to any future face.
+- The `button` reset does not clear the UA's `padding: 1px 6px`.
+
+**JS / data**
+
+- `{x?.length && <p/>}` renders the text **"0"** when `x` is `[]`. Use a
+  ternary. The menu renderers were all three written the unsafe way.
+- **`[data-reveal]` blocks are hidden only under `.has-reveal`, and that class is
+  added by the inline script in `Base.astro`'s head** — after checking both
+  `prefers-reduced-motion` and `IntersectionObserver`. Deliberately inline, not a
+  module: a module that failed to load would leave half the homepage at
+  `opacity: 0`. **A rule that hides content must be owned by the script that can
+  un-hide it.**
+- **That observer's `threshold` must stay 0.** A threshold is a fraction of the
+  *target's own area*, not the viewport, so a target taller than the screen may
+  never reach it — at 0.08, `/team`'s ~2863px list loaded invisible. Use
+  `rootMargin` for "properly on screen"; it is height-independent. It cleared 8%
+  at a 768px viewport by 0.07 of a point, which is why it tested fine. And check
+  whether pixels are *loaded* or merely transparent before touching a loading
+  strategy — `getComputedStyle(el).opacity` answers it in one line.
+- **Dead-code sweeps need care here**: keys and classes are built at runtime (see
+  i18n above), and a docstring claiming a function is used by `npm run check` is
+  not evidence — two such functions had the checker carrying its own copy.
+  `src/lib/hours.ts` was correctly swept as dead and correctly restored from git
+  one change later; the sweep is cheap to undo, guessing the logic twice is not.
+- `Plates.astro` and `Goal.astro` pick photos **by id**, not by position, and
+  throw at build time if an id is missing.
+
+**Photos**
+
+- **A photo added straight to `src/assets/photos/` never meets the downsample**,
+  and nothing in the build complains. `prepare-photos.mjs` reads the SOURCE
+  folder outside the repo only. `dsc-9892.jpg` arrived that way at 1836x4080 and
+  5.08MB. Apply the script's own treatment by hand — `.rotate()`,
+  `resize(2560, 2560, {fit:'inside', withoutEnlargement:true})`,
+  `jpeg({quality:88, mozjpeg:true})` — **to a copy, not in place**: doing it in
+  place destroyed the only 5MB original, which was untracked.
 - **Placeholder data that looks real is invisible to `npm run check`.** The
-  opening hours shipped wrong for months: `site.json` held invented times whose
-  only warning was the word PLACEHOLDER inside `hours.$comment`, and
-  `outstandingSiteFields` skipped every `$`-prefixed key outright — so the
-  checker never mentioned them, while README had already listed them under
-  "confirmed and in place". The walk now reports a PLACEHOLDER `$comment` when
-  nothing under it trips a rule of its own, which is precisely that case and
-  stays quiet where the data already flags itself (seo's example domain; geo's
-  nulls were the other such case until the client supplied them).
-  The wider lesson is the one at the top of this file: check the claim
-  before writing it down, in both directions — README asserting something is
-  confirmed does not make the JSON agree.
-- `scroll-padding-top` on the container and `scroll-margin-top` on the target
-  **both** apply and they stack. The site carried both for the sticky nav, so an
-  anchor jump landed a section 180px down a viewport whose nav was 81px tall
-  (100 + 80), and a menu jump chip landed a category at 208px (100 + 108) — a
-  fat empty band under the bar on every jump, which nobody had measured. Only
-  `scroll-padding-top` on `<html>` survives; it covers anchors, focus scrolling
-  and snapping in one place. If a jump target ever looks wrongly offset, check
-  whether something has reintroduced a `scroll-margin-top` on top of it.
+  opening hours shipped wrong for months behind a `$comment` the walk skipped
+  outright, while README called them confirmed. The walk now reports a
+  PLACEHOLDER `$comment` when nothing under it trips a rule of its own.
 
-  **It is paired with the bar's height and the two move together.** The bar is
-  `min-height: 6rem` + 1px of border = 97px. Change one without the other and
-  every anchored heading goes behind the bar.
+**Verifying**
 
-  **`scroll-padding-top` is `calc(6.0625rem - 2px)`, not `6.0625rem`, and the
-  2px is deliberate** — see the comment on the rule itself. It overshoots so the
-  section boundary tucks *under* the bar rather than landing on it, which is what
-  stops a fractional device scale factor anti-aliasing the seam into a visible
-  hairline. Measured on the rendered page: every anchor lands the section top
-  2.0–2.4px above the bar's bottom, `#goal` and `#plates` included. This note
-  used to claim the two matched "exactly, no extra air" and that a jump landed
-  "flush at 97px, hairline to hairline"; that was true before the seam fix and
-  is not now. Re-measure before repeating either figure.
-
-  **There used to be 19px of extra air (`7.25rem`, 116px) and it was a bug,
-  not a margin.** It was carried over from the old alternating-tier homepage,
-  where a scroll landing flush with the bar exposed a sliver of neutral tier
-  background above the heading — so a little air read as breathing room. It
-  stopped meaning that once the homepage became one ground with drawn edges:
-  `id="goal"` and friends sit on the `<section>` itself, which butts directly
-  against the section above it, so the 19px was scrolling *past* the section
-  boundary into the previous band. Jumping to `/#goal` left a visible sliver
-  of the hero photo peeking out under the bar — reported as "I still see a
-  part of the section above" — because the gap isn't neutral space, it's
-  whatever the previous section actually is. Every section already carries
-  4–8rem of its own top padding before the heading (`--section-y`), so the
-  extra offset was never buying any breathing room to begin with; it only had
-  a bleed-through cost. Re-verified by jumping to `/#goal`: the bar's bottom is
-  at 97px and the section top lands at 95px — 2px *behind* the bar rather than
-  below it, per the seam fix above — so nothing of the hero is visible.
-- Vertical padding on an inline `<a>` does not grow its row. The stacked mobile
-  nav links need `display: block` or the tap targets collapse to ~26px.
-- **`.section--tight` has been removed, and the reason is worth keeping.** It
-  existed for one band — Take away, back when that was a heading and a phone
-  number — because the full `--section-y` around two lines of text reads as a
-  gap rather than as breathing room. That band now carries a photo set, so by
-  the utility's own rule it takes the full padding, and nothing else in the site
-  used the class. Rather than leave a rule that matches no markup (see the
-  `.menu__legal h3` entry below for how that goes unnoticed), it went. If a
-  short text-only band appears again, it is three lines of CSS to reinstate.
-
-- **Each Take away card is one control that places one call, and the clock picks
-  the number.** The whole card is an `<a href="tel:…">`, at the client's request
-  that the panels behave as buttons. That is what forces the clock logic: a
-  control that dials has to commit to one number *before* the tap, so it cannot
-  simply show both and let the visitor choose.
-
-  `site.json` holds two — `phone` (the landline) and `phoneAfterHours` (the
-  mobile). The server renders the landline on every card, the JSON-LD advertises
-  the landline, and a visitor with no JavaScript keeps the landline, so the
-  default is the *correct* number during service rather than merely a safe one.
-  The script then rewrites the swapping cards when the restaurant is shut.
-
-  **Three of the band's four dialling controls swap; take away is the one that
-  does not, and that is one rule rather than an inconsistency.** Take away can
-  only be done during service, so the landline is the only number it could ever
-  want. A reservation, a party enquiry and a special order are all things
-  someone rings about at midnight, so the reservations panel and both note cards
-  swap. Ask what the call is *for*, not which row the card is in.
-
-  **The four attributes that drive it are spread from one `swapAttrs` object in
-  the frontmatter**, not written per card. Two card types disagreeing about
-  which number they offer is the worst failure this section can have — it would
-  look perfectly fine on screen — and one object is what makes that impossible
-  rather than merely unlikely.
-
-  **The href and the visible digits are rewritten together and must never
-  disagree.** The number is on the card precisely so there is something to check
-  before tapping — a control that dials an invisible target gives a visitor
-  nothing to verify, and someone whose JavaScript never ran would have no way to
-  notice they are being offered the landline at 2am. Changing one without the
-  other is the worst failure this section can have, because it looks fine.
-
-  It is evaluated in **Europe/Athens**, not the visitor's timezone — someone
-  calling from London at 22:00 is calling a restaurant where it is already
-  midnight — which `Intl` handles, so no offset is hard-coded and DST needs no
-  thought. The schedule is passed to the client from `site.hours.entries` rather
-  than restated, so editing the hours moves the swap with them.
-
-  The decision itself is `isOpenAt` in `src/lib/hours.ts`, not inline in the
-  component, so the shipped logic is the logic that gets tested. `closes:
-  "00:00"` means the *end* of the day, not the start of one: 16:00–00:00 covers
-  16:00 up to but not including midnight, which is why 00:00 Wednesday is shut
-  even though Tuesday ran "until midnight". A genuinely overnight range
-  (20:00–02:00) is handled too, though nothing uses one yet.
-
-  **This is the second time this feature has been built, and it was deleted in
-  between.** For one revision both numbers were shown at once, each under a
-  "Εντός / Εκτός ωραρίου" label, and `hours.ts` was removed as dead code with
-  `isOpenAt` having no caller. Making the cards into buttons brought it straight
-  back. Worth knowing before deleting it again: the labels
-  (`contact.duringHours` / `contact.afterHours`) and `.contact__phone-when` went
-  with that revision and are not coming back either — with one number on screen
-  there is nothing for a label to distinguish.
-
-  **Verify the open path by editing the schedule, not by waiting.** The shut path
-  is whatever the clock happens to give you. The open path was confirmed by
-  temporarily widening `hours.entries` to include the current minute, rebuilding,
-  and checking both cards read the landline in both the `href` and the digits —
-  then reverting. That exercises `isOpenAt` through the real script.
-
-  **The selector is `[data-phone-swap]`, spread onto the controls that swap —
-  never a hand-typed id.** An earlier version selected `#contact-phone`, which
-  had stopped being rendered when the markup moved; `getElementById` returned
-  null, the swap silently did nothing, and nothing caught it. `astro check`
-  passes on that, `npm run check` compares i18n keys and never looks at markup,
-  and the page renders perfectly.
-
-  **The attribute belongs on the anchor that dials, never on the card.** On a
-  panel those are the same element — the whole card is the link. On a note card
-  they are not: the card is a `<div>` and the control is the small call link
-  inside it, so the attribute goes there. That keeps the query's contract exact
-  — every match is an anchor with an `href` to rewrite and a
-  `.contact__phone-number` inside it — rather than "a card, somehow", and it is
-  why the script's `HTMLAnchorElement` typing and its `setAttribute('href', …)`
-  needed no change when the second card type arrived.
-
-  **Verified both paths after the note cards were added.** Open: live at Sunday
-  22:36 Athens against a 16:00–00:00 Sunday, all four links on the landline.
-  Closed: Sunday's `closes` temporarily narrowed to 17:00 and rebuilt — all
-  three swapping controls flipped to the mobile in the `href` *and* the digits,
-  take away stayed on the landline — then reverted. **Restart the preview server
-  and reopen the browser session between those two runs.** `astro preview`
-  serves a stale `dist/` after a rebuild, and `playwright-cli navigate` re-opens
-  the session's stored URL rather than the one passed to it, so a cache-busting
-  query string is silently ignored. Both together cost a while: `dist/index.html`
-  on disk had the new schedule and the DOM did not.
-
-- **All four photographs in this band carry `alt=""`, and the rule is "is it
-  inside the control".** Everything inside a control is concatenated into its
-  accessible name, so a descriptive alt would prepend a sentence about a table
-  setting to "Κλείστε τη θέση σας 21 3099 1571" — the name a screen-reader user
-  hears before deciding whether to place a call. The picture illustrates the
-  title; the title identifies the control.
-
-  On the panels the control is the `<a>` and the photograph is inside it. On the
-  note cards it is the `<summary>`, and the photograph is inside that. **This
-  changed once and the history is the useful part**: for one revision the note
-  cards were passive — a photograph stacked over a flat panel, with the call the
-  only control — and their photographs correctly carried real translated alt,
-  `gallery.${id}.alt` for the sourcing one and a standalone `contact.eventsAlt`
-  for the events one. Making the cards into disclosures put both pictures inside
-  a control and the alt had to go. `contact.eventsAlt` went with it; the sourcing
-  photograph keeps its gallery alt on `/gallery`, where it is still content.
-
-  Verified in the a11y tree, both locales: the panels are "Κλείστε τη θέση σας
-  21 3099 1571" and "Take away 21 3099 1571", the note summaries are exactly
-  their titles — "Διοργανώστε την εκδήλωσή σας" / "Plan your event" and
-  "Παραγγελίες εκτός μενού" / "Off-menu requests" — and each note's call link is
-  "Τηλέφωνο 21 3099 1571" / "Phone 21 3099 1571".
-
-  **That label is why the note link is not named by bare digits.** Its visible
-  text is a number and nothing else, and out of context a link called
-  "21 3099 1571" says nothing about what it does — so `contact.phoneLabel`, the
-  key Find Us already renders as a visible label, is prefixed as `.sr-only`.
-  Nothing new was invented, the switch owns both halves, and the visible number
-  stays inside the accessible name, which is what WCAG 2.5.3 asks for.
-
-  Card titles are `<span>`s, not `<h3>`s, for the neighbouring reason: a heading
-  inside a control is legal but makes the document outline claim a section where
-  there is a button. `.contact__head h2` is the band's heading, and the four card
-  titles are the four controls' names.
-
-  **The note cards had no title for two revisions and now do**, which is a
-  reversal worth recording because the reasoning changed rather than the taste.
-  Titles were declined at the client's request when the paragraph was visible on
-  the card and opened it — a title would have been a second, shorter way of
-  saying what the sentence beneath it already said, which is the two-titles-
-  stacked failure the eyebrow history is about. Folding the paragraph into a film
-  removed that: closed, there is nothing else on the card to say what it is. The
-  client supplied both titles. Note the register — "Διοργανώστε" and the panels'
-  "Κλείστε" are formal plural, while the paragraphs inside are informal singular
-  ("Κάλεσέ μας", "τη δική σου"). The titles match their neighbours on the card
-  face rather than the copy behind it, deliberately.
-
-- **The note cards take `.contact__panel`'s ratio, not their sources'.** Both
-  photographs are portrait — `oysters-on-ice` is 1152x2560 (1:2.22) and
-  `sushi-events.jpg` is 608x1080 (9:16) — so a 4:3 crop is a hard one, and it
-  was checked frame by frame against the masters rather than assumed: the
-  oysters still fill the frame and the events shot arguably reads better tight
-  than square. Neither needs an `object-position` override.
-
-  **They were `1 / 1` for one revision and that is the thing not to reinstate
-  casually.** The square was chosen to protect those portrait sources, and it
-  was the right call while the cards were photograph-above-text — but it is also
-  what made the lower row a different size and shape from the upper one, which
-  is the complaint this whole revision answers. The ratio is a property of the
-  *pair of rows*, not of the photographs. If a future photograph will not take
-  4:3, crop it or replace it; do not re-ratio the card.
-
-  Both are otherwise unused on the homepage. Back when the events card drew
-  from the gallery this took two attempts: `toast-outdoors` is the obvious first
-  choice for it and is already **Our Goal's** photograph, and
-  `sushi-board-overhead` is one of the four plates in the band **directly
-  above**. Check `Goal.astro` and `Plates.astro` before pointing this band at a
-  gallery id.
-
-- **The note cards are `<details>` elements and carry no script at all.**
-
-  The client's complaint was that the two lower cards read as a different species
-  from the two above. They were: 1:1 against 4:3, no title against a title,
-  photograph-above-text against text-over-photograph. All three followed from one
-  constraint — a ~60-word paragraph cannot sit on `.contact__panel`'s scrim,
-  which is a fixed-length ramp sized for two short bold lines owing 3:1 where
-  body copy owes 4.5:1.
-
-  A click-revealed **film** dissolves that rather than fighting it. Closed, the
-  card is the same object as a panel. Open, the film is near-opaque
-  (`--black` at 93%) and *allowed* to hide the photograph, so the paragraph sits
-  on what is effectively a flat surface. Measured worst single pixel, both cards,
-  open: paragraph **5.92 / 5.99:1** at `--step--1` (owes 4.5:1), call **12.90 /
-  13.73:1**. Swapping either photograph cannot move those figures, which is the
-  standing benefit over the scrim.
-
-  **A native disclosure, deliberately, not a button and a class toggle.** The
-  site's other hide-and-reveal is `.has-reveal`, which exists because a rule that
-  hides content must be owned by something that can un-hide it — the failure mode
-  being a dead script leaving the page at `opacity: 0`. `<details>` has no such
-  failure mode: it opens, keyboards and announces its own expanded state with no
-  JS, and the paragraph is real DOM throughout, so the copy is there for search
-  engines and screen readers whether or not anyone clicks. Anything built here
-  with a button and `aria-expanded` would be strictly more code and strictly less
-  robust.
-
-  Four details that cost time:
-
-  - **The title must be hidden when open.** Kept, it forced the film to reserve
-    5.5rem beneath the paragraph, and the copy plus the call then wanted 356px
-    inside a 326px card — `margin-top: auto` collapsed and the phone number drew
-    straight through the title. The paragraph identifies the card perfectly well
-    on its own.
-  - **The head is `left: auto` when open, and that is what makes the phone
-    number clickable — it is not a way of aligning the cue right.** This one
-    shipped broken and was reported as "the phone is not calling". The head is
-    absolutely positioned inside the `<summary>` at `z-index: 4`, above the
-    film, and `left` + `right` together make it span the whole card. With the
-    title hidden that box is nearly empty, but it still lies directly over the
-    call link at the bottom of the film and swallows every click on it — the tap
-    lands on the summary, so the card *closes* instead of dialling. Dropping
-    `left` shrinks the box to the disc, which both parks the cue in the
-    bottom-right corner and hands the rest of the row back to the film. The
-    first version used `text-align: right`, which moves the glyph and changes
-    nothing about the box.
-
-    **A screenshot cannot see this and neither can a contrast sweep** — the card
-    looks exactly right in both states. `document.elementFromPoint` at the badge
-    and at the digits is the test, and the answer must be the anchor: it returned
-    `.contact__note-head` before the fix and `.contact__note-call` after.
-    Anything absolutely positioned over a film with something interactive in it
-    needs the same check.
-  - **The cue is two glyphs swapped by `display`, not one glyph rotated.** It
-    was a chevron turned 90° when open, which points it *down* — and a downward
-    chevron is what a **closed** disclosure conventionally wears, so the open
-    card was showing the closed card's icon. A cross needs no convention. Only
-    one is ever in the flow, so the disc cannot be sized by whichever glyph is
-    wider, and there is deliberately no transition: the two shapes share no
-    geometry, so nothing can tween and a cross-fade at 15px reads as a flicker.
-  - **`list-style: none` *and* `::-webkit-details-marker`** are both needed to
-    remove the disclosure triangle; Safari still draws it from the pseudo-element
-    when only the first is set.
-
-  **The title and the cue share one line**, at the client's request — a flex row
-  with `space-between`, the disc `flex: none` so a wrapping Greek title cannot
-  squeeze it into an ellipse, and `align-items: flex-end` so a two-line title
-  keeps the arrow beside its last line rather than floating up beside its first.
-  Measured at 320, 390, 768, 1024 and 1366 in both locales: the disc stays square
-  (29-33px) and the gap between the words and the disc never falls below 12px.
-
-  The arrow in the cue is the glyph an arrow was *removed* from the panels for
-  being — see that note. It is right here for the same reason it was wrong there:
-  these cards go somewhere, and the phone glyph stays on the thing that dials.
-
-- **The events card's photograph is the one on the site that is deliberately
-  outside `gallery.json`, and the client's file for it is 68% black bars.**
-
-  `sushi events.jpg` arrives 1920x1080, which looks like an ordinary landscape
-  photo. It is not: the actual picture is **608x1080 at x=656** — a portrait
-  frame pillarboxed into 16:9, exported from the same portrait phone footage a
-  video of this scene came from. Uncropped, the card would show a narrow strip
-  of food between two black fields. The bars are pure black, so a
-  threshold-based crop detector reports the whole frame — **the number came
-  from a pixel scan**, which is the second time that has been true for this
-  client's media. Scan, don't trust the filter.
-
-  Cropped, it is a good source and that is the difference worth recording: a
-  608px square crop into the card's 432px box is a **0.71x downscale** on
-  desktop and 1.14x on a dpr-2 phone, so it reads sharp beside the oysters
-  master. The video that briefly occupied this card was 228px and 1.89x/3.04x
-  the other way, which is why it read soft and why it is gone.
-
-  **It is a named export in `lib/photos.ts`, not a gallery id**, because the
-  client did not want it as a tile on `/gallery` and every `gallery.json` entry
-  renders there. Dropping it into `gallery/` unlisted was the obvious shortcut
-  and is wrong: `npm run check` walks `gallery/` and `team/` only, and would
-  report it as "not shown on the site", which would be false. It lives in
-  `sections/`, which nothing walks. It carries no alt at all, for the reason in
-  the alt-text note above — it sits inside a `<summary>`. The regeneration
-  recipe is on
-  the export; re-measure the crop box if the client sends a different export.
-
-- **Text over the Take away photos is safe because of the scrim, not the
-  photos.** Both images have blown highlights in every third of the frame —
-  brightest channel 255 in all of them — so an average reading of the source
-  proves nothing. `.contact__panel::before` is a bottom-weighted gradient that
-  is opaque enough to carry the block on its own. Verified the way it has to be
-  verified: hide `.contact__panel-body`, screenshot the rendered panel, and
-  sample every pixel of the box each line occupies. Re-measure that way if the
-  photos are ever swapped — worst *single* pixel, never the mean, which ran 6.0
-  to 14.6 here and would have hidden every failure below.
-
-  **Sample the hovered state, not just the resting one.** The cards lighten on
-  hover — a second layer, `.contact__panel::after`, fades out — so the resting
-  state is the *best* case and hovered is the floor. Measuring only at rest is
-  how a total failure of the scrim went unnoticed for a whole revision; see the
-  stacking-order note below.
-
-  Worst pixel over both cards, both locales, at rest and hovered, at 320, 390,
-  768, 1024 and 1366px — five widths because the block's height changes with the
-  wrap and the card's height changes with the column count, and the worst case is
-  not at either end:
-
-  | line | colour | owes | worst (hovered) |
-  |---|---|---|---|
-  | title (`.contact__panel-title`) | `--salt` | 3:1 | 11.78:1 |
-  | number (`.contact__panel-call`) | `--salt` | 3:1 | 12.71:1 |
-
-  Both are bold at `--step-1` / `--step-0`, so both owe 3:1 and clear it four
-  times over. There used to be a third line here — a `--step--1` "Εντός ωραρίου"
-  label in `--wood-light`, the only small text on the cards, which owed 4.5:1 and
-  measured 5.19:1 at its worst. It is gone with the two-number layout, and its
-  figure is worth keeping only as a warning: it is the one that came within
-  0.7 of failing, and any small or tinted text put back on these cards inherits
-  that margin, not the comfortable one the salt lines have.
-
-  **The gradient stops are lengths (`rem`), not percentages, and that is what
-  makes the figures above hold at every width.** They were percentages when the
-  card carried a single title. The block is a title over a number — a fixed
-  number of pixels tall *whatever the card is* — while a percentage ramp scales
-  with the card, so a short card pushes the same text further up a thinner part
-  of the scrim. Measured on the percentage version, the small label read 5.05:1
-  at 1366px and **3.49:1 at 390px**, a fail that only appeared at one width. In
-  lengths the dense end simply covers the text block (8rem clears it on every
-  card size) and the ramp finishes at 16rem, so a tall card shows *more*
-  photograph than the percentage version did and a short one is scrimmed further
-  up — which is correct, because on a short card the text really does cover more
-  of the picture.
-
-  **The ramp came down from 11rem/21rem when the cards became controls**, and
-  that is the maintenance rule rather than a one-off: the block lost a row when
-  the two numbers collapsed into one, and the cards got smaller, so the old ramp
-  was greying picture that no longer had any text over it. Re-measure the block
-  and move the first two stops with it whenever a line is added or removed.
-
-  **This ramp is also the reason the two note cards put their picture *above*
-  the text rather than behind it, and it is the clearest case the rule has
-  had.** The ask was for the two service paragraphs to become cards "like the
-  ones above". They are ~60 words each: at `--step-0` they run to six or seven
-  lines, so most of the block would sit above the dense 8rem in the thin part of
-  the ramp — and body copy owes 4.5:1 where the salt lines owe 3:1. The margin
-  it would have been building on is the 3.49:1 recorded two paragraphs up, not
-  the 11-12:1 the titles enjoy. Split into a photograph over a flat `--black`
-  panel, the copy is `--light-stone` at **6.55:1** and the number `--salt` at
-  **14.77:1**, both against a flat token with no scrim in the path and nothing
-  to re-measure when a photograph is swapped. The badge fill is 14.77:1 against
-  the card and its black glyph 14.77:1 on the fill. Measured on the rendered
-  page.
-
-  So the general form of the rule: **the scrim carries two short bold lines,
-  and it is not a general-purpose text background.** Anything longer, smaller
-  or lighter than that goes on a surface instead.
-
-  **The stacked layout is square, and that is a consequence of the fixed-height
-  scrim rather than a separate design choice.** Below 48rem `.contact__panel`
-  goes `4/3` → `1/1`. A 4:3 panel at 390px is 261px tall, and a fixed ~150px
-  block plus its scrim took about two-thirds of it — the table setting was barely
-  there. A square is 350px at the same width and gives that back. Above 48rem the
-  panels are side by side and 4:3 is the wider, better frame, so the switch is
-  where the column count changes. Both panels move together; see the note on the
-  4:3 compromise for why they must.
-- **A photo added straight to `src/assets/photos/` never meets the downsample,
-  and nothing in the build complains.** `prepare-photos.mjs` walks the SOURCE
-  folder outside the repo and writes *into* `src/assets`; it never reads what is
-  already there, so a file dropped directly in keeps whatever size it arrived
-  at. `dsc-9892.jpg` came in that way at **1836x4080 and 5.08MB**, against the
-  ~200-500KB the prepared masters run to, and `npm run check`, `astro check` and
-  the build all passed on it — Astro happily generates its responsive variants
-  from a 5MB master, so the only symptom is a repo carrying a file the project's
-  own docs say should never be committed. Applying the script's own treatment by
-  hand (`.rotate()`, `resize(2560, 2560, {fit:'inside', withoutEnlargement:true})`,
-  `jpeg({quality:88, mozjpeg:true})`) took it to 1152x2560 and 0.19MB.
-
-  **Do that to a copy, not in place.** Doing it in place is what happened here,
-  and it destroyed the only 5MB copy at that path — the file was untracked, so
-  git did not have it either. If the original matters, put it in the SOURCE
-  folder first, which also makes `npm run photos` able to reproduce the master.
-- `Plates.astro` picks its four photos **by id**, not by taking the first four in
-  `gallery.json`. The gallery is ordered for the gallery — room, sign, drinks and
-  plates interleaved — so position is not a stable way to ask for "the food", and
-  reordering that file would otherwise silently change the homepage. It throws at
-  build time if an id is missing rather than rendering a gap.
-- `logo-clean.png` is the badge, and it is **no longer the only logo file** —
-  `LOGO-01.png`, and the trimmed `logo-wordmark.png` derived from it, is the
-  horizontal lockup the hero uses. The badge carries the nav and the footer,
-  and the favicons are generated from it. The measured geometry: the
-  canvas is **1672×940**, the badge inside it is **888×899** — near enough square
-  — with 393px of transparent field to its left and 391px to its right. So it is
-  horizontally centred, and 47% of the file's width is empty.
-
-  That is why anything sizing it by **height** pays for the field: at 80px tall
-  the file wants 142px of width to show an 80px mark. `prepare-favicons.mjs` deals
-  with it by trimming to the badge and normalising to 512×512 before cropping —
-  every box in that script is measured against the normalised square, not the
-  file's own pixels.
-
-  **The nav deals with it without a second asset.** `.nav__logo` is a square box
-  — 5rem, the same at every viewport width now that the bar no longer shrinks
-  it to make room for a wider link list — with `object-fit: cover`,
-  which shows the central 940px of the source: the whole 888px badge with 26px
-  to spare each side. The field is cropped away for
-  free, the mark fills the box, and the bar reuses the asset the hero has already
-  loaded instead of a trimmed copy that would need regenerating whenever the logo
-  changes. This works *because* the badge is horizontally centred; a replacement
-  logo that is off-centre will crop wrong, silently, and look like sloppy
-  cropping rather than like a geometry change. Re-measure before trusting it.
-
-  **The crop also makes `sizes` lie, deliberately.** srcset picks a candidate
-  from the img's *layout* width, but cover throws away 47% of this file, so a
-  file served at the box's own width renders a mark 56% of that size. Nav.astro
-  passes `sizes="142px"` with `widths={[142, 284]}` — 80 × 1672/940 and its 2x —
-  which is the width that fills the box, not the width the box measures. Resize
-  `.nav__logo` and both numbers move with it.
-
-  **The disc stays inside the bar, and that was tested the hard way.** Hanging it
-  half out — the treatment on thyme-restaurant-bar-nafplio.gr, whose 180px badge
-  sits in a 94px bar with 106px below it — was built at 11rem and reverted. It is
-  mechanically fine (`align-self: start` and a negative `margin-block-end` hold
-  the bar at 97px, and .nav has no `overflow` to shear it). It fails on content:
-  this bar is opaque and sticky over three black bands, so the disc covered the
-  opening words of a Team paragraph on scroll, and at the top of the homepage it
-  put a second fokia badge 6px above the hero logo — the page h1, the same mark.
-  The reference has no hero logo and centres its badge over an empty column, so
-  it pays neither cost. Do not rebuild it without solving those two.
-- When screenshotting to verify, disable Chrome's HTTP cache, force
-  `scroll-behavior: auto` before scrolling to trigger lazy images, and clear
-  `localStorage['fokia:lang']` before testing the default locale. A clip whose
-  page coordinates fall below the fold silently captures the wrong region unless
-  `captureBeyondViewport: true` goes with it. The preview server answers on
-  `localhost`, not `127.0.0.1`.
-- **Never stop the browser with `taskkill /IM chrome.exe`.** That matches every
-  `chrome.exe` on the machine, including the ones the person at the keyboard has
-  open, and one headless instance is ~40 processes so the count tells you
-  nothing. Launch verification Chrome with its own `--remote-debugging-port` and
-  `--user-data-dir`, record the pid, and stop only that — `Browser.close` over
-  its own port, or `taskkill //PID <pid> //T //F`. Better still, leave it running
-  and reuse it between rounds.
+- Disable Chrome's HTTP cache, force `scroll-behavior: auto` before scrolling to
+  trigger lazy images, and clear `localStorage['fokia:lang']` before testing the
+  default locale. A clip below the fold needs `captureBeyondViewport: true`. The
+  preview server answers on `localhost`, not `127.0.0.1`.
+- **Never stop the browser with `taskkill /IM chrome.exe`** — it matches every
+  Chrome on the machine, including the user's. Launch with your own
+  `--remote-debugging-port` and `--user-data-dir`, record the pid, and stop only
+  that; better still, reuse it between rounds.
 
 ## Skills
 
-Installed at `~/.claude/skills/` — **user-level, not in this repo**, so a fresh
-clone does not get them. Listed here so it is clear which ones apply to this
-project and which do not.
+Installed at `~/.claude/skills/` — **user-level, not in this repo**.
 
-| Skill | Use it for | Notes |
-|---|---|---|
-| `frontend-design` | Aesthetic direction, typography, layout | The one this site's look came from |
-| `taste-skill` | Anti-templated frontend, redesigns | Overlaps `frontend-design`; pick one per task rather than both |
-| `web-design-guidelines` | Auditing UI against the Web Interface Guidelines | Fetches the rules at runtime, so it needs network |
-| `playwright-cli` | Driving a browser to verify a change | See below — prefer it over hand-rolled CDP |
-| `image-to-code-skill` | — | **Written for Codex.** Its core directive is to generate design images first, which Claude Code cannot do. Installed, but its main workflow will not run here. |
+| Skill | Use it for |
+|---|---|
+| `frontend-design` | Aesthetic direction, typography, layout — where this site's look came from |
+| `taste-skill` | Anti-templated frontend; overlaps `frontend-design`, pick one per task |
+| `web-design-guidelines` | Auditing UI against the Web Interface Guidelines (needs network) |
+| `playwright-cli` | Driving a browser to verify a change — prefer it over hand-rolled CDP |
+| `image-to-code-skill` | **Written for Codex**; its image-generation workflow will not run here |
 
-`@playwright/cli` is also a project devDependency, so that part *is* committed.
-Use it instead of hand-writing CDP WebSocket scripts, which is how every
-screenshot in this project's history was taken:
+`@playwright/cli` is a project devDependency:
 
 ```
 npx playwright-cli open http://localhost:4321/ --browser chrome
@@ -2064,9 +581,8 @@ npx playwright-cli screenshot --filename shot.png
 npx playwright-cli close
 ```
 
-`--browser chrome` drives the system Chrome, so no 150 MB browser download is
-needed. Session state lands in `.playwright-cli/`, which is gitignored. The
-warning below about never killing Chrome by image name still applies.
+`--browser chrome` drives the system Chrome, so no browser download is needed.
+Session state lands in `.playwright-cli/`, which is gitignored.
 
 ## Reference
 
@@ -2075,8 +591,6 @@ Approved plan: `C:\Users\KEOGE\.claude\plans\magical-brewing-firefly.md`.
 Photo originals (never committed):
 `C:\Users\KEOGE\Documents\wetransfer_fokia-reviewed_2026-08-27_1446\`.
 
-## Astro docs
-
-- [Components](https://docs.astro.build/en/basics/astro-components/)
-- [Images](https://docs.astro.build/en/guides/images/)
-- [Styling](https://docs.astro.build/en/guides/styling/)
+Astro docs: [Components](https://docs.astro.build/en/basics/astro-components/) ·
+[Images](https://docs.astro.build/en/guides/images/) ·
+[Styling](https://docs.astro.build/en/guides/styling/)

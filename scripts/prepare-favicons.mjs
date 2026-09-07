@@ -1,20 +1,16 @@
 /**
- * Generates the favicons from the client's logo (logo-clean.png).
+ * Generates the favicons from the client's logo (logo-clean.png). Re-run only
+ * if the logo changes:
  *
  *   node scripts/prepare-favicons.mjs
  *
- * Re-run only if the logo changes. Two pieces of artwork, on purpose:
+ * Two pieces of artwork on purpose: tab icons use the wave-in-the-o monogram,
+ * because the full badge is a grey smudge at 16px, while the Apple touch icon
+ * uses the whole badge, which iOS renders large enough to read.
  *
- *   Tab icons use the wave-in-the-o monogram. The full badge is unreadable at
- *   16px — the wordmark and "SEAFOOD BAR" collapse into a grey smudge — while
- *   the monogram still reads as a distinct mark at every size.
- *
- *   The Apple touch icon uses the whole badge, because iOS renders it large on
- *   the home screen where the wordmark is legible and more recognisable.
- *
- * The .ico is written by hand rather than pulling in a dependency: the format
- * is a 6-byte header, one 16-byte entry per image, and then the images. Every
- * browser that still asks for favicon.ico accepts PNG payloads inside it.
+ * The .ico is written by hand rather than pulling in a dependency: a 6-byte
+ * header, one 16-byte entry per image, then the images. Every browser that
+ * still asks for favicon.ico accepts PNG payloads inside it.
  */
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';

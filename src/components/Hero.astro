@@ -14,30 +14,15 @@ const { locale = defaultLocale } = Astro.props;
   <div class="hero__grid">
     <div class="hero__copy">
       {/*
-        The wordmark is the client's own logo artwork, drawn as a mask.
+        The wordmark is the client's logo artwork drawn as a CSS mask, not an
+        <img>, so its colour stays a token: the artwork is pure white on
+        transparency, and masked, the element's own background is the colour.
+        See .hero__wordmark in global.css.
 
-        It was typeset for a while — see the history in CLAUDE.md — because the
-        only logo file then available was the badge, whose concrete texture is
-        baked *inside* the disc and read on the black hero as a pale circle
-        with a word in it. LOGO-01.png is a different asset: the horizontal
-        lockup, white on transparency, with no field of its own.
-
-        It is a `mask-image` rather than an <img> so the colour stays a token.
-        The artwork is pure white, so painting it stone would otherwise mean
-        baking --light-stone into a file and regenerating it whenever the
-        palette moves; masked, the element's own background is the colour and
-        --light-stone applies live. See .hero__wordmark in global.css.
-
-        That costs the alt attribute, so the accessible name is carried by
-        .sr-only text instead — the same name the typeset version computed,
-        "fokia seafood bar", and this is the homepage's only h1. The mark is
-        `aria-hidden` so the name is not announced twice.
-
-        `site.name` is not translated. `hero.tagline` is "seafood bar" in both
-        locales, but it still carries data-i18n so the language switch owns it
-        rather than it silently drifting if one locale ever changes — the words
-        are inside the logo artwork now, but the accessible name is still real
-        text and still has to follow the locale.
+        That costs the alt attribute, so the accessible name is .sr-only text —
+        "fokia seafood bar", the homepage's only h1 — with the mark aria-hidden
+        so it is not announced twice. hero.tagline is the same words in both
+        locales but still carries data-i18n, so the switch owns it.
       */}
       <h1 class="hero__wordmark">
         <span
@@ -53,9 +38,8 @@ const { locale = defaultLocale } = Astro.props;
       <p class="hero__intro" data-i18n="hero.intro">{t(locale, 'hero.intro')}</p>
 
       {/*
-        One call to action. Reservations are a phone call, and the number is
-        rendered once in Take away & Reservations — a hero button could only
-        scroll to it, so the menu is the thing worth sending people to.
+        One call to action: reservations are a phone call, and the number is
+        rendered in Take away, so a hero button could only scroll to it.
       */}
       <div class="hero__actions">
         <a class="btn btn--primary" href="/menu" data-i18n="hero.cta">{t(locale, 'hero.cta')}</a>
@@ -85,20 +69,15 @@ const { locale = defaultLocale } = Astro.props;
         ))
       }
       {/*
-        The controls live in a <template> rather than in the DOM so a visitor
-        without JavaScript is never shown a control that cannot do anything —
-        but the labels are still rendered by Astro, in the right locale, and
-        carry data-i18n-label so the language switch keeps translating them
-        after the script has cloned them. Cloned nodes are invisible to the
-        switcher's initial pass, so the script calls `fokiaI18n.refresh()` once
+        The controls live in a <template> so a visitor without JS is never shown
+        a control that does nothing — but the labels are rendered by Astro in the
+        right locale and carry data-i18n-label. Cloned nodes are invisible to the
+        switcher's initial pass, so the script calls fokiaI18n.refresh() once
         they are in the page.
 
-        One child now: the dot strip. The stop button that used to sit in the
-        bottom-right corner was removed at the client's request — see the WCAG
-        note on `start()` below for what that costs, because it is not nothing.
-
-        Dashes only for the dots, as originally designed: no arrows and no scrim
-        pill behind them. See the note in global.css about what that costs.
+        One child: the dot strip. The stop button was removed at the client's
+        request — see the WCAG note on start() for what that costs. Bare dashes,
+        no arrows and no scrim pill; see global.css for what that costs.
       */}
       <template id="hero-controls-template">
         <div class="hero__dots"></div>
@@ -118,11 +97,9 @@ const { locale = defaultLocale } = Astro.props;
 
 <script>
   /**
-   * Hero crossfade.
-   *
-   * Everything below is enhancement: with no JS the first slide stays visible
-   * and the hero is a still image, which is also the fastest possible LCP.
-   * Nothing here runs when the visitor has asked for reduced motion.
+   * Hero crossfade. Everything below is enhancement: with no JS the first slide
+   * stays visible, which is also the fastest possible LCP. None of it runs when
+   * the visitor has asked for reduced motion.
    */
   const media = document.getElementById('hero-media');
   const slides = media ? Array.from(media.querySelectorAll<HTMLElement>('.hero__slide')) : [];
@@ -134,8 +111,7 @@ const { locale = defaultLocale } = Astro.props;
     const INTERVAL = 3000;
     let current = 0;
     let timer: number | undefined;
-    /* The transient hold while a pointer or the keyboard is in the hero. It was
-       one of two flags; the other, `stopped`, went with the stop button. */
+    /* The transient hold while a pointer or the keyboard is in the hero. */
     let hovering = false;
 
     // Reveals slides 2..n, which until now were display:none so they would not
@@ -180,24 +156,16 @@ const { locale = defaultLocale } = Astro.props;
       either half of it.
 
       2.2.2 requires that anything moving automatically for more than five
-      seconds can be paused, stopped or hidden by the visitor. This carousel
-      advances every 3s and never stops on its own, and the control that used to
-      satisfy the criterion — `.hero__pause`, bottom-right, its own scrim — was
-      removed on request along with `a11y.heroPause` / `a11y.heroPlay` and the
-      `stopped` flag.
+      seconds can be paused, stopped or hidden. This advances every 3s and never
+      stops; the control that satisfied it (.hero__pause) was removed on request.
 
-      The hold below is NOT a substitute and never was: a touch visitor has no
-      hover, and the hold ends the moment the pointer leaves. That was the whole
-      reason the button existed. The dots are not one either — they jump between
-      slides, they do not stop the timer.
-
-      `prefers-reduced-motion` still skips this block entirely, so a visitor who
-      has asked for less motion gets a still hero. That covers the vestibular
-      case; it does not cover 2.2.2, which is about control and attention.
+      The hold below is NOT a substitute: a touch visitor has no hover, and it
+      ends the moment the pointer leaves. Nor are the dots — they jump between
+      slides, they do not stop the timer. prefers-reduced-motion skips this
+      block, which covers the vestibular case, not control.
 
       Restoring compliance means putting a stop control back. Shortening the
-      interval does not help — 2.2.2 counts total duration of the movement, not
-      the gap between steps.
+      interval does not help: 2.2.2 counts total duration, not the gap.
     */
     const start = () => {
       window.clearInterval(timer);

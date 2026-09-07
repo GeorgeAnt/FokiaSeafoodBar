@@ -1,24 +1,17 @@
 /**
- * Generates the Open Graph share card, public/og-image.jpg.
+ * Generates the Open Graph share card, public/og-image.jpg. Re-run only if the
+ * photo below or the logo changes:
  *
  *   node scripts/prepare-og-image.mjs
  *
- * Re-run only if the carousel photo below or the logo changes. Like the
- * favicons, this is a one-time build artifact that IS committed — social
- * crawlers fetch it as a plain static file and never run Astro's image
- * pipeline, so it cannot be a <Picture /> variant.
+ * A committed build artifact, like the favicons: social crawlers fetch it as a
+ * plain static file and never run Astro's image pipeline, so it cannot be a
+ * <Picture /> variant. It is the hero's own construction at 1200x630 — a
+ * carousel frame, a bottom-weighted scrim, and the wordmark painted from a
+ * token rather than baked into a file.
  *
- * It is the hero's own construction at share-card proportions: a carousel
- * photograph, a bottom-weighted scrim, and the wordmark painted --light-stone.
- * Built rather than hand-cropped for the same reason the hero masks its logo —
- * the colour stays a token, so recolouring the mark is an edit here and not a
- * new file from a designer.
- *
- * 1200x630 is Facebook's and LinkedIn's documented size and satisfies
- * twitter:card=summary_large_image, which the site already declares. It is one
- * card for every page and every locale: og:title and og:description carry what
- * differs, and a locale-specific card would need the whole set regenerated
- * whenever a photograph moved.
+ * One card for every page and every locale; og:title and og:description carry
+ * what differs.
  */
 import { writeFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -28,12 +21,10 @@ import sharp from 'sharp';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
- * The darkest of the four carousel frames, and chosen for that rather than for
- * being the best photograph: the mark is painted --light-stone, so the card is
- * really a contrast problem wearing a photograph. dsc-2857 was tried first and
- * puts a blown-white cocktail directly behind the "k" — see the measurement the
- * bottom of this script prints, which is what settled it. Filename order is the
- * carousel's own order (see lib/photos.ts).
+ * The darkest of the four carousel frames, chosen for that rather than for
+ * being the best photograph: this card is a contrast problem wearing a picture.
+ * dsc-2857 was tried first and puts a blown-white cocktail behind the "k" — see
+ * the measurement this script prints, which is what settled it.
  */
 const PHOTO = join(root, 'src/assets/photos/carousel/dsc-2900.jpg');
 
@@ -46,14 +37,9 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 
 /**
- * --salt, not the --light-stone the hero paints this same mark.
- *
- * The hero sets the wordmark on --black, where light stone is 6.55:1. Here it
- * sits on a photograph, and this site already has a rule for that: stone over a
- * photo is the Take away panels' problem, and those carry --salt for exactly
- * this reason. Light stone measured **1.35:1** at its worst pixel against the
- * concrete tabletop — the script's own check caught it — because it is a mid
- * grey and so is the table.
+ * --salt, not the --light-stone the hero paints this same mark: there it sits on
+ * --black at 6.55:1, here on a photograph, where light stone is a mid grey and
+ * so is a concrete tabletop. It measured 1.35:1 at its worst pixel.
  */
 const SALT = { r: 0xe2, g: 0xe8, b: 0xeb };
 
@@ -89,11 +75,9 @@ const scrim = Buffer.from(
 
 /*
   The artwork is pure white on transparency, so its shape is entirely in the
-  alpha channel — exactly what makes the CSS mask work in the hero. Here the
-  same property is used the other way round: a flat stone rectangle is given
-  the artwork's alpha as its own, which paints the mark in the token colour
-  without the file ever carrying it. Tinting the white pixels instead would
-  bake --light-stone into a binary, which is the thing this codebase avoids.
+  alpha channel: a flat stone rectangle is given that alpha as its own, which
+  paints the mark in the token colour without the file carrying it. Tinting the
+  white pixels instead would bake --light-stone into a binary.
 */
 const markSource = sharp(WORDMARK).resize({ width: MARK_WIDTH });
 const { width: markW, height: markH } = await markSource.png().toBuffer({ resolveWithObject: true })
@@ -123,18 +107,11 @@ const card = await photo()
 await writeFile(DEST, card);
 
 /* ---------------------------------------------------------------------------
-   Verification, printed rather than assumed.
-
-   The card is a light mark on a photograph, which is the situation CLAUDE.md
-   has a standing rule about: sample every pixel the text occupies, never the
-   mean. The mean over this box runs comfortable while a single blown highlight
-   behind one letter fails, which is exactly what dsc-2857 did.
-
-   Measured on the *scrimmed* card with the mark not yet composited, since what
-   the mark has to survive is whatever is left underneath it. og:image has no
-   WCAG obligation — it is a picture, not an interface — but a wordmark nobody
-   can read in a Facebook timeline is the whole reason the card exists, so the
-   3:1 a large graphic owes is the bar used here.
+   Verification, printed rather than assumed: sample every pixel the mark
+   occupies, never the mean — the mean runs comfortable while one blown
+   highlight behind a letter fails, which is what dsc-2857 did. Measured on the
+   scrimmed card before the mark is composited. og:image owes WCAG nothing, but
+   a wordmark nobody can read in a timeline defeats the card, so 3:1 is the bar.
    --------------------------------------------------------------------------- */
 const srgb = (c) => {
   const v = c / 255;

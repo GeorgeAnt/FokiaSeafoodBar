@@ -10,16 +10,9 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 /*
-  The food, on the page that sells it.
-
-  Before this band the homepage showed one cocktail and four staff portraits:
-  every plate the kitchen actually sends out lived on /gallery, one click away
-  from anyone who never got there. This is the product.
-
-  Four ids rather than "the first four in gallery.json", because the gallery is
-  ordered for the gallery — room, sign, drinks and plates interleaved — and this
-  band wants plates only. Chosen by id so reordering gallery.json cannot quietly
-  change what the homepage shows.
+  Four ids rather than "the first four in gallery.json": the gallery is ordered
+  for the gallery — room, sign, drinks and plates interleaved — and this band
+  wants plates only. By id, so reordering that file cannot change the homepage.
 */
 const PLATE_IDS = ['sushi-board-overhead', 'ceviche-presented', 'seared-fish-puree', 'prawns-bisque'];
 
@@ -37,32 +30,18 @@ const plates = PLATE_IDS.map((id) => {
 ---
 
 {/*
-  .section-dark, which is --charcoal now rather than Deep Black, and so is every
-  other band below the hero. The light / mid / dark alternation this comment
-  used to describe is gone: bands are told apart by the 1px hairline
-  .section-dark draws on top of itself. Black was the right ground for food
-  photography and charcoal still is — this band lost the least in that change.
-
-  Deliberately NOT in the nav, and the old reason given here (43px of clearance
-  at 1025px) is three changes out of date — the bar collapses at 75rem now, not
-  64rem. It is a content decision: the band is reached by scrolling and its own
-  button goes to /gallery. See the nav note in CLAUDE.md for the current figure.
+  Deliberately NOT in the nav: the band is reached by scrolling and its own
+  button goes to /gallery. Adding a link costs the bar nothing either way — the
+  nav has shown no inline link list at any width since the burger became the
+  only way in.
 */}
 <section class="section section-dark plates" id="plates">
   <div class="wrap">
     {/*
-      Centred, and deliberately NOT .section-head any more.
-
-      That class sets --step-3 for the heading and --step-1 for the paragraph
-      under it, and the client asked for this band to match Our Goal instead:
-      --step-2 for the heading, plain body size for the line beneath. Rather
-      than out-specifying .section-head from a later rule — same specificity,
-      so it would have been winning on source order alone — the class is gone
-      and .plates__head carries the whole thing. .section-head still styles
-      /menu, /gallery, /team and Find Us, which are unchanged.
-
-      The button used to live in here, on the right of a two-column header row.
-      It is below the photographs now.
+      Centred, and deliberately NOT .section-head: that class sets --step-3 and
+      --step-1, and the client asked this band to match Our Goal (--step-2 over
+      body size). Equal specificity, so keeping it would have meant winning on
+      source order alone.
     */}
     <header class="plates__head" data-reveal>
       <h2 data-i18n="plates.heading">{t(locale, 'plates.heading')}</h2>
@@ -70,31 +49,20 @@ const plates = PLATE_IDS.map((id) => {
     </header>
 
     {/*
-      Uneven columns and a stagger on the even ones. This is the page's one
-      expressive layout — Team is a straight grid and Find Us is a split, so the
-      variance is spent here rather than smeared across all three. The tracks are
-      fractional rather than equal so the row does not read as four cards.
-
-      On narrow screens it becomes a horizontal scroll-snap strip instead of a
-      four-photo tower: the point of the band is that you take it in at a glance.
+      Uneven columns and a stagger on the even ones — the page's one expressive
+      layout, so the variance is spent here rather than smeared across bands.
+      2x2 on a phone; see .plates__row in global.css for why not a scroll strip.
     */}
     <ul class="plates__row" data-reveal>
       {
         plates.map((plate) => (
           <li class="plates__item">
             {/*
-              Each plate links to /gallery, which is where the rest of them are.
-
-              The link takes its accessible name from the photo's own alt — the
-              gallery's real per-image text — so four links to the same place
-              are still told apart when read out, rather than four repetitions
-              of "see the gallery". That is also why the alt stays non-empty
-              here: emptying it would leave the link unnamed.
-
-              The box styling moved to .plates__link with it. .plates__item kept
-              overflow: hidden while it was the only element, and an ancestor
-              with overflow: hidden clips a descendant's focus ring — see the
-              note in global.css.
+              Each plate links to /gallery, and takes its accessible name from
+              the photo's own alt, so four links to the same place are still
+              told apart when read out — which is why the alt stays non-empty
+              here. The box styling lives on .plates__link, not .plates__item:
+              an ancestor with overflow: hidden clips a descendant's focus ring.
             */}
             <a class="plates__link" href="/gallery">
               <Picture

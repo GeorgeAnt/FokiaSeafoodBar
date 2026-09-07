@@ -1,39 +1,12 @@
-/* ==========================================================================
-   fokia — seafood bar
-   Single stylesheet. Astro inlines it, so there is no blocking CSS request.
-   ========================================================================== */
+/* fokia — seafood bar. One stylesheet; Astro inlines it. */
 
-/* --------------------------------------------------------------------------
-   Fonts — self-hosted, Greek + Latin, one file per weight per script.
-
-   Static builds, not variable. Google's variable fonts ship unhinted —
-   ttfautohint does not support them — and Windows leans on hinting at text
-   sizes, which is what made the type look blocky there. The static builds are
-   hinted.
-
-   One family for the whole site, which is the client's decision: the hierarchy
-   is carried by weight, not by a serif/sans pairing, so there is no display
-   face to pair against.
-
-     Manrope  400 body · 500 secondary · 600 labels and buttons · 700 headings
-
-   `font-synthesis: none` is set on body, so a weight or a slant that is not in
-   this list will NOT be faked — it falls back to the nearest real one. Adding a
-   weight in the CSS means adding its files here too.
-
-   **Manrope ships no italic, in any weight.** That is why synthesis is off for
-   style as well as weight: left on, the browser shears an upright into a fake
-   oblique, and mechanically slanted Greek is conspicuously wrong — Greek
-   italics are a different construction, not the upright at an angle. The one
-   place the site used a real italic (the wine producer line on /menu) carries
-   its distinction with weight instead. Do not add `font-style: italic`
-   anywhere; it will silently render as upright.
-
-   Dish names mix scripts inside a single line ("Tuna tataki με jalapeño sauce"),
-   so both subsets must be present in the same family or the line renders in two
-   different typefaces. Manrope covers Greek, which is not a given for a
-   geometric sans and is the reason this swap was possible at all.
-   -------------------------------------------------------------------------- */
+/* Fonts — self-hosted Manrope, Greek + Latin, one file per weight per script.
+   Static builds, not variable: Google's variable fonts are unhinted and look
+   blocky on Windows. Only 400/500/600/700 ship, and font-synthesis is off on
+   body — an unshipped weight falls back rather than being faked, so adding a
+   weight in CSS means adding its files here. Manrope has NO italic in any
+   weight: font-style: italic renders as plain upright, silently. Greek coverage
+   is required — dish names mix scripts inside one line. */
 @font-face {
   font-family: 'Manrope';
   font-style: normal;
@@ -103,43 +76,27 @@
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 
-/* --------------------------------------------------------------------------
-   Tokens — every colour in the site is defined here and nowhere else.
-   -------------------------------------------------------------------------- */
+/* Tokens — every colour in the site is defined here and nowhere else. */
 :root {
   /* Client palette, used exactly as supplied. */
   --wood: #813a18;
   --black: #181414;
-  /* The homepage band ground, one step up from Deep Black. It is not in the
-     client palette — like --salt it is ours — and it is deliberately the same
-     warmth as --black (both are +3/+4 red over their neutral) so the two read
-     as one family rather than as a colour cast. Deep Black stays for the
-     surfaces that must be the darkest thing on the page: the hero, the nav and
-     the footer. Everything between them is this. */
+  /* Homepage band ground, one step up from --black. Same warmth as --black so
+     the two read as one family. --black is reserved for the hero, nav and
+     footer; every band between them is this. */
   --charcoal: #221f1f;
   --stone: #625e60;
   --light-stone: #a09a91;
 
-  /* PROPOSED light neutral — the supplied palette has no background tone, so
-     this one is ours. It is drawn from the concrete and stone the photos were
-     actually shot on, which are cool: a warm cream sits the food photography on
-     top of the page instead of into it, and turns the client's brick red into
-     terracotta. Salt is the same value range, read cold.
-       --salt        14.8:1 with Deep Black, 6.6:1 with Wood, 5.2:1 with Stone
-       --salt-deep   4.7:1 on Stone, where it is the muted text
-     Change these two values to restyle every light section at once. */
+  /* Light neutral — ours, not the client's. Deliberately cold: the photos were
+     shot on grey concrete, and a warm cream drags --wood toward terracotta.
+     --salt 14.8:1 on --black, 6.6:1 on --wood; --salt-deep 4.7:1 on --stone. */
   --salt: #e2e8eb;
   --salt-deep: #d5dee2;
 
-  /* Derived accent. Wood is only legible on light ground — 2.3:1 on Deep Black —
-     so the dark surfaces get a tint of it instead. It follows the oxidation
-     path, rust weathered in salt air, dusty and pink, rather than lightening
-     Wood toward orange, which lands on terracotta and reads as a different
-     brand. 6.4:1 on Deep Black.
-
-     There was a second tint, --wood-pale, for the Stone tier. Both went when the
-     homepage became one charcoal ground and .section-stone stopped being used.
-     Sections set --accent; nothing should reference --wood directly. */
+  /* Derived accent. --wood is 2.3:1 on --black, so dark surfaces get this tint
+     (6.4:1 on --black) instead. Sections set --accent; never reference --wood
+     directly for text. */
   --wood-light: #c98a76;
   --paper: #f5f9fa;
 
@@ -149,16 +106,12 @@
   --bg: var(--salt);
 
   /* Ghost-button hover fill: inverts against whichever surface it sits on. */
-  /* Light-tier rules are tinted with Wood, not grey. It is the one tier Wood is
-     legible on (see above), and a warm hairline across a cold ground is what
-     ties the brick red to the salt. Dark and Stone override this with a neutral
-     tint, because Wood at this opacity would disappear on both. */
+  /* Light-tier rules are tinted with Wood; dark tiers override with a neutral
+     tint, where Wood at this opacity would disappear. */
   --rule: color-mix(in srgb, var(--wood) 24%, transparent);
 
-  /* Both are Manrope. They stay two tokens rather than collapsing into one:
-     every rule in this file already says which role it wants, so a future
-     display face can be reintroduced by editing one line instead of hunting
-     down which of ~20 font-family declarations meant "heading". */
+  /* Both are Manrope. Kept as two tokens so a display face could be
+     reintroduced in one line rather than by auditing ~20 declarations. */
   --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
@@ -168,9 +121,8 @@
   --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.5rem);
   --step-2: clamp(1.5rem, 1.34rem + 0.8vw, 2.1rem);
   --step-3: clamp(1.9rem, 1.6rem + 1.5vw, 3rem);
-  /* The top of the scale, and currently unused — the largest thing on the site
-     is --step-3. Kept so the ramp has no gap, but do not cite it as evidence of
-     how big the type gets: measure the rendered heading instead. */
+  /* Unused — the largest thing on the site is --step-3 (47px). Kept so the
+     ramp has no gap; do not cite it as the site's real maximum. */
   --step-4: clamp(2.4rem, 1.85rem + 2.7vw, 4.4rem);
 
   --gutter: clamp(1.25rem, 0.9rem + 1.7vw, 3rem);
@@ -192,47 +144,22 @@
 
 html {
   scroll-behavior: smooth;
-  /* Sticky nav must not cover the heading of an anchored section. This is the
-     ONLY offset for it — see the note above .wrap; adding scroll-margin-top to
-     a target stacks with this rather than replacing it.
-
-     Bar is 6rem + 1px of border = 97px, and this matches it exactly — no extra
-     "breathing room" added on top. There used to be ~19px more (7.25rem), left
-     over from the old alternating-tier homepage: back then a scroll landing
-     flush with the bar exposed a sliver of neutral tier background above the
-     heading, so a little air read as intentional. It reads differently now
-     that the homepage is one ground with drawn edges (`id="goal"` etc. sit on
-     the `<section>` itself, which butts directly against the section above
-     it) — that "air" was scrolling past the section boundary into the PREVIOUS
-     section, so an anchor jump left a sliver of the hero photo (or whatever
-     band precedes the target) visible under the bar. Every section already
-     carries 4–8rem of its own top padding before the heading (`--section-y`),
-     so there was never any breathing room to gain by not matching the bar
-     exactly. Both numbers still move together: changing .nav__inner min-height
-     without changing this drops every anchored heading behind the bar.
-
-     The -2px is not slop, it is the fix for a second bug and it must stay.
-     Landing *exactly* on the boundary sounds right and is not: at a 125%
-     display scale the bar's 97px snaps to 121 device px, i.e. 96.8 CSS px,
-     while this padding stays a literal 97px, so every jump finished 0.55 of a
-     device pixel short — and that fractional row anti-aliases whatever is
-     above the boundary into a hairline under the bar. It was reported as "a
-     small gap" on Our Goal and Where to Find Us and NOT on Take away, which
-     is the tell: the bands above those two are the hero photograph and the
-     Take away photo panels, both bright, while the band above Take away is
-     charcoal and hides the same seam. Overshooting by 2px tucks the boundary
-     under the bar at any scale factor; the section's own top hairline is what
-     gets hidden, and the bar's border-bottom is already drawing that edge. */
+  /* The ONLY offset for the sticky nav. A scroll-margin-top on a target stacks
+     with this rather than replacing it (that double-count once landed sections
+     100px low). It tracks .nav__inner's height: 6rem + 1px border = 97px, so
+     raising one means raising the other or every anchor lands under the bar.
+     The -2px is deliberate: landing exactly on the boundary leaves a
+     fractional device-pixel row at non-integer display scales, which
+     anti-aliases the band above into a visible hairline. Overshooting tucks
+     the seam under the bar. */
   scroll-padding-top: calc(6.0625rem - 2px);
   -webkit-text-size-adjust: 100%;
-  /* The site is one fixed light theme — the dark bands are surface tiers, not a
-     dark mode. Stated so the UA paints scrollbars, the overscroll gutter and
-     form-control defaults to match, rather than following the visitor's OS and
-     putting a dark scrollbar down the side of a salt page. */
+  /* One fixed light theme — the dark bands are surface tiers, not a dark mode.
+     Stated so the UA does not paint a dark scrollbar down a salt page. */
   color-scheme: light;
-  /* Chosen rather than inherited. The default is a blue-grey wash that reads as
-     a rendering fault over the photographs and the black bands; this is the
-     palette's own accent at an opacity that registers as a tap and nothing more. */
+  /* The UA default is a blue-grey wash that reads as a rendering fault over the
+     photographs. Note: Chrome ignores border-radius here, so every rounded
+     control has to opt out and define its own :active. */
   -webkit-tap-highlight-color: color-mix(in srgb, var(--wood) 20%, transparent);
 }
 
@@ -243,8 +170,8 @@ body {
   font-family: var(--font-body);
   font-size: var(--step-0);
   line-height: 1.6;
-  /* Style as well as weight: Manrope has no italic, and a sheared upright is
-     worse than no italic at all — see the note in the @font-face block. */
+  /* Style as well as weight: Manrope has no italic and a sheared upright is
+     worse than none, conspicuously so in Greek. */
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -256,10 +183,8 @@ svg {
   max-width: 100%;
 }
 
-/* <picture> exists only to group its <source> elements. Letting it generate a
-   box breaks percentage heights on the <img> inside — the img resolves `height:
-   100%` against the picture, which is inline and has no definite height, so it
-   silently falls back to its intrinsic size and overflows the container. */
+/* <picture> must not generate a box: it is inline by default, so height: 100%
+   on the <img> inside resolves against nothing and silently overflows. */
 picture {
   display: contents;
 }
@@ -269,16 +194,12 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  /* 700, a step above the 600 that labels and buttons use, because with one
-     family across the whole site the weight is the only thing separating a
-     heading from the text under it. The old serif could sit at 600 and still
-     read as a different voice. */
+  /* 700 against the 600 labels and buttons use — with one family, weight is the
+     only thing separating a heading from the text under it. */
   font-weight: 700;
   line-height: 1.12;
-  /* Geometric sans set large needs the tracking pulled in: the biggest heading
-     on the site renders at 47px (--step-3 at its ceiling), where the default
-     spacing already reads loose and the word stops holding together.
-     Deliberately not applied to body copy, which needs the room. */
+  /* A geometric sans set large reads loose at default tracking. Deliberately
+     not applied to body copy. */
   letter-spacing: -0.02em;
   margin: 0;
   text-wrap: balance;
@@ -319,10 +240,8 @@ button {
   cursor: pointer;
 }
 
-/* Drops the ~300ms double-tap-to-zoom delay on things that are tapped, and
-   nowhere else — the page as a whole stays pinch-zoomable. It matters most on
-   the controls a visitor taps in sequence: the carousel dots, the menu tabs and
-   jump chips, and the lightbox arrows. */
+/* Drops the ~300ms double-tap delay on tapped controls only; the page stays
+   pinch-zoomable. */
 a,
 button,
 label,
@@ -331,9 +250,9 @@ input {
   touch-action: manipulation;
 }
 
-/* No border-radius here. It applies to the *element*, not to the ring — modern
-   browsers already follow the element's own corners — so setting it rounded the
-   corners of whatever was focused, most visibly the square gallery tiles. */
+/* No border-radius here: it applies to the *element*, not the ring — browsers
+   already follow the element's own corners — and setting it rounded the corners
+   of whatever had focus, most visibly the square gallery tiles. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -352,22 +271,12 @@ input {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Scroll behaviour — settling on bands, and revealing them on entry
+/* Scroll behaviour — settling on bands, and revealing them on entry.
 
-   `proximity`, never `mandatory`. The bands are not viewport-sized and cannot
-   be: measured at 1366x768, Plates (834), Team (1030) and Find Us (1082) are
-   all taller than the screen, and on a 390x844 phone Team is 2961 — three and a
-   half viewports. `mandatory` fights every one of those, pulling the reader off
-   content they are still in the middle of, and on the short band (Take away,
-   232) it hands two lines a whole screen. `proximity` only settles the scroll
-   when it already ended near a boundary, so a tall band scrolls through its own
-   content normally and then the next one clicks into place.
-
-   Gated at 48rem because below it the bands are several viewports each and
-   there is nothing to settle onto, and gated on reduced motion because snapping
-   moves the page without the reader asking.
-   -------------------------------------------------------------------------- */
+   proximity, never mandatory: three of the four homepage bands are taller than
+   the viewport, so mandatory pulls the reader out of a band mid-read and hands
+   a short band a whole screen. Gated at 48rem (below it there is nothing to
+   settle onto) and on reduced motion. */
 @media (min-width: 48rem) and (prefers-reduced-motion: no-preference) {
   html {
     scroll-snap-type: y proximity;
@@ -380,13 +289,10 @@ input {
 }
 
 /*
-  Bands rise as they enter. `.has-reveal` is set by the inline script in
-  Base.astro, which adds it only once it has confirmed both reduced-motion and
-  IntersectionObserver support — so nothing is ever hidden by a rule that has no
-  way to un-hide it. Without the script the page is simply static.
-
-  The hero is deliberately not a target: it is the first paint and carries the
-  LCP image.
+  Bands rise as they enter. .has-reveal is set by the inline script in
+  Base.astro only after it confirms reduced-motion and IntersectionObserver
+  support — a rule that hides content must be owned by something that can
+  un-hide it. The hero is not a target: it carries the LCP image.
 */
 @media (prefers-reduced-motion: no-preference) {
   .has-reveal [data-reveal] {
@@ -396,8 +302,8 @@ input {
       opacity 0.7s var(--ease),
       transform 0.7s var(--ease);
   }
-  /* The second and any later block in a band comes in a beat behind the first,
-     so a band that snaps in whole still reads as head-then-content. */
+  /* Later blocks in a band come in a beat behind the first, so a band that
+     enters whole still reads head-then-content. */
   .has-reveal [data-reveal] ~ [data-reveal] {
     transition-delay: 0.12s;
   }
@@ -415,29 +321,19 @@ input {
   margin-inline: auto;
 }
 
-/* No scroll-margin-top here. `scroll-padding-top` on <html> already insets the
-   scrollport for the sticky nav, and the two stack: a section carrying both
-   landed 180px down a viewport whose nav is 81px tall, leaving a 100px empty
-   band under the bar on every anchor jump. One mechanism, on the container,
-   covers anchors, focus scrolling and snapping alike. */
+/* No scroll-margin-top here — scroll-padding-top on <html> is the one
+   mechanism, and the two stack rather than replacing each other. */
 .section {
   padding-block: var(--section-y);
 }
 
 /*
-  The homepage's one band tier.
+  The homepage's one band tier: every section below the hero is --charcoal, and
+  what separates one from the next is this border-top (--rule, Light Stone at
+  30% on this tier), not a tone change. Removing it does not give a subtler
+  page, it gives one undifferentiated column.
 
-  It was Deep Black and carried only From the kitchen, back when the page
-  alternated light / mid / dark and the *tone change* was what separated one
-  band from the next. It is --charcoal now and carries every section below the
-  hero, so that separation had to come from somewhere else: the border-top
-  below is it — 1px of --rule, which on this tier's own tokens is Light Stone
-  at 30%, the same hairline the nav carries under itself. See the band note in
-  CLAUDE.md, which this replaced rather than amended.
-
-  --rule is declared in this block and the border consumes it from the same
-  element, which resolves fine — custom properties are looked up on the element
-  that uses them.
+  --rule is declared and consumed on the same element, which resolves fine.
 */
 .section-dark {
   background: var(--charcoal);
@@ -447,9 +343,8 @@ input {
   --accent: var(--wood-light);
   --rule: color-mix(in srgb, var(--light-stone) 30%, transparent);
 }
-/* The last band sits against the footer, which is --black and one step darker.
-   The step alone is subtle at this size, so the run of hairlines is closed off
-   with one more rather than stopping short of the footer. */
+/* The last band sits against the --black footer; the run of hairlines is closed
+   off with one more rather than stopping short of it. */
 main > .section-dark:last-child {
   border-bottom: 1px solid var(--rule);
 }
@@ -483,13 +378,9 @@ main > .section-dark:last-child {
   translate: -50% 0;
 }
 
-/* Section heading: small letterspaced eyebrow above a display heading.
-
-   CURRENTLY UNRENDERED: Our Goal was the last section carrying one, and its
-   heading now names the section itself. The class is kept because
-   `.section-head p:not(.eyebrow)` still names it — that guard is what stops a
-   paragraph rule outranking this one, and it should stay defensive whether or
-   not an eyebrow exists today. See the eyebrow note in CLAUDE.md. */
+/* Section eyebrow. CURRENTLY UNRENDERED — no markup uses it. Kept because
+   .section-head p:not(.eyebrow) still names it and that guard must stay
+   defensive whether or not an eyebrow exists today. */
 .eyebrow {
   font-family: var(--font-body);
   font-size: var(--step--1);
@@ -506,10 +397,9 @@ main > .section-dark:last-child {
 .section-head h2 {
   font-size: var(--step-3);
 }
-/* :not(.eyebrow) is load-bearing. `.section-head p` is (0,1,1) and `.eyebrow`
-   is (0,1,0), so without it this rule wins and an eyebrow inside a section head
-   silently renders at heading size in the muted tone instead of small in the
-   accent — which is what made five sections look like they had two titles. */
+/* :not(.eyebrow) is load-bearing: .section-head p is (0,1,1) against .eyebrow's
+   (0,1,0), so without it an eyebrow renders at heading size in the muted tone —
+   which is what made five sections look like they had two titles. */
 .section-head p:not(.eyebrow) {
   margin-top: 0.9rem;
   max-width: var(--measure);
@@ -523,38 +413,23 @@ main > .section-dark:last-child {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  /* Horizontal padding is up from 1.6rem for the pill: at a 999px radius the
-     curve eats into the corners of the text box, and uppercase set at 0.08em
-     tracking has no side bearings left to give. */
+  /* Up from 1.6rem for the pill: at this radius the curve eats the corners of
+     the text box, and uppercase at 0.08em tracking has no bearings to give. */
   padding: 0.85rem 2rem;
   font-size: var(--step--1);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  /* Fully round, not --radius. Written as a literal 999px to match every other
-     pill in this file (the menu tab group, the jump chips, the tags) rather
-     than introducing a second radius token used by one rule.
-
-     --radius (2px) is still the site's default and still correct for
-     rectangular surfaces — inputs, the language switch, image frames. This is
-     scoped to .btn, which is used in exactly three places and all three are on
-     the homepage: the hero CTA, the From the kitchen CTA and the Find Us map
-     button. There is no .btn on /menu or /gallery, so nothing else moves. */
+  /* Fully round, not --radius. A literal 999px to match the other pills in this
+     file (menu tabs, jump chips, tags) rather than adding a second token.
+     --radius (2px) is still right for rectangular surfaces. */
   border-radius: 999px;
   border: 1px solid transparent;
-  /*
-    Opts out of the site-wide tap highlight set on `html`, which is wrong here
-    twice over. Chrome paints that highlight against the element's border *box*
-    and ignores `border-radius`, so tapping a 999px pill flashed a hard-edged
-    rectangle around it — reported from a real device, not theorised. And the
-    wash is --wood, which stopped being this control's colour when
-    .btn--primary went stone. The :active rules below replace it with feedback
-    that follows the pill.
-
-    Scoped to .btn deliberately: the wood wash is still right for the site's
-    ordinary links, and `html` keeps it.
-  */
+  /* Opts out of the site-wide tap highlight on html: Chrome paints it against
+     the border *box* and ignores border-radius, so a tap on this pill flashed a
+     hard-edged rectangle. Reported from a device — it cannot be seen with a
+     mouse or in a screenshot. The :active rules below are the other half. */
   -webkit-tap-highlight-color: transparent;
   transition:
     background-color 0.2s var(--ease),
@@ -563,22 +438,13 @@ main > .section-dark:last-child {
 }
 
 /*
-  Stone fill, black label — every .btn on the site, which is the three CTAs on
-  the homepage: the hero's "see the menu", From the kitchen's link to /gallery
-  and Find Us's link to the map. They were an outlined pair against this one
-  until the client asked for all three to match it.
+  Stone fill, black label — every .btn on the site (three CTAs, all on the
+  homepage). --light-stone, never --stone: --stone under a black label is 2.9:1
+  and fails outright, --light-stone is 6.55:1 on the hero black and 5.86:1 on
+  the charcoal bands, with the label at 6.55:1 on the fill.
 
-  It is --light-stone, not --stone. --stone under a --black label measures
-  2.9:1, which fails the 4.5:1 minimum for button text outright; --light-stone
-  measures 6.6:1 and the fill itself is 6.6:1 against the hero black, well over
-  the 3:1 a control's boundary needs. This is the same call as the hero
-  wordmark above it, and it makes the two one family: the mark and the one
-  thing you can press are the same stone.
-
-  Hover goes *lighter*, to --salt (14.8:1 under black), rather than darkening
-  the way the old --wood fill did. On a dark ground a lift reads as pressable;
-  mixing black into a mid stone walks the label's contrast back down toward the
-  2.9:1 that ruled --stone out in the first place.
+  Hover goes *lighter*, to --salt (13.22:1 on the band). Darkening a mid stone
+  walks the label back toward the 2.9:1 that ruled --stone out.
 */
 .btn--primary {
   background: var(--light-stone);
@@ -587,47 +453,27 @@ main > .section-dark:last-child {
 .btn--primary:hover {
   background: var(--salt);
 }
-/*
-  All three sit on --charcoal now rather than on three different tiers, so one
-  pair of numbers covers the set: the fill is 5.86:1 against the band, well over
-  the 3:1 a control's boundary needs, and the label is 6.55:1 on the fill.
-  Hovered, the salt fill is 13.22:1 against the band. Measured on the rendered
-  page.
-*/
-/* Pressed goes the other way from hover — down off --salt, past the resting
-   stone, so a tap that never hovers still registers as a press. 5.2:1 under the
-   black label, still over the 4.5:1 minimum. */
+/* Pressed goes the other way from hover — below the resting stone, so a tap
+   that never hovers still registers. 5.2:1 under the black label. */
 .btn--primary:active {
   background: color-mix(in srgb, var(--light-stone) 88%, var(--black));
 }
 
-/*
-  The hover fill must be a real colour, never `currentColor`.
-
-  `background: currentColor` resolves against the element's own computed `color`
-  — including a `color` set in the same block. Paired with `color: var(--black)`
-  it made the fill, the text and the border all Deep Black on the Deep Black
-  hero, so hovering the button made it disappear entirely.
-*/
+/* The hover fill must be a real colour, never currentColor: it resolves against
+   the element's own computed color — including one set in the same block — so
+   fill and text come out identical and the control disappears. */
 /* --------------------------------------------------------------------------
    Navigation
    -------------------------------------------------------------------------- */
 /*
-  The bar is a dark surface sitting inside the light tier, so it has to carry
-  the dark tier's tokens itself — exactly as .section-dark and .lightbox do.
-  Without them the links inherit --stone on Deep Black and the hover state
-  inherits --wood at 2.3:1, which is the same trap the lightbox's focus ring
-  fell into. It is the tokens that make this safe, not the background alone.
+  A dark surface inside the light tier, so it carries the dark tier's tokens
+  itself, exactly as .section-dark and .lightbox do. Without them the links
+  inherit --stone and the hover inherits --wood at 2.3:1; the background is the
+  easy half.
 
-  Opaque, not the old translucent salt: the bar crosses three black bands (Hero,
-  From the kitchen, the footer) and a blur over black is just black, so the
-  translucency bought nothing and cost a compositing layer.
-
-  The bottom rule is load-bearing rather than decorative. --rule resolves here
-  to Light Stone at 30%, which is the only thing separating the bar from the
-  hero directly beneath it — both are --black, and without the edge they read as
-  one field. See the note in CLAUDE.md: this is the same collision that put Our
-  Goal on the mid tier, and the bar cannot solve it by moving.
+  The bottom rule is load-bearing: it is the only thing separating the bar from
+  the hero beneath it, both --black. Remove it and the nav disappears into the
+  hero.
 */
 .nav {
   position: sticky;
@@ -643,51 +489,21 @@ main > .section-dark:last-child {
 }
 
 /*
-  Logo, utilities, toggle — the link list is never shown inline any more, at
-  any viewport width. It used to appear in the bar above 75rem, centred by a
-  three-track grid (`1fr auto 1fr`); the client asked for the burger to be the
-  only way into the links, on every size of screen, so that grid and the
-  width-budget math it required (see CLAUDE.md's history on the old 75rem
-  breakpoint) are gone rather than being one more tier to maintain.
+  Logo, social icons, utilities — the link list is NEVER shown inline, at any
+  viewport width (the client asked for the burger to be the only way in). Three
+  tracks; .nav__links spans all three as a full-width panel shown only while
+  [data-open='true'].
 
-  What is left is a three-track grid with the logo in the first track, the
-  social icons in the middle one and the language button plus the toggle in the
-  last, and the link list (`.nav__links`, below) spanning all three as a
-  full-width panel that only appears when `[data-open='true']`.
+  Tracks are 1fr auto 1fr on a phone (icons centred in the bar) and 1fr auto
+  auto from 48rem (icons rejoin the utilities on the right). Only the middle
+  track's justify-self changes at the breakpoint.
 
-  **The tracks change at 48rem and only the middle one moves.** On a phone the
-  grid is `1fr auto 1fr`, so the icons are centred in the bar; from 48rem it is
-  `1fr auto auto`, the empty track collapses onto the left of the logo, and the
-  icons land beside the language button as one right-hand group again — the
-  arrangement the bar had before, at the client's request that centring is a
-  phone treatment rather than the layout. Nothing else is restated: the three
-  items keep the same tracks and the same `justify-self` at both sizes, and the
-  only other declaration in the media query is the gap.
+  A grid, not a flex row, because a grid cannot wrap: the old row overflowed a
+  320px bar and dropped the toggle onto a second line. Note scrollWidth does not
+  catch a wrapping row — compare .nav__toggle's top against .nav__logo's bottom.
+  At 320px: 92 + 68 + 92 plus two 0.5rem gaps = 268px inside 280px.
 
-  **The grid replaced a wrapping flex row, and it fixed a real bug rather than
-  only centring the icons.** The flex row paid two fixed 1rem gaps plus a
-  1.1rem gap inside `.nav__utils`, and at 320px the wrap is 280px against
-  80 (logo) + 68 (icons) + 44 (language) + 40 (toggle) = 232px of content: the
-  gaps came to 49.6px, the row came to 281.6px, and the toggle wrapped onto a
-  second line. It was reported from a device. Note that CLAUDE.md claimed a
-  `max-width: 22.5rem` block handled exactly this and no such block was in the
-  file — the note outlived the code.
-
-  The grid cannot wrap at all, so that failure mode is gone by construction
-  rather than by a breakpoint that has to be re-measured whenever a control
-  changes size. What it costs instead is symmetry: `1fr auto 1fr` centres the
-  icons against the *bar*, so both side tracks are as wide as the wider of the
-  two, and the wider one is the language-plus-toggle group at ~92px, not the
-  80px logo. At 320px that is 92 + 68 + 92 + two 0.5rem gaps = 268px inside
-  280px. The gap opens to 1rem from 30rem up, where there is room for it.
-
-  Centring against the container rather than against the neighbours is the same
-  thing the old inline link list needed, and `position: absolute` was tried and
-  reverted for it once already — see CLAUDE.md. A grid track does it in flow.
-
-  6rem = 96px, +1px of border = 97px, which is exactly what scroll-padding-top
-  on <html> is set to. Raising this means raising scroll-padding-top in the
-  same edit or every anchor jump lands under the bar.
+  6rem + 1px border = 97px, which scroll-padding-top on <html> must match.
 */
 .nav__inner {
   display: grid;
@@ -703,16 +519,10 @@ main > .section-dark:last-child {
   }
 }
 /*
-  Tablet and up: the icons stop being centred and rejoin the utilities on the
-  right. `auto` for the third track rather than `1fr` is the whole change —
-  the middle track then sits against it instead of in the middle of the bar.
-
-  1.1rem, not the 1rem above, because at this width the gap is doing the job
-  `.nav__utils` used to do with its own: it separates the pair of icons from
-  the language button, and it has to stay wider than `.social`'s 0.25rem or the
-  four controls read as four peers rather than a pair and a group. It applies
-  between the logo and the icons too, where nothing depends on it — the 1fr
-  track has already pushed them apart.
+  From 48rem the icons stop being centred and rejoin the utilities: auto rather
+  than 1fr for the third track is the whole change. The 1.1rem gap is what sets
+  the icon pair apart from the language button, and must stay wider than
+  .social's own 0.25rem or the four controls read as four peers.
 */
 @media (min-width: 48rem) {
   .nav__inner {
@@ -729,19 +539,8 @@ main > .section-dark:last-child {
 }
 
 /*
-  The language button and the toggle, as one grid item at the end of the bar.
-
-  The social icons used to live here too, and the 1.1rem gap that separated
-  them from the language button — deliberately wider than `.social`'s own
-  0.25rem, so the icon pair read as one object rather than as peers in a row —
-  went with them: the grid's middle track is what sets the icons apart now, and
-  it is a whole track rather than a gap. What is left is two unlike controls, a
-  filled pill and a bare glyph, which need far less air between them than two
-  groups did.
-
-  `justify-self: end` rather than `margin-inline-start: auto`: the track is
-  1fr and therefore wider than this group, so the item has to be pushed inside
-  its own cell.
+  The language button and the toggle as one grid item. justify-self: end rather
+  than an auto margin — the track is 1fr and wider than this group.
 */
 .nav__utils {
   display: flex;
@@ -753,15 +552,9 @@ main > .section-dark:last-child {
 }
 
 /*
-  The middle track, and the one item on this bar whose position changes with
-  the viewport: centred on a phone, ranged right with the utilities from 48rem
-  (see the media query above).
-
-  `justify-self: center` is redundant against an `auto` track that is exactly
-  the icons' width — the centring is really done by the two 1fr tracks either
-  side — and it is kept because it is the half of the pair the media query
-  overrides. Written as two states of one property, the phone/tablet difference
-  is legible in one line rather than spread across track lists.
+  The middle track, and the one item whose position changes with the viewport:
+  centred on a phone, ranged right from 48rem. justify-self is the single
+  declaration the media query flips.
 */
 .nav__social {
   grid-column: 2;
@@ -770,42 +563,20 @@ main > .section-dark:last-child {
 }
 
 /*
-  The logo is cropped by the box, not by a second asset.
+  The logo is cropped by the box, not by a second asset. logo-clean.png is
+  1672x940 with the 888x899 badge centred in it, so 47% of the file's width is
+  empty field: sized by height it would spend 142px of bar to show an 80px mark.
+  A square box with object-fit: cover shows the central 940px — the whole badge.
 
-  logo-clean.png is 1672x940 with the badge — 888x899, near enough square —
-  centred inside it: 393px of transparent field to the left, 391px to the right.
-  Sized by height, the file would therefore spend 142px of bar width to show an
-  80px mark, and 47% of that width would be empty field.
-
-  A square box with object-fit: cover shows the central 940px of the source,
-  which contains the whole 888px badge with 26px to spare each side. So the
-  field is cropped away for free, the mark is as big as the box, and the nav
-  reuses the asset the hero has already loaded rather than shipping a trimmed
-  copy that would have to be regenerated whenever the logo changes.
-
-  This depends on the badge staying horizontally centred in its canvas. If a new
-  logo file arrives off-centre, re-measure before trusting the crop — the
-  failure is silent and looks like a badly cropped logo.
+  This depends on the badge staying horizontally centred in its canvas. A
+  replacement logo that is off-centre crops wrong, silently. It is also why
+  Nav.astro passes sizes="142px" rather than the box's own width.
 */
 /*
-  5rem = 80px, in a bar whose min-height is 96px: 8px of air above and below.
-  The client asked for the mark to read at the scale it does on the reference
-  site they sent (thyme-restaurant-bar-nafplio.gr), where a 180px disc sits in a
-  94px bar with 74px inside it and 106px hanging below onto the hero.
-
-  Only the size was taken, and the rest was built and reverted rather than
-  argued about — worth recording so it is not rebuilt. The overhang (11rem,
-  align-self: start, a negative margin-block-end to keep the bar at 97px) works
-  mechanically, but that reference bar is transparent over a hero and this one is
-  opaque black and sticky over three black bands: the disc covered the opening
-  words of a Team paragraph on scroll, and at the top of the homepage it stacked
-  a second fokia badge 6px above the hero logo, which is the page h1 and the
-  same mark. The reference gets away with both because it has no hero logo and
-  its badge is centred over an empty column. Centring was not taken either — that
-  is what forced the links into two balanced groups the last time (see
-  .nav__inner).
-
-  So: as large as the bar holds, in flow at the start, fully inside the bar.
+  5rem in a 96px bar, fully inside it. Hanging the disc half out of the bar (the
+  client's reference site does this) was built and reverted: this bar is opaque
+  and sticky over three dark bands, so the disc covered body copy on scroll and
+  stacked a second badge above the hero logo, which is the page h1.
 */
 .nav__logo {
   display: block;
@@ -823,9 +594,8 @@ main > .section-dark:last-child {
 }
 
 /*
-  Always a dropdown panel now, never an inline list — the link list only
-  renders when `.nav__inner` carries `[data-open='true']`, at every viewport
-  width, and stacks full width below the logo/utilities/toggle row.
+  Always a dropdown panel, never an inline list — it renders only while
+  .nav__inner carries [data-open='true'], at every viewport width.
 */
 .nav__links {
   /* Row 2, spanning every track: the panel is the width of the bar. */
@@ -861,13 +631,9 @@ main > .section-dark:last-child {
   border-bottom: 0;
 }
 /*
-  White on hover, not wood — the same --salt the .btn--primary fill lifts to and
-  the same one the Find Us links take. Every hover on the site now brightens
-  toward salt rather than warming toward the accent.
-
-  :focus-visible is here too so keyboard and pointer show the same thing. The
-  global focus outline still draws in --accent on top of it, which is wanted —
-  that ring is the focus indicator, and it should not look like a hover.
+  White on hover, not wood — every hover on the site brightens toward --salt.
+  :focus-visible is here too; the global focus ring still draws in --accent on
+  top, which is wanted, because focus should not look like hover.
 */
 .nav__links a:hover,
 .nav__links a:focus-visible {
@@ -876,11 +642,9 @@ main > .section-dark:last-child {
 }
 
 /*
-  The nav can show where you are, and this is now the one place a wood tint
-  survives in the bar. That is deliberate rather than an oversight: hover became
-  salt, so if this marker went salt too, "the page you are on" and "the link
-  under your pointer" would be indistinguishable. Wood keeps the state marker
-  and the pointer feedback saying different things.
+  The one wood tint left in the bar, deliberately: hover is salt, so a salt
+  current-page marker would be indistinguishable from the link under the
+  pointer.
 */
 .nav__links a[aria-current='page'] {
   color: var(--text);
@@ -894,13 +658,9 @@ main > .section-dark:last-child {
   gap: 0.25rem;
 }
 /*
-  2rem box, matching `.lang`'s min-height so the two utility controls sit on
-  the same line rather than one looking taller than the other. This is a
-  deliberate step down from the 44px touch target the box held before — still
-  comfortably over the 24px WCAG 2.5.8 minimum, in the same spirit as the hero
-  dots' 2rem × 2.75rem exception (see CLAUDE.md). The client asked for the
-  nav's utility row to read smaller now that it no longer has to make room for
-  the visible link list beside it.
+  2rem box, matching .lang's min-height so the two utility controls sit on one
+  line. A deliberate step down from the site's usual 44px target — still over
+  the 24px WCAG 2.5.8 minimum, same exception the hero dots take.
 */
 .social a {
   display: grid;
@@ -918,13 +678,10 @@ main > .section-dark:last-child {
   color: var(--salt);
 }
 /*
-  The mark is the same 2rem as its box, which looks like an error and is not.
-  Both icons are drawn as a rounded square inset from the viewBox — `rect
-  x="3" y="3" width="18"` of a 24 unit grid, see SocialLinks.astro — so the
-  artwork carries its own 12.5% margin and the visible square lands at 24px
-  inside the 32px box. Sizing the svg *below* the box just shrinks the mark
-  twice over. If the icon set is ever redrawn to the edge of its viewBox, this
-  is the rule that has to come back down.
+  The mark is the same 2rem as its box, which looks like an error and is not:
+  both icons are drawn inset from their viewBox (rect x=3 y=3 w=18 of 24), so
+  the artwork carries its own margin and lands at 24px inside the 32px box. If
+  the icons are ever redrawn to the edge, this has to come back down.
 */
 .social svg {
   width: 2rem;
@@ -932,28 +689,10 @@ main > .section-dark:last-child {
 }
 
 /*
-  One round button now, not a two-segment box.
-
-  It stopped being a segmented control when it stopped reporting a state: there
-  is no selected half left to fill, so there is no reason for the square frame
-  that used to hold two of them, and --radius (2px) — right for the site's
-  rectangular surfaces — is wrong for a lone control. It is a pill like .btn,
-  written as the same literal 999px for the same reason.
-
-  Stone, not wood. --wood-light filled the selected half at 6.4:1 on the black
-  bar and that was fine, but with the segments gone the fill is no longer
-  marking a selection, and the site's one other filled control — the hero CTA —
-  went --light-stone. Same fill, same black label, 6.55:1 both ways: against the
-  bar and under the text. Hover lifts to --salt exactly as the CTA does. --wood
-  and --wood-light are both still in use as accents elsewhere; what went is the
-  last place a wood tint was a *surface* outside /menu.
-
-  min-height matches `.social a`'s box (2rem) rather than the 44px target the
-  button held before — a deliberate shrink, made together with the social icons
-  above, now that the bar no longer has a visible link list to leave room for.
-  Width is pared back separately from height: min-width is just enough to hold
-  "EN"/"ΕΛ" without the two states jumping, and horizontal padding is tighter
-  than the button's old 0.95rem now that it isn't fighting anything for room.
+  One round button, not a two-segment control: it reports no state, so there is
+  no selected half to fill and no frame to hold. A pill like .btn, same literal
+  999px. --light-stone fill under a --black label, 6.55:1 both ways, hover lifts
+  to --salt exactly as the CTA does. min-height matches .social a's 2rem box.
 */
 .lang {
   min-height: 2rem;
@@ -961,22 +700,11 @@ main > .section-dark:last-child {
   padding: 0.15rem 0.5rem;
   border: 1px solid transparent;
   border-radius: 999px;
-  /*
-    The pair that every rounded control on this site needs, and this one was
-    missing it. `html` sets a site-wide tap highlight — `--wood` at 20% — and
-    Chrome paints that against the element's border *box*, ignoring
-    `border-radius`, so a tap on this 999px pill flashed a hard-edged wood
-    rectangle around a round button. Reported from a device: it cannot be seen
-    with a mouse and does not appear in a screenshot, because the highlight is a
-    compositor effect.
-
-    This is the bug `.btn` already had a note about, arriving exactly where that
-    note said it would. The button became a pill when the two-segment language
-    switch collapsed into one control, and the opt-out did not come with the
-    radius. The `:active` state below is the other half of the pair — opting out
-    of the highlight without giving a press state back leaves a tap with no
-    feedback at all.
-  */
+  /* Every rounded control on this site needs this pair: Chrome paints the
+     site-wide tap highlight against the border box and ignores border-radius,
+     so a tap on this pill flashed a hard-edged wood rectangle. The :active
+     state below is the other half — opting out without a press state leaves a
+     tap with no feedback at all. */
   -webkit-tap-highlight-color: transparent;
   background: var(--light-stone);
   color: var(--black);
@@ -989,23 +717,16 @@ main > .section-dark:last-child {
     color 0.18s var(--ease);
 }
 /*
-  Hover gated, press not — and on this control the gate is the whole fix.
+  Hover gated, press not. A touch browser fakes :hover on tap and leaves it
+  applied; tapping this button switches the language in place, so it sat lit at
+  --salt until something else was tapped. pointer: fine is in the query too,
+  because a laptop with a touchscreen reports both and the pair asks the
+  narrower question. :active stays ungated — it lasts as long as the finger is
+  down and leaves nothing behind.
 
-  A touch browser fakes `:hover` on tap and leaves it applied, because there is
-  no pointer to move away. Tapping this button does not navigate anywhere: the
-  language switches in place and the button stays under the finger, lit at
-  `--salt`, until something else is tapped. Reported as the button "remaining
-  white instead of the stone colour", and reproduced on an emulated phone —
-  after the tap, `matches(':hover')` is true on a `hover: none` device and the
-  background computes to rgb(226,232,235).
-
-  `:active` stays ungated and stays salt: it is the press acknowledgement, it
-  lasts exactly as long as the finger is down, and it leaves nothing behind.
-
-  The same latent bug is in every other `:hover` on a control that keeps the
-  visitor on the page — the menu tabs, the jump chips, the gallery tiles, the
-  Find Us tel:/mailto: links, the social icons. They are not gated yet; see the
-  note in CLAUDE.md.
+  The same latent bug is in every ungated :hover on a control that keeps the
+  visitor on the page: the menu tabs and jump chips, the gallery tiles, the Find
+  Us tel:/mailto: links, the social icons.
 */
 @media (hover: hover) and (pointer: fine) {
   .lang:hover {
@@ -1015,9 +736,8 @@ main > .section-dark:last-child {
 .lang:active {
   background: var(--salt);
 }
-/* The word, always — nothing swaps it to the short code any more. The button
-   is small enough now that the old narrow-phone width budget this used to
-   solve doesn't come up; see CLAUDE.md if that stops being true. */
+/* The word, always. Nothing swaps it for the short code any more; the markup
+   and the data-i18n plumbing for a swap are still in Nav.astro. */
 .lang__code {
   display: none;
 }
@@ -1061,8 +781,8 @@ main > .section-dark:last-child {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Centred, not left-aligned: the lockup is a wordmark over a tagline over a
-     sentence, which reads as a badge rather than as a column of copy. */
+  /* Centred, not ranged left: a wordmark over a tagline over a sentence reads
+     as a badge rather than a column of copy. */
   align-items: center;
   text-align: center;
   gap: 1.75rem;
@@ -1072,37 +792,24 @@ main > .section-dark:last-child {
   .hero__copy {
     padding-inline: clamp(2rem, 1rem + 4vw, 5rem);
     max-width: 36rem;
-    /* Both sides, so the block sits in the middle of its half. With
-       margin-inline-start alone it was pushed against the photo and left the
-       outer edge of the panel bare. */
+    /* Both sides, so the block sits in the middle of its half. */
     margin-inline: auto;
     gap: 2.25rem;
   }
 }
 
 /*
-  The client's own wordmark lockup, painted rather than placed.
+  The client's own wordmark, painted rather than placed: a mask-image, not an
+  <img>. The artwork (LOGO-01.png, trimmed to logo-wordmark.png — see
+  lib/photos.ts) is white on transparency, so its shape is in the alpha channel
+  and the element's own background is the colour. Recolouring the logo is
+  therefore a token change, not a new asset.
 
-  It is a `mask-image`, not an <img>, and that is the whole reason this works
-  in a token. The artwork (LOGO-01.png, see lib/photos.ts) is pure white on
-  transparency, so its shape lives in the alpha channel: masked, the element's
-  own `background` is what you see, and the colour stays --light-stone rather
-  than being baked into a file that would need regenerating every time the
-  palette moved.
+  --light-stone, never --stone: 6.55:1 on the hero's black against 2.9:1, which
+  fails even the 3:1 large-text floor.
 
-  --light-stone, never --stone: 6.55:1 on the hero's Deep Black against 2.9:1,
-  which fails even the 3:1 large-text floor. That was true of the typeset
-  wordmark this replaces and it is no less true of a silhouette.
-
-  The size is carried over from that typeset lockup rather than invented: it
-  measured 191x114 at 1366 and 145x76 at 390, so the clamp below lands 192px
-  and 144px of *width* at those two viewports and the height follows from the
-  artwork's own 1.705 aspect — 113px and 84px. Matching the width matched the
-  height to within a pixel at the top end, which is luck, but it is why this
-  reads as the same object at the same scale rather than as a new one.
-
-  aspect-ratio, not a height: the mask has no intrinsic size to contribute, so
-  without it the box would collapse to nothing.
+  aspect-ratio, not a height: a mask contributes no intrinsic size, so without
+  it the box collapses.
 */
 .hero__wordmark {
   margin: 0;
@@ -1113,22 +820,18 @@ main > .section-dark:last-child {
   display: block;
   width: clamp(9rem, 7.9rem + 4.7vw, 12rem);
   aspect-ratio: 1.705;
-  /*
-    The fill is gated behind support for the thing that shapes it, because this
-    rule fails *open*: a browser that paints the background but cannot mask it
-    shows a solid stone rectangle 191px wide in the middle of the hero, which
-    is far worse than showing nothing. Unsupported, the box stays empty and the
-    .sr-only text still gives the h1 its name.
-  */
+  /* The fill is gated behind support for the thing that shapes it, because this
+     rule fails *open*: a browser that paints backgrounds but cannot mask would
+     show a solid stone rectangle across the hero. Unsupported, the box stays
+     empty and the .sr-only text still names the h1. */
   -webkit-mask-image: var(--wordmark);
   mask-image: var(--wordmark);
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
-  /* contain, not cover: the asset is trimmed to the artwork, so the box and the
-     mark share an aspect and contain simply fills it. cover would crop the
-     lockup if that ever stopped being exactly true. */
+  /* contain, not cover: the asset is trimmed to the artwork. An untrimmed
+     source would scale the mark down and leave the rest as air. */
   -webkit-mask-size: contain;
   mask-size: contain;
 }
@@ -1138,15 +841,8 @@ main > .section-dark:last-child {
   }
 }
 
-/*
-  --step-0, the same size .goal__body p inherits, at the client's request that
-  the two read alike. It was a bespoke clamp (1.3rem → 1.75rem, ~28px at 1366)
-  sitting off the step scale entirely; the token is used rather than a literal
-  matching value so the two move together if the scale is ever retuned.
-
-  The measure is in `ch`, so it tracks the font rather than fighting it — the
-  column narrows with the type instead of stretching the line.
-*/
+/* --step-0, matching .goal__body p at the client's request — the token rather
+   than a literal, so the two move together if the scale is retuned. */
 .hero__intro {
   font-size: var(--step-0);
   color: var(--light-stone);
@@ -1177,12 +873,10 @@ main > .section-dark:last-child {
 }
 
 /*
-  Only the first slide exists as far as the browser is concerned until the
-  carousel is enhanced. The slides are stacked inside the viewport, so
-  `loading="lazy"` does NOT defer them — all four would download during the
-  initial load and compete with the LCP image for bandwidth. `display: none`
-  does defer them, and it is also the correct no-JS end state: without
-  JavaScript the hero is a single still image.
+  display: none, not loading="lazy". The slides are stacked inside the viewport,
+  so lazy does not defer them — all four would download during the initial load
+  and compete with the LCP image. It is also the correct no-JS end state: the
+  hero is then a single still image.
 */
 .hero__slide {
   display: none;
@@ -1211,32 +905,28 @@ main > .section-dark:last-child {
 }
 
 /*
-  Carousel controls — bare dashes, as originally designed.
-
-  KNOWN TRADE-OFF, chosen deliberately. The photos are mid-grey exactly where
-  these sit, so a hairline drawn straight onto the image measures 1.7-2.3:1
-  against them on every slide, under the 3:1 WCAG minimum for a control. A scrim
-  pill behind them fixed that and was reverted for the lighter look. If the
-  contrast is ever raised again, put the surface back rather than only darkening
-  the dash — the photo underneath changes on every slide.
+  KNOWN TRADE-OFF. The photos are mid-grey exactly where these sit, so a bare
+  dash measures 1.7-2.3:1 against them, under the 3:1 a control owes. A scrim
+  pill fixed that and was reverted for the lighter look. A position indicator
+  can carry this; a control someone must find on every slide cannot — if the
+  contrast is ever raised, put the surface back rather than only darkening the
+  dash, because the photo changes on every slide.
 */
 .hero__dots {
   position: absolute;
   z-index: 2;
-  /* 0.875rem, not the original 1.25rem: the hit box below grew from 2rem to
-     2.75rem tall and the dash sits at its centre, so the strip has to drop by
-     half the difference to leave the dashes on exactly the line they were on. */
+  /* Dropped from 1.25rem when the hit box grew from 2rem to 2.75rem, so the
+     dashes stay on the same line. */
   bottom: 0.875rem;
   left: 50%;
   translate: -50% 0;
   display: flex;
   gap: 0.6rem;
 }
-/* 2rem wide by 2.75rem tall. The width is deliberately left at the dash's own
-   width — widening the box widens the dash with it (::after is `width: 100%`)
-   and spreads the strip, which is the one thing this control's design is. 32px
-   is comfortably over the 24px WCAG 2.5.8 floor, and the dashes are adjacent,
-   so the row is a continuous target with no dead ground between them. */
+/* 2rem x 2.75rem. The width is the dash's own width — ::after is width: 100%,
+   so widening the box widens the dash and spreads the strip, which is the whole
+   of this control's design. Over the 24px WCAG 2.5.8 floor, and adjacent, so
+   the row is one continuous target. */
 .hero__dots button {
   width: 2rem;
   height: 2.75rem;
@@ -1255,27 +945,14 @@ main > .section-dark:last-child {
 }
 
 /*
-  `.hero__pause` used to live here — a 2.75rem scrimmed disc in the bottom-right
-  corner, the WCAG 2.2.2 stop control. It was removed at the client's request;
-  the reasoning and what it costs are on `start()` in Hero.astro.
-
-  Worth keeping from its note, because it is the reason the two hero controls
-  looked different: the dashes are a position indicator whose low contrast over
-  the photos is a recorded trade-off, while a control that has to be *found* on
-  every slide gets a scrim of its own — the .lightbox__close construction. If a
-  stop control ever comes back, it comes back with the scrim.
+  .hero__pause lived here — the WCAG 2.2.2 stop control, removed at the client's
+  request; see start() in Hero.astro for what that costs. If a stop control ever
+  comes back, it comes back with its scrim.
 */
 
 /* --------------------------------------------------------------------------
    Our Goal
    -------------------------------------------------------------------------- */
-/*
-  Renamed from .goal__lead, which is what it was: a lead *sentence* under a
-  small eyebrow. The eyebrow's words are the heading now and the sentence is
-  gone, so the size stayed and the name had to move with the content. The 24ch
-  measure went with the sentence too — it existed to stop a long line, and this
-  is two words.
-*/
 /* Centred with the block below it. The heading is two words, so it takes no
    measure of its own — .goal__body carries that for the paragraphs. */
 .goal__heading {
@@ -1287,21 +964,14 @@ main > .section-dark:last-child {
 }
 
 /*
-  The band is a split that continues the hero's grid.
+  A split that continues the hero's grid. Above 60rem — the hero's own
+  breakpoint, so the two bands change shape together — two equal full-bleed
+  columns, the photo at min(88vh, 52rem), which is the hero's min-height
+  verbatim. The two bands read as one 2x2 with the pictures on a diagonal, so
+  if the hero's breakpoint, height or split moves, this has to move with it.
 
-  Above 60rem — the hero's own breakpoint, deliberately, so the two bands change
-  shape at the same width — this is two equal full-bleed columns and the photo
-  takes `min(88vh, 52rem)`, which is the hero's `min-height` verbatim. That is
-  what "the same dimensions as the carousel" means here: the picture below the
-  copy is the same box as the picture beside it.
-
-  No .wrap and no .section: the photo column has to reach the viewport edge to
-  line up with the carousel's, so the band cannot be inset by a wrap, and the
-  vertical rhythm --section-y would add is carried by the text column's own
-  padding instead. The .section-dark hairline still draws the top edge.
-
-  Stacked below 60rem the photo keeps a 4/5 frame, the same ratio .hero__media
-  falls back to.
+  No .wrap and no .section: the photo column has to reach the viewport edge, so
+  --section-y is carried by the text column's own padding instead.
 */
 .goal__grid {
   display: grid;
@@ -1314,10 +984,8 @@ main > .section-dark:last-child {
   }
 }
 
-/*
-  The text column carries the band's padding, since the section has none — and
-  it is centred *within its own half* rather than across the whole band.
-*/
+/* The text column carries the band's padding, since the section has none, and
+   is centred within its own half rather than across the band. */
 .goal__col {
   display: flex;
   flex-direction: column;
@@ -1331,14 +999,9 @@ main > .section-dark:last-child {
 }
 
 /*
-  Source order is text then photo, so the photo stacks *under* the text on a
-  phone — which is the right way round there. The hero above ends with the
-  carousel, so a photo-first Goal would put two photographs back to back with
-  nothing between them.
-
-  `order: -1` only inside the media query: it moves the picture to the left of
-  the text once they are side by side, which is the whole point of the layout,
-  and it is a purely visual move — the DOM keeps the h2 first.
+  Source order is text then photo, so on a phone the photo stacks *under* the
+  text — the hero above ends with the carousel, and a photo-first Goal would put
+  two photographs back to back. order: -1 applies only side by side.
 */
 .goal__media {
   position: relative;
@@ -1356,9 +1019,8 @@ main > .section-dark:last-child {
     order: -1;
     aspect-ratio: auto;
   }
-  /* Out of flow so the picture cannot set the row's height: the grid's height
-     comes from the text column and the min-height above, and the image fills
-     whatever that turns out to be. Same construction as .find__media. */
+  /* Out of flow so the picture cannot set the row's height: the height comes
+     from the text column. Same construction as .find__media. */
   .goal__media img {
     position: absolute;
     inset: 0;
@@ -1366,16 +1028,13 @@ main > .section-dark:last-child {
 }
 
 /*
-  The measure is on this container rather than on each paragraph, which is what
-  centring requires: centred lines are read by their middles, so both paragraphs
-  have to share one axis or the block comes apart. It is capped so the column
-  does not set an over-long centred line on a wide screen — inside a half-width
-  track it now rarely reaches the cap, which is the point.
+  The measure is on this container, not on each paragraph: centred lines are
+  read by their middles, so both paragraphs must share one axis. 46rem is
+  narrower than --measure because centred text wants a shorter line.
 
-  KNOWN COST, accepted by the client when they asked for centred copy: the first
-  paragraph is ~60 words, and that is long for centred setting. If it ever reads
-  badly, the fix is to range the paragraphs left inside this same column (drop
-  text-align here) rather than to widen it.
+  KNOWN COST, accepted by the client: the first paragraph is ~60 words, long for
+  centred setting. The fix, if it ever reads badly, is to range the paragraphs
+  left inside this column — not to widen it.
 */
 .goal__body {
   max-width: 46rem;
@@ -1386,9 +1045,8 @@ main > .section-dark:last-child {
   color: var(--text-muted);
   margin-block: 0 clamp(1.5rem, 1rem + 2vw, 3rem);
 }
-/* .btn is inline-flex, so it sits on the text baseline and is centred by the
-   container's text-align. No block context is wanted here — giving it one
-   would need its own auto margins to stay centred. */
+/* .btn is inline-flex, so it is centred by the container's text-align. Giving
+   it a block context would need its own auto margins. */
 .goal__cta {
   margin-top: 0.5rem;
 }
@@ -1409,9 +1067,8 @@ main > .section-dark:last-child {
   display: inline-flex;
   gap: 0.25rem;
   padding: 0.25rem;
-  /* var(--rule) is a band-divider hairline, not a control outline — see the
-     note on .menu__jump a. Same fix: --text-muted (--stone), 5.16:1 on
-     --salt against --rule's ~1.46:1. */
+  /* --rule is a band divider, not a control outline: ~1.46:1 on --salt, under
+     the 3:1 of WCAG 1.4.11. --text-muted is 5.16:1. */
   border: 1px solid var(--text-muted);
   border-radius: 999px;
   margin-bottom: 2.5rem;
@@ -1466,8 +1123,8 @@ main > .section-dark:last-child {
   padding-bottom: 1.75rem;
   border-bottom: 1px solid var(--rule);
 }
-/* 19 chips on the food panel, tapped in sequence on a phone — they were ~34px
-   and are the strongest case on the site for the 44px minimum. */
+/* 19 chips on the food panel, tapped in sequence on a phone — the strongest
+   case on the site for the 44px minimum. */
 .menu__jump a {
   display: inline-flex;
   align-items: center;
@@ -1476,12 +1133,9 @@ main > .section-dark:last-child {
   text-decoration: none;
   color: var(--text-muted);
   padding: 0.35rem 0.85rem;
-  /* var(--rule) is a hairline meant for dividing bands, not a control's own
-     boundary — composited on --salt it reads at ~1.46:1, under the 3:1 a
-     control outline owes (WCAG 1.4.11). These chips are links, not dividers,
-     so they take --text-muted's own colour (--stone, 5.16:1 on --salt) —
-     already the chip's label colour, so the outline now matches the word
-     inside it instead of nearly disappearing against the page. */
+  /* --rule is a band divider, not a control's boundary: ~1.46:1 on --salt,
+     under the 3:1 WCAG 1.4.11 asks. --text-muted is 5.16:1 and is already the
+     chip's label colour. */
   border: 1px solid var(--text-muted);
   border-radius: 999px;
   transition:
@@ -1505,8 +1159,8 @@ main > .section-dark:last-child {
   }
 }
 
-/* Same double-count as `.section` had: the jump chips landed a category 208px
-   down. `scroll-padding-top` on <html> is the one that does this job. */
+/* No scroll-margin-top — it double-counts with scroll-padding-top on <html>
+   and landed a category 208px down. */
 .menu__category {
   break-inside: avoid;
   margin-bottom: 3rem;
@@ -1584,11 +1238,9 @@ main > .section-dark:last-child {
 }
 
 /*
-  Was italic. Manrope has no italic and synthesis is off, so `font-style:
-  italic` here would have rendered as plain upright — identical to
-  .menu__item-desc, which is the one thing this line has to be distinguishable
-  from. The register is carried by weight now: 500 against the 400 around it,
-  still muted, still --step--1.
+  Was italic. Manrope has no italic and synthesis is off, so font-style: italic
+  would render as plain upright — identical to .menu__item-desc, which is the
+  one thing this line has to be told apart from. Weight 500 carries it instead.
 */
 .menu__item-wine {
   font-weight: 500;
@@ -1627,10 +1279,9 @@ main > .section-dark:last-child {
   padding-top: 2rem;
   border-top: 1px solid var(--rule);
 }
-/* h2, not h3 — the block's heading sits directly under the page's h1 and the
-   markup has always said so. This selector said h3 and matched nothing, which
-   left the one legally required heading on the site rendering at default
-   display-face h2 size instead of as the small label it is meant to be. */
+/* h2, not h3 — the markup has always said h2, and this selector said h3 and
+   silently matched nothing, leaving the one legally required heading at default
+   h2 size. Grep the tag as well as the class. */
 .menu__legal h2 {
   font-family: var(--font-body);
   font-size: var(--step--1);
@@ -1654,24 +1305,15 @@ main > .section-dark:last-child {
 }
 
 /* --------------------------------------------------------------------------
-   From the kitchen — the food, on the homepage.
-
-   The page used to show one cocktail and four staff portraits; every plate was
-   on /gallery. This band is the product, and it is the page's one expressive
-   layout: Team is a straight grid and Find Us is a split, so the variance is
-   spent in one place rather than smeared across all three.
+   From the kitchen — the food, on the homepage. The page's one expressive
+   layout; the other bands are deliberately plainer.
    -------------------------------------------------------------------------- */
 /*
-  Centred, and sized to match Our Goal rather than to match .section-head.
-
-  --step-2 on the heading and plain body size on the line under it are the sizes
-  .goal__heading and .goal__body p render at; the client asked for the two bands
-  to agree. 46rem is .goal__body's measure for the same reason — the two centred
-  blocks share an axis and a width, so they read as one system down the page.
-
-  This band does not use .section-head at all, deliberately: that class sets
-  --step-3 and --step-1 at the same specificity these rules have, so keeping it
-  would have made the sizes depend on which rule came later in the file.
+  Centred, and sized to match Our Goal rather than .section-head: --step-2 and
+  body size, on .goal__body's 46rem measure, so the centred blocks share an axis
+  down the page. Deliberately NOT .section-head — that class sets --step-3 at
+  the same specificity as a per-band override, so the size would depend on
+  source order.
 */
 .plates__head {
   max-width: 46rem;
@@ -1694,17 +1336,15 @@ main > .section-dark:last-child {
   text-align: center;
 }
 
-/* 2x2 on a phone rather than a scroll strip: four photos in a row that scrolls
-   would need its own keyboard affordance to be reachable without a pointer, and
-   a 2x2 needs none. It is also still one glance rather than a tower. */
+/* 2x2 on a phone rather than a scroll strip: a scrolling row would need its own
+   keyboard affordance, and a 2x2 is still one glance. */
 .plates__row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
 }
 @media (min-width: 60rem) {
-  /* Fractional, not equal: four equal columns read as four cards. The uneven
-     tracks plus the stagger below are the whole of this section's variance. */
+  /* Fractional, not equal: four equal columns read as four cards. */
   .plates__row {
     grid-template-columns: 1.25fr 1fr 1fr 1.15fr;
     align-items: start;
@@ -1719,11 +1359,10 @@ main > .section-dark:last-child {
   background: color-mix(in srgb, var(--light-stone) 20%, transparent);
 }
 /*
-  The tile is the link now, and `overflow: hidden` moved onto it from
-  .plates__item. That is not tidying: an outline is painted outside the border
-  box and is clipped by an *ancestor* that hides overflow, so leaving it on the
-  <li> would have cut the focus ring off the photo inside it. An element's own
-  overflow never clips its own outline, so it is safe here.
+  The tile is the link, and overflow: hidden belongs here rather than on
+  .plates__item: an outline is painted outside the border box and is clipped by
+  an *ancestor* that hides overflow, so on the <li> it would cut the focus ring
+  off the photo. An element never clips its own outline.
 */
 .plates__link {
   display: block;
@@ -1738,45 +1377,26 @@ main > .section-dark:last-child {
 }
 
 /* --------------------------------------------------------------------------
-   Team — alternating photo / text rows. Reads correctly at 4 members and at 6.
-
-   Restored from the portrait grid at the client's request. The grid existed
-   because these rows are the homepage's most repeated shape — one per member,
-   plus Find Us below in the same composition — and at four people that ran to
-   roughly 45% of the page's height. What sent it back was the fifth member:
-   five equal columns are ~220px each, which sets the bio about four words to
-   the line. Rows give the paragraph a real measure again. If a sixth member
-   arrives, weigh the page length before adding a sixth row.
+   Team — alternating photo / text rows, on /team. A portrait grid was tried and
+   reverted: five equal columns are ~220px, which sets the bio four words to the
+   line. Rows cost page height, which is why the section left the homepage.
    -------------------------------------------------------------------------- */
 /* --------------------------------------------------------------------------
-   TEMP concrete ground — under test on /team and /menu. Not meant to survive in
-   this form; see the notes in Team.astro and Menu.astro.
+   TEMP concrete ground — under test on /team, /menu and /gallery.
 
-   The texture itself comes from the component as --bg-texture, because it has
-   to go through Astro's image pipeline (the source jpg is 9.3MB). Only the
-   overlay lives here, so the two pages cannot drift apart on it.
+   The texture comes from the component as --bg-texture (it has to go through
+   Astro's image pipeline); only the overlay lives here, so the pages cannot
+   drift. The overlay LIGHTENS: the texture's mean luma is 146.6 and the logo
+   badge's concrete is ~170, so no amount of black could reach it. --salt at 28%
+   lands the ground at 170.
 
-   The overlay is a *lightening* pass, not a darkening one: measured, the
-   texture's mean luma is 146.6 and the logo badge's concrete fill is ~170, so
-   no amount of black could have reached the logo's brightness. --salt at 28%
-   over the texture lands the ground at 170.
+   That makes it a light ground, so these pages keep the light tier. --text-muted
+   is the one token that had to move: --stone measured 1.80:1 at the ground's
+   darkest patches, so body text is --black instead (5.15:1 worst, 7.50:1
+   median). Cost: body copy is now the same ink as the headings.
 
-   At that brightness this is a light ground, so both pages keep the light tier
-   (--text: --black). --text-muted is the one token that had to move: the light
-   tier sets it to --stone (#625e60), a mid grey on mid-grey concrete, which
-   measured 1.80:1 at the ground's darkest patches against the 4.5 body text
-   owes — it merged into the background. Black instead: 5.15:1 at that same
-   worst patch, 7.50:1 at the ground's median.
-
-   The cost is hierarchy. Body copy is now the same ink as the headings, where
-   on flat --salt the muted grey separated them at 5.2:1. On /menu that costs
-   more than on /team, because --text-muted carries the dish descriptions, the
-   wine lines, the tags and the legal block — everything that is not a dish
-   name. Size and weight are what tell them apart now.
-
-   Still outstanding on both: --accent (--wood) is 2.32:1 at the worst patches
-   and 3.37:1 at the median, against the 4.5 its small uppercase owes. That is
-   the team role labels and the menu subheads. */
+   STILL OUTSTANDING: --accent (--wood) is 2.32:1 at the worst patches against
+   the 4.5 its small uppercase owes — the team role labels and menu subheads. */
 .section--concrete-test {
   background-image: linear-gradient(rgba(226, 232, 235, 0.28), rgba(226, 232, 235, 0.28)),
     var(--bg-texture);
@@ -1785,18 +1405,12 @@ main > .section-dark:last-child {
   --text-muted: var(--black);
 }
 
-/* All three concrete-ground pages, not just /menu: `cover` scales against
-   whichever axis needs more stretching, and on a long, narrow page against a
-   landscape texture that's height, not width — see the width notes this
-   replaced in Team.astro and Gallery.astro. `fixed` ties that math to the
-   *viewport* instead of the full scrolling section, which is always shorter
-   than the page, so one 2560px source stays sharp (in fact slightly
-   downscaled) at any section length instead of needing an ever-larger source
-   image to outrun it — /team's member list and /gallery's masonry grid both
-   grow with content the same way /menu's category list does. Safe here
-   because nothing between these sections and the viewport carries a
-   transform — a transformed ancestor would make `fixed` compute against it
-   instead and silently stop working. */
+/* All three concrete-ground pages. cover scales against whichever axis needs
+   more stretching, which on a long narrow page is height; fixed ties that to
+   the viewport instead of the whole scrolling section, so one 2560px source
+   stays sharp at any section length. Safe only because nothing between these
+   sections and the viewport carries a transform — a transformed ancestor makes
+   fixed compute against it and silently stop working. */
 #menu.section--concrete-test,
 #team.section--concrete-test,
 #gallery.section--concrete-test {
@@ -1816,15 +1430,14 @@ main > .section-dark:last-child {
 }
 @media (min-width: 48rem) {
   .team__member {
-    /* The portrait is deliberately the narrower column: at 4:5 a wider one makes
-       each row tall enough to push the next member entirely off screen. */
+    /* The portrait is deliberately the narrower column: at 4:5 a wider one
+       makes each row tall enough to push the next member off screen. */
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
   }
 
-  /* Reverse every second row. The track sizes have to be swapped along with the
-     items — reordering alone would drop the portrait into the wide track and
-     double that row's height. This is the gotcha that came back with the
-     layout; it is not optional. */
+  /* Reverse every second row. The track sizes have to be swapped along with
+     order — reordering alone drops the portrait into the wide track and doubles
+     that row's height. */
   .team__member:nth-child(even) {
     grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
   }
@@ -1845,7 +1458,6 @@ main > .section-dark:last-child {
   object-fit: cover;
 }
 
-/* Beside a portrait across half the page again, not over a ~290px column. */
 .team__name {
   font-size: var(--step-2);
 }
@@ -1903,11 +1515,8 @@ main > .section-dark:last-child {
 
 /* --------------------------------------------------------------------------
    Lightbox — a <dialog> cloned out of #lightbox-template once JS is running.
-
-   The scrim sits on the dialog itself rather than only on ::backdrop: the
-   element is sized to the whole viewport, so its own background is what the
-   photo is actually read against, and ::backdrop is left matching it for the
-   sliver of cases where it shows.
+   The scrim is on the dialog itself, since it fills the viewport; ::backdrop
+   matches it for the sliver of cases where it shows.
    -------------------------------------------------------------------------- */
 .lightbox {
   width: 100vw;
@@ -1923,19 +1532,17 @@ main > .section-dark:last-child {
   overscroll-behavior: contain;
   background: color-mix(in srgb, var(--black) 90%, transparent);
   color: var(--salt);
-  /* The dialog is appended to <body>, not to a section, so it inherits the
-     light tier's tokens — and the global :focus-visible ring is drawn in
-     --accent. That resolved to --wood, which is 2.3:1 on Deep Black: the focus
-     indicator on the arrows and the close button was under the 3:1 a control
-     needs, on the darkest surface in the site. The dark tier's tint is 6.4:1. */
+  /* The dialog is appended to <body>, so it inherits the light tier's tokens —
+     and the global :focus-visible ring draws in --accent, which resolved to
+     --wood at 2.3:1 on this near-black scrim. The dark tier's tint is 6.4:1.
+     Anything else moved out to the body needs the same treatment. */
   --accent: var(--wood-light);
 }
 /*
-  `display` is set only while the dialog is open, and this is load-bearing.
-  The UA stylesheet hides a closed dialog with `dialog:not([open])
-  { display: none }`, but any author `display` beats it — so declaring
-  `display: grid` on `.lightbox` itself leaves a full-viewport dark block
-  sitting in the page after the footer, adding 100dvh to the document.
+  display is set only while open, and this is load-bearing: the UA hides a
+  closed dialog with dialog:not([open]) { display: none }, and ANY author
+  display beats it — declaring it on .lightbox itself leaves a full-viewport
+  dark block in the page after the footer, adding 100dvh to the document.
 */
 .lightbox[open] {
   display: grid;
@@ -1953,8 +1560,8 @@ main > .section-dark:last-child {
 
 .lightbox__img {
   max-width: min(92vw, 78rem);
-  /* Leaves the counter clear of the photo. The arrows deliberately overlap it,
-     as they do in the reference — that is what the backing triangle is for. */
+  /* Leaves the counter clear of the photo. The arrows deliberately overlap it —
+     that is what the backing triangle is for. */
   max-height: 84dvh;
   width: auto;
   height: auto;
@@ -1962,18 +1569,11 @@ main > .section-dark:last-child {
 }
 
 /*
-  Arrows, built the way the reference gallery builds them: a solid triangle at
-  the very edge of the viewport rather than a button with a fill.
-
-  Two triangles, not one. `::after` is the light arrowhead and `::before` is a
-  larger dark one directly behind it, offset so it reads as a rim. That backing
-  is not decoration — it is what keeps the arrowhead above the 3:1 a control
-  needs when it lands on a pale part of a photograph, which is the job the pill
-  did before. Ours uses --black behind --salt rather than the reference's mid
-  grey, so the pairing is a little stronger than the original.
-
-  The triangles come from borders, so the button itself stays empty: no glyph,
-  no SVG, nothing for the language switch to translate.
+  Two triangles, not one: ::after is the light arrowhead and ::before a larger
+  dark one behind it. The backing is not decoration — it is what keeps the
+  arrowhead over 3:1 when it lands on a pale part of a photograph, the job a
+  scrim does elsewhere. Borders draw them, so the button stays empty: no glyph
+  for the language switch to translate.
 */
 .lightbox__arrow {
   position: absolute;
@@ -2056,14 +1656,14 @@ main > .section-dark:last-child {
   transition:
     background-color 0.2s var(--ease),
     color 0.2s var(--ease);
-  /* The dialog is full-bleed, so these offsets are measured from the physical
-     edge of the display: on a notched phone in landscape the close button
-     landed under the cutout. max() keeps the designed offset everywhere it is
-     already clear and only grows it where the inset says it has to. */
+  /* The dialog is full-bleed, so offsets are measured from the physical edge:
+     on a notched phone in landscape the close button landed under the cutout.
+     max() only grows the offset where the inset says it must. */
   top: max(clamp(0.5rem, 0.2rem + 1.5vw, 2rem), env(safe-area-inset-top, 0px));
   right: max(clamp(0.5rem, 0.2rem + 1.5vw, 2rem), env(safe-area-inset-right, 0px));
 }
-/* Explicit fill/text pair, never `currentColor` — see the ghost button note. */
+/* Explicit fill/text pair, never currentColor: it resolves against the
+   element’s own computed color, so fill and text come out identical. */
 .lightbox__close:hover,
 .lightbox__close:focus-visible {
   background: var(--salt);
@@ -2101,19 +1701,10 @@ main > .section-dark:last-child {
 }
 
 /*
-  Centred head, sized to match the other bands rather than `.section-head`.
-
-  --step-2 on the heading and body size on the line under it are what
-  .plates__head, .goal__heading and .find__head h2 all render at; the three band
-  titles on this page are one size and this is the fourth. 46rem is the same
-  measure Our Goal and From the kitchen centre their copy on, so the four blocks
-  share an axis down the page.
-
-  **Deliberately not `.section-head`**, for the reason recorded on
-  .plates__head: that class sets --step-3 at the same specificity as a per-band
-  override, so keeping it would make each heading's size depend on which rule
-  came later in the file. `.section-head` still owns /menu, /gallery and /team,
-  where --step-3 is a page title rather than a band label.
+  Centred head at --step-2 on the same 46rem measure as .plates__head,
+  .goal__heading and .find__head h2 — the four band titles are one size.
+  Deliberately NOT .section-head, which sets --step-3 at the same specificity
+  and would make the size depend on source order.
 */
 .contact__head {
   max-width: 46rem;
@@ -2131,20 +1722,10 @@ main > .section-dark:last-child {
 }
 
 /* --------------------------------------------------------------------------
-   Contact — two cards, each of which places one phone call.
-
-   It was a heading set against the number on one line, and `.section--tight`
-   existed to stop that two-line band reading as a gap. The client asked for the
-   two services to be pictured, so the band took a photo set and the full
-   `--section-y` like every other section with images in it. Then they asked for
-   the pictures to behave as buttons: each card is now an <a href="tel:…">,
-   deliberately smaller and heavily rounded so it reads as a control rather than
-   as photography that happens to be clickable.
-
-   **56rem, centred.** The cards used to fill `.wrap` — 610px each at 1366px,
-   which is a photograph, not a button. Capping the pair rather than the
-   individual card keeps the gap between them proportional and keeps them
-   centred under the band's own axis.
+   Contact — four cards, each of which places one phone call. Each is an
+   <a href="tel:…">, so it is sized and rounded to read as a control rather than
+   as photography that happens to be clickable. 56rem caps the pair rather than
+   the card, which keeps the gap proportional and the pair centred.
    -------------------------------------------------------------------------- */
 .contact__panels {
   display: grid;
@@ -2161,78 +1742,44 @@ main > .section-dark:last-child {
 }
 
 /*
-  4:3 on both panels, which is a compromise the sources force: dsc-4367 is
-  landscape (2560x1706) and dsc-3936 is portrait (1707x2560). A portrait frame
-  would cut the table setting to a slice; a landscape one would behead the
-  takeaway box. 4:3 costs each a little and butchers neither, and matching the
-  two matters more than either crop — side by side, unequal frames read as a
-  mistake.
+  4:3 on both panels, which the sources force: dsc-4367 is landscape and
+  dsc-3936 portrait. Matching the two matters more than either crop — side by
+  side, unequal frames read as a mistake.
 */
 .contact__panel {
   position: relative;
   display: block;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  /*
-    Rounder than anything else on the site that holds a picture. --radius (2px)
-    is for rectangular surfaces — inputs, image frames — and this stopped being
-    one when it became a control. It is not a `.btn` 999px either: at this size a
-    stadium would crop the photograph to a lozenge and lose the corners of the
-    text. 1.75rem is the compromise, and it is what makes the card read as a
-    button at a glance rather than as a photo with a link in it.
-  */
+  /* Rounder than anything else here that holds a picture: --radius (2px) is for
+     rectangular surfaces and this is a control, but 999px would crop the
+     photograph to a lozenge. */
   border-radius: 1.75rem;
-  /*
-    Dark, not `--salt-deep` like the site's other image frames, and this is a
-    fix rather than a preference. The card's own background paints in the
-    anti-aliased fringe of the rounded clip, outside where the photograph
-    reaches, so a light value shows as a pale hairline tracing the corner —
-    faint at rest and much clearer on hover, because the wash that was dimming
-    it has faded out. Measured on the bottom-left curve, hovered: the brightest
-    fringe pixel went from luminance **72 to 44** once this went dark, against a
-    card interior of 27 and a band of 31 — 44 is ordinary edge anti-aliasing,
-    72 was a visible hairline.
-
-    It also makes a better placeholder: this sits on `--charcoal` and the image
-    is lazy-loaded, so a light block would flash before the photo arrives.
-  */
+  /* Dark, not --salt-deep like the site's other image frames, and this is a fix:
+     the card's own background paints in the anti-aliased fringe of the rounded
+     clip, so a light value traces a pale hairline round the corner — clearest
+     on hover, when the wash dimming it fades out. Brightest fringe pixel went
+     72 to 44 once this went dark. It is also the placeholder behind a lazy
+     image on a dark band. */
   background: var(--black);
   color: var(--salt);
   text-decoration: none;
-  /*
-    Chrome paints the site-wide tap highlight against the border *box* and
-    ignores border-radius, so on a card this round a tap flashed a hard-edged
-    wood rectangle around it — the same bug `.btn` has a note about, and one that
-    cannot be seen with a mouse or caught in a screenshot. Opt out and define the
-    press state below.
-  */
+  /* Chrome paints the site-wide tap highlight against the border box and
+     ignores border-radius, so a tap flashed a hard-edged rectangle. Opt out and
+     define the press state below. */
   -webkit-tap-highlight-color: transparent;
-  /*
-    Slower than the site's small controls, and deliberately so: this is a
-    300-450px card, and a lift that crosses that much area in 0.2s reads as a
-    snap rather than as a movement. The `ease` keyword made it worse — it is
-    front-loaded, so most of the travel happened in the first third and the
-    settle was invisible. The curve here is a decelerate: quick to commit, long
-    to arrive.
-  */
+  /* Slower than the site's small controls: this is a 300-450px card, and a lift
+     that crosses that area in 0.2s reads as a snap. The ease keyword is
+     front-loaded and made it worse; this curve is a decelerate. */
   transition:
     transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
     box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 /*
-  Square while the cards are stacked one per row.
-
-  The text block is a fixed height and the scrim under it is too (see below), so
-  on a short card they eat a fixed number of pixels out of a smaller picture: at
-  390px a 4:3 card is 261px tall and the block plus its scrim covered about
-  two-thirds of it, which left the table setting barely visible. A square is
-  350px at the same width and gives that back. It applies below 48rem only —
-  above it the cards are side by side and 4:3 is the wider, better frame.
-
-  Both cards move together. The 4:3 compromise exists because one source is
-  landscape (2560x1706) and the other portrait (1707x2560), and the reason it was
-  a compromise rather than a per-photo crop still holds here: side by side or
-  stacked, unequal frames read as a mistake.
+  Square while the cards are stacked one per row. The text block and its scrim
+  are a fixed height, so on a short card they eat a fixed number of pixels out
+  of a smaller picture — at 390px a 4:3 card is 261px tall and they covered
+  about two thirds of it. Both cards move together.
 */
 @media (max-width: 47.999rem) {
   .contact__panel {
@@ -2243,35 +1790,22 @@ main > .section-dark:last-child {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Slower than the card it sits in. The lift is the response to the pointer;
-     the photograph drifting behind it is the depth, and depth should lag. */
+  /* Slower than the card it sits in: the lift is the response, the photograph
+     drifting behind it is the depth, and depth should lag. */
   transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /*
-  Control states. The card has no border and no fill of its own — the photograph
-  is the surface — so it cannot signal hover the way a filled button does. It
-  lifts, gains a shadow, and pushes the picture in slightly behind the fixed
-  scrim, which reads as depth rather than as a colour change.
+  The card has no border or fill of its own — the photograph is the surface — so
+  it signals hover by lifting, gaining a shadow and pushing the picture in
+  behind the fixed scrim.
 
-  **The hover half is gated behind `(hover: hover)`, and that gate is a bug fix,
-  not a nicety.** A touch browser fakes `:hover` on tap and then leaves it
-  applied — there is no pointer to move away, so nothing clears it. Tapping a
-  card here opens the dialer, and on coming back the card was still sitting in
-  its hover state, lifted and zoomed, until something else was tapped; the client
-  reported it as the effect "going away" on return, which is exactly what a stuck
-  state looks like when it finally clears. It cannot be reproduced with a mouse.
-
-  `pointer: fine` is in the query as well as `hover: hover` because a device can
-  report both — a laptop with a touchscreen, or a phone with a mouse attached —
-  and the pair asks the narrower question: is there a pointer that can hover
-  *and* aim precisely. Anything else gets the press state instead.
-
-  So on touch the feedback is `:active` alone: it lasts exactly as long as the
-  finger is down, which is the whole point — a momentary acknowledgement of a tap
-  that is about to dial, with no state left behind to get stuck. `:focus-visible`
-  stays outside the gate, because it is the keyboard's affordance and a keyboard
-  is not a pointer; it does not fire on a tap.
+  The hover half is gated behind (hover: hover) and (pointer: fine) as a bug
+  fix: a touch browser fakes :hover on tap and leaves it applied, and these
+  cards open the dialer, so a visitor came back to a card stuck lifted and
+  zoomed. pointer: fine is in the query because a device can report both, and
+  the pair asks the narrower question. :focus-visible stays OUTSIDE the gate — a
+  keyboard is not a pointer — and on touch :active is the whole feedback.
 */
 @media (hover: hover) and (pointer: fine) {
   .contact__panel:hover {
@@ -2282,8 +1816,7 @@ main > .section-dark:last-child {
     transform: scale(1.04);
   }
   /* Shorter than the 1.2s return on the base rule: quick enough to feel like a
-     response to the pointer, slow enough to read as the picture lighting rather
-     than as a state flipping. */
+     response, slow enough to read as the picture lighting. */
   .contact__panel:hover::after {
     opacity: 0;
     transition-duration: 0.8s;
@@ -2300,8 +1833,8 @@ main > .section-dark:last-child {
   opacity: 0;
   transition-duration: 0.8s;
 }
-/* The press is the one state that should feel immediate — it has to land under
-   the finger, not 0.45s after it — so it overrides the card's own timing. */
+/* The press has to land under the finger, not 0.45s after it, so it overrides
+   the card's own timing. */
 .contact__panel:active {
   transform: translateY(-1px) scale(0.99);
   transition-duration: 0.1s;
@@ -2321,93 +1854,44 @@ main > .section-dark:last-child {
   .contact__panel:focus-visible img {
     transform: none;
   }
-  /* The wash still clears on hover — it is a brightness change, not motion, and
-     removing it would leave a hover with no feedback at all. Only the crossfade
-     goes. */
+  /* The wash still clears on hover — it is a brightness change, not motion.
+     Only the crossfade goes. */
 }
 
 /*
-  The scrim. Not a flat tint over the whole photo — that greys the image out to
-  protect one corner — but a gradient weighted to the bottom, where the title
-  is. It is on the ::before so it sits over the img and under the text.
+  The scrim: a gradient weighted to the bottom where the text is, on ::before so
+  it sits over the img and under the text. Both photographs have blown
+  highlights in every third of the frame, so the ramp has to carry the text on
+  its own.
 
-  The stops are not decoration. Both photographs have blown highlights in every
-  third of the frame, so the title cannot rely on the picture being dark under
-  it; the bottom of the ramp is opaque enough to carry white text on its own,
-  and the photo underneath only ever improves the reading.
+  The stops are LENGTHS, not percentages, and that is what makes this survive a
+  narrow card: the text block is a fixed number of pixels tall whatever the card
+  is, while a percentage ramp scales with the card and pushes the same text into
+  a thinner part of it. Measured on the percentage version, the small line fell
+  to 3.49:1 at 390px. In lengths, 8rem clears title-plus-number at every card
+  size and the ramp finishes by 16rem.
 
-  **The stops are lengths, not percentages, and that is the whole of what makes
-  this survive a narrow card.** They were percentages while the card carried a
-  single line of title. It carries a title over a number now, and that block is a
-  fixed number of pixels tall whatever the card is — while a percentage ramp
-  scales with the card, so a short card pushes the same text further up a thinner
-  part of it. The cards are shortest not on a phone but just above the 48rem
-  breakpoint, where two columns share a 768px viewport. Measured on the
-  percentage version, the small line fell to 3.49:1 at 390px — a fail — while
-  reading 5.05:1 at 1366px.
-
-  In lengths, the dense end covers the text block and nothing else has to be
-  guessed: 8rem clears title-plus-number on every card size and the ramp is
-  finished by 16rem. A taller card therefore shows *more* photograph than the
-  percentage version did, not less; a short one is scrimmed further up, which is
-  exactly right, because on a short card the text really does cover more of the
-  picture.
-
-  The ramp came down from 11rem/21rem when the cards became controls: the block
-  lost a row (the two numbers collapsed into one that the clock chooses) and the
-  cards got smaller, so the old ramp was scrimming picture that no longer had
-  text over it.
-
-  Re-measured by pixel sampling at every width after the change, not by eye. The
-  figures are in CLAUDE.md.
+  Re-measure the block and move these stops with it whenever a line is added or
+  removed. Worst single pixel, never the mean — and sample hovered, not at rest.
 */
 /*
-  **Every layer in this card carries an explicit z-index, and that is a bug fix
-  rather than defensive habit.** The stack is img 0, scrim 1, wash 2, text 3.
-
-  Painting order here is not what the DOM suggests. `.contact__panel:hover img`
-  sets a `transform`, and a transformed element creates a stacking context and is
-  painted in the same pass as positioned descendants with `z-index: auto` — in
-  DOM order. The `<img>` comes after `::before` in that order, so the moment the
-  card was hovered the photograph painted *over* the scrim and the text
-  protection vanished for exactly as long as the pointer was on the card.
-
-  It survived a full contrast sweep because every measurement was taken at rest.
-  Sample the hovered state too; that is where this hid.
+  Every layer carries an explicit z-index — img 0, scrim 1, wash 2, text 3 — and
+  that is a bug fix. .contact__panel:hover img sets a transform, and a
+  transformed element is painted in the same pass as positioned descendants with
+  z-index: auto, in DOM order; the <img> comes after ::before, so hovering
+  painted the photograph OVER the scrim and text contrast went to 1.00:1. It
+  survived every contrast sweep because they were all taken at rest.
 */
 /*
-  The scrim also carries a 1px dark ring on the inside of the rounded edge, and
-  it is there for the photograph rather than as a border.
+  The scrim also carries a 2px dark ring inside the rounded edge, for the
+  photograph rather than as a border: both images run bright to the card's
+  boundary, and a near-white pixel anti-aliased against the band is a light
+  hairline. Hover makes it obvious, because the wash dimming it fades out.
 
-  Both images have bright areas running right to the card's boundary — the
-  concrete at the top and down the left of the table setting — and where a
-  near-white pixel is anti-aliased against a `--charcoal` band you get a light
-  hairline tracing the card. It is not a rendering bug and it is not
-  device-specific: it is the picture meeting the edge. Hover makes it obvious,
-  because the wash that had been dimming it fades out.
-
-  **It has to live here, not on `.contact__panel`.** An inset shadow paints
-  immediately after the element's own background and *before* its content, so on
-  the card itself the `<img>` covered it completely — applied, computed, and
-  doing nothing, which is exactly how it was first written. `::before` is above
-  the image in the stack and has no content of its own to hide it.
-
-  An inset shadow rather than a border: it follows `border-radius` for free,
-  costs no layout, and is invisible everywhere the photograph is already dark,
-  which is most of the perimeter.
-
-  **2px, not 1px, and the reason is fractional device pixels.** At a display
-  scale of 125% the card's edges land on half-device-pixel boundaries, so a 1px
-  ring only partly covers the outermost row and a bright photograph still showed
-  through it. Measured hovered at dpr 1.25, brightest edge pixel per side —
-  top / bottom / left / right:
-
-    no ring   145 / 55 / 157 / 74
-    1px       126 / 34 /  52 / 49
-    2px        56 / 35 /  59 / 35   (band behind the card: 31)
-
-  1px fixed the left edge and left the top almost untouched. 2px brings all four
-  to within ~25 of the band, which is what stops it reading as a line.
+  It must live on ::before, not on .contact__panel: an inset shadow paints
+  before the element's content, so on the card the <img> covered it completely.
+  2px, not 1px, because at a 125% display scale the edges land on
+  half-device-pixel boundaries and a 1px ring only partly covers the outer row.
 */
 .contact__panel::before {
   content: '';
@@ -2426,31 +1910,20 @@ main > .section-dark:last-child {
 }
 
 /*
-  The wash — the second darkening layer, and the *only* one that moves.
+  The wash — the second darkening layer, and the ONLY one that moves. The card
+  lightens on hover as this fades out.
 
-  The card lightens on hover: the picture comes up as the wash fades out, and
-  comes back down slowly when the pointer leaves. It is a separate pseudo-element
-  from the scrim above rather than an opacity on that one, and the split is the
-  whole reason this is safe to animate at all.
+  The scrim above is load-bearing and must never fade: animating it would walk
+  the measured text contrast to nothing on every hover, invisibly in a
+  screenshot of either end state. Because the wash only ever adds darkness,
+  hovered — wash fully gone — is the contrast floor, which is the state the
+  recorded figures were measured in.
 
-  **The scrim is load-bearing and must never fade.** It is what carries the
-  title and the number over photographs with blown highlights in every third of
-  the frame, at ratios that were measured pixel by pixel. Animating *it* would
-  walk that contrast down to nothing every time someone hovered, and the failure
-  would be invisible in a screenshot of either end state.
-
-  So the two layers do different jobs. `::before` protects the text and is
-  static. `::after` is atmosphere over the whole card and is the thing that
-  lifts. Because the wash only ever *adds* darkness, the hovered state — wash
-  fully gone — is the contrast floor, and it is exactly the state the recorded
-  figures were measured in. At rest the text is darker-backed than measured, and
-  mid-transition it is somewhere between the two. There is no state in the
-  animation that is worse than the numbers in CLAUDE.md.
-
-  Flat rather than a gradient on purpose: the bottom of the card is already at
-  90-94% black from the scrim, so a flat 30% adds almost nothing there and
-  almost all of its effect where the picture is clean. The card lights up from
-  the top down without the text area appearing to flicker.
+  Flat rather than a gradient: the bottom of the card is already 90-94% black
+  from the scrim, so a flat wash adds almost all of its effect where the picture
+  is clean, and the card lights from the top down instead of the text
+  flickering. Halve THIS to brighten a photograph; touch the scrim only with a
+  pixel scan open.
 */
 .contact__panel::after {
   content: '';
@@ -2477,9 +1950,8 @@ main > .section-dark:last-child {
   z-index: 3;
 }
 
-/* Title and number sit in one block rather than being positioned individually:
-   they have to stay a fixed distance apart as the card scales, and only the
-   block's distance from the bottom edge is a design decision. */
+/* Title and number in one block: they stay a fixed distance apart as the card
+   scales, and only the block's offset from the bottom is a design decision. */
 .contact__panel-body {
   position: absolute;
   left: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
@@ -2488,15 +1960,9 @@ main > .section-dark:last-child {
 }
 
 /*
-  A span, not an <h3>, and displayed as a block.
-
-  The whole card is a link now, and a heading inside a link is legal but makes
-  the outline claim a section that is really a control. The band's own .sr-only
-  <h2> already gives this section its heading, and the two card titles are the
-  links' names.
-
-  --step-1, down from --step-2: the cards are about a third narrower than they
-  were, and the old size ran "Κλείστε τη θέση σας" to two lines inside a control.
+  A span, not an <h3>: the whole card is a link, and a heading inside a link
+  makes the outline claim a section where there is a control. The band's own h2
+  is the heading; these titles are the links' names.
 */
 .contact__panel-title {
   display: block;
@@ -2509,8 +1975,8 @@ main > .section-dark:last-child {
 }
 
 /* The number the card will dial. Shown rather than merely dialled, so there is
-   something to check before tapping — and so a visitor whose JavaScript never
-   ran can see that the card is offering the landline. */
+   something to check before tapping — and so a visitor whose JS never ran can
+   see it is offering the landline. */
 .contact__panel-call {
   display: inline-flex;
   align-items: center;
@@ -2523,17 +1989,10 @@ main > .section-dark:last-child {
   letter-spacing: 0.01em;
 }
 /*
-  The affordance for these cards used to be an arrow, and it was removed — see
-  the note in Contact.astro — because an arrow says "goes somewhere" and a
-  tel: link places a call. This is the replacement: a filled circle behind the
-  phone glyph, same fill-plus-dark-glyph idiom as `.btn--primary` and `.lang`,
-  the site's other two filled controls. It reads as a button without borrowing
-  an icon that means the wrong thing.
-
-  Sized in em off .contact__panel-call's own font-size (--step-0), so it never
-  needs its own breakpoint. 1.8em is deliberately roomier than the icon inside
-  it — a circle that exactly hugs its glyph reads as a decorated icon, not a
-  control; a badge with air around the glyph is what makes it read as one.
+  An arrow was tried here and removed: an arrow says "goes somewhere" and a tel:
+  link places a call. A filled disc behind the phone glyph instead, the same
+  fill-plus-dark-glyph idiom as .btn--primary and .lang. Sized in em off the
+  call's own font-size, so it never needs a breakpoint.
 */
 .contact__phone-badge {
   display: inline-flex;
@@ -2545,12 +2004,8 @@ main > .section-dark:last-child {
   border-radius: 50%;
   background: var(--salt);
 }
-/*
-  Black on the fill, not currentColor — currentColor here would still resolve
-  to --salt, the same as the fill, and the glyph would vanish. Same reasoning
-  documented in CLAUDE.md for why `background: currentColor` is never paired
-  with an element's own `color`.
-*/
+  /* Black on the fill, never currentColor — it would resolve to the same --salt
+     as the disc and the glyph would vanish. */
 .contact__phone-badge .contact__phone-icon {
   color: var(--black);
   width: 0.95em;
@@ -2565,31 +2020,14 @@ main > .section-dark:last-child {
 }
 
 /*
-  The two service notes — private events and special sourcing.
+  The two service notes. They were a centred column of prose before, capped at
+  46rem, and both of that version's rules retired together: a card IS the fixed
+  left edge centring was buying, so the copy is ranged left and the card is the
+  axis. Do not re-centre it to match Our Goal.
 
-  They have now been three things: two columns of prose from 48rem, then one
-  centred column capped at 46rem, and now a second row of cards, at the client's
-  request that they read as the pair above does. The centred version's rules are
-  gone rather than adapted, and it is worth knowing which and why, because two of
-  them were load-bearing right up until they weren't:
-
-  - **The measure was on the container, not on each `p`.** Centred lines are read
-    by their middles, so two paragraphs sharing one axis was the whole point, and
-    a `max-width` per paragraph would have given the shorter one its own narrower
-    centre. A card is that axis now, so the rule has nothing left to do.
-  - **The copy was centred at 46rem** because a full-width band gives the eye no
-    fixed left edge to return to — the same argument Our Goal still runs on. A
-    card *is* a fixed left edge, so centring inside one buys nothing and costs
-    the ragged right that makes six lines of Greek scannable. It is ranged left.
-
-  What is deliberately shared with the panels: the 56rem cap, the gap, the 48rem
-  breakpoint and the 1.75rem radius. All four cards therefore land on one 2x2
-  block rather than on two unrelated rows.
-
-  What is deliberately *not* shared is where the photograph goes — see
-  .contact__note-media — and that is the difference that tells the rows apart at
-  a glance: the top two are pictures you tap, the bottom two are pictures over
-  something you read that ends in something you tap.
+  Deliberately shared with the panels: the 56rem cap, the gap, the 48rem
+  breakpoint and the 1.75rem radius, so all four cards land on one 2x2 block.
+  What is NOT shared is where the photograph goes — see .contact__note-media.
 */
 .contact__notes {
   display: grid;
@@ -2606,63 +2044,39 @@ main > .section-dark:last-child {
 }
 
 /*
-  A flat panel under a photograph, not a photograph with text on it.
+  A flat panel under a photograph, not a photograph with text on it. The
+  constraint is the scrim: .contact__panel::before is a fixed-length ramp sized
+  for two short bold lines owing 3:1, and these paragraphs are ~60 words of body
+  copy owing 4.5:1. On a flat --black panel the copy is --light-stone at 6.55:1
+  with no scrim in the path at all.
 
-  The constraint is the scrim: .contact__panel::before is a fixed-length ramp
-  sized for two lines of --salt bold owing 3:1, and these paragraphs are ~60
-  words. Most of that block would sit above the ramp's dense 8rem in the thin
-  part of it, and body copy owes 4.5:1 rather than 3:1 — against a margin that
-  has already been measured at 3.49:1 once, on the one small tinted line these
-  cards ever carried. Below the picture instead, the copy is --light-stone on
-  --black at 6.55:1 and there is no scrim in the path at all.
-
-  --black under a --charcoal band is the same step .contact__panel takes for its
-  own background, and the hairline is the same --rule the bands and the nav are
-  drawn apart with, so the card is lifted off the page with vocabulary already in
-  use rather than with a new surface token.
-
-  `overflow: hidden` is what makes the photograph take the card's top corners;
-  the media block below has no radius of its own.
+  overflow: hidden is what gives the photograph the card's top corners.
 */
 /*
-  The note card is the panel card, plus a film.
+  The note card is the panel card, plus a film. Closed, it is the same object:
+  same 4:3, radius, scrim, title position and disc. Open, the film hides the
+  photograph outright, so the paragraph sits on a flat surface and owes the
+  scrim nothing.
 
-  It did not start that way: it was a photograph stacked *above* a flat panel
-  holding the paragraph, because a ~60-word paragraph cannot sit on
-  .contact__panel's scrim (a fixed-length ramp sized for two short bold lines
-  owing 3:1, where body copy owes 4.5:1). That construction was correct and it
-  was also the thing that made the lower row read as a different species from
-  the upper one — two photo cards over two article cards.
-
-  Moving the paragraph behind a disclosure dissolves the constraint rather than
-  fighting it. Closed, this is the same object as .contact__panel: same 4:3, same
-  1.75rem radius, same scrim, same title in the same corner, same circular badge.
-  Open, the film hides the photograph outright, so the paragraph is on a flat
-  surface and owes nothing to the scrim at all.
-
-  **Keep this in step with .contact__panel.** The two are now deliberately one
-  design in two files' worth of rules; a change to the panel's ratio, radius,
-  scrim or motion that is not made here reopens exactly the complaint this
-  revision existed to answer.
+  KEEP THIS IN STEP WITH .contact__panel — a change to the panel's ratio,
+  radius, scrim or motion that is not made here reopens the complaint this
+  revision answered (the lower row reading as a different species).
 */
 .contact__note {
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 1.75rem;
-  /* Dark for the reason .contact__panel is: the card's own background paints in
-     the anti-aliased fringe of the rounded clip, so a light value traces a pale
-     hairline round the corner. It is also the placeholder behind a lazy image on
-     a dark band. */
+  /* Dark for the reason .contact__panel is: a light value traces a pale hairline
+     in the anti-aliased fringe of the rounded clip. */
   background: var(--black);
   -webkit-tap-highlight-color: transparent;
   transition:
     transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
     box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-/* Square while the cards are stacked one per row — the same switch, at the same
-   breakpoint, for the same reason .contact__panel makes it: a fixed-height text
-   block eats a far larger share of a short card. */
+/* Square while stacked one per row — same switch, same breakpoint, same reason
+   .contact__panel makes it. */
 @media (max-width: 47.999rem) {
   .contact__note {
     aspect-ratio: 1 / 1;
@@ -2670,12 +2084,9 @@ main > .section-dark:last-child {
 }
 
 /*
-  The summary is the whole closed card, so it is sized to fill it rather than
-  laid out as a row of its own.
-
-  `list-style: none` plus the -webkit- pseudo-element is what removes the
-  disclosure triangle; **both are needed**, because Safari still draws the marker
-  from the pseudo-element even when list-style is cleared.
+  The summary is the whole closed card, so it is sized to fill it. list-style:
+  none AND the -webkit- pseudo-element are BOTH needed to remove the disclosure
+  triangle; Safari still draws it from the pseudo-element otherwise.
 */
 .contact__note-summary {
   position: absolute;
@@ -2690,34 +2101,21 @@ main > .section-dark:last-child {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Slower than the card, exactly as on the panels: the lift is the response to
-     the pointer and the photograph drifting behind it is the depth. */
+  /* Slower than the card, exactly as on the panels. */
   transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /*
   The scrim — lengths rather than percentages, so the ramp covers a fixed text
-  block whatever the card's size. It carries the title only; the film is what
-  carries the paragraph.
+  block whatever the card's size. It carries the title only; the film carries
+  the paragraph.
 
-  **Shorter than .contact__panel's, and the amount was measured rather than
-  chosen.** The client asked for less of the photograph to be greyed on these two
-  cards, on the reasoning that they carry one line where the panels carry two.
-  That reasoning is right about the copy and wrong about the geometry, which is
-  the thing to know before shortening it again: the note title is --step-1 and
-  the Greek "Διοργανώστε την εκδήλωσή σας" **wraps to two lines** at 1366, so its
-  block reaches 6.08rem off the card's bottom against the panels' 6.04rem. The
-  two blocks are the same height. Halving the stops outright would have left that
-  first line sitting at roughly 20-40% black.
-
-  So the dense end covers the measured block and the ramp finishes as soon as it
-  can afterwards: 6.5rem rather than 8, out by 12rem rather than 16. That is a
-  quarter off the ramp's reach and about 1.5rem more picture at the bottom of
-  every card — the visible half of the reduction comes from the wash below, which
-  costs nothing.
-
-  Re-measure this block and move these stops with it whenever a line is added or
-  removed, or the title's size changes. Worst *single* pixel, never the mean.
+  Shorter than .contact__panel's (6.5rem/12rem against 8/16) and the amount was
+  MEASURED, not halved: the Greek title wraps to two lines, so its block reaches
+  6.08rem against the panels' 6.04rem — the two blocks are the same height. A
+  true halving measured 2.73:1 on Greek card 0 at 1366. At 6.5rem the worst
+  pixel is 11.76:1 and is essentially the scrim alone, so swapping either
+  photograph cannot move it.
 */
 .contact__note-summary::before {
   content: '';
@@ -2735,21 +2133,11 @@ main > .section-dark:last-child {
   );
 }
 /*
-  The wash — the layer that moves. Same split and same reasoning as the panels:
-  the scrim above is load-bearing for contrast and never animates, this is
-  atmosphere and does.
-
-  **15%, half the panels' 30%, and this is where the client's "reduce it by half"
-  is actually paid.** It is a flat layer over the whole card, so it is what dims
-  the *top* of the picture where there is no scrim at all — halving it brightens
-  the photograph everywhere the title is not, which is the whole of what was
-  being asked for. And it cannot move a single contrast figure: the wash only
-  ever adds darkness and fades to nothing on hover, so hovered is already the
-  measured floor. A lighter wash makes the resting state closer to that floor
-  rather than worse than it.
-
-  The two rows therefore no longer wash identically. That is deliberate: the
-  panels' scrim carries a number as well as a title and has more to protect.
+  The wash — the layer that moves; same split and reasoning as the panels. 15%,
+  half the panels' 30%, and this is where a client request to reduce the film is
+  paid: it is flat, so it is what dims the top of the picture where there is no
+  scrim, and it cannot move a contrast figure, because hovered (wash gone) is
+  already the measured floor.
 */
 .contact__note-summary::after {
   content: '';
@@ -2761,14 +2149,10 @@ main > .section-dark:last-child {
 }
 
 /*
-  Title and cue on one line, pinned where .contact__panel-body sits, so the two
-  rows agree to the pixel about where a card's words begin.
-
-  A row, at the client's request that the wording and the arrow share a line
-  rather than stack. `space-between` is what puts the cue hard against the
-  card's right edge without the title needing a width, and `gap` is the floor
-  between the two when a Greek title runs long — the title is `min-width: 0` so
-  it wraps into the space it has rather than pushing the disc off the edge.
+  Title and cue on one line, pinned where .contact__panel-body sits so the two
+  rows agree about where a card's words begin. space-between puts the cue hard
+  against the right edge without the title needing a width; the title is
+  min-width: 0 so a long Greek title wraps rather than pushing the disc off.
 */
 .contact__note-head {
   position: absolute;
@@ -2792,20 +2176,12 @@ main > .section-dark:last-child {
 }
 
 /*
-  The cue: the same filled disc as .contact__phone-badge, carrying an arrow
-  instead of a phone.
+  The same filled disc as .contact__phone-badge, carrying an arrow. An arrow was
+  removed from the panels because those place a call; these cards do go
+  somewhere, so it is right here for the reason it was wrong there.
 
-  An arrow was tried on the *panels* and removed, because an arrow says "goes
-  somewhere" and those cards place a call. These cards do go somewhere — they
-  open — so the glyph is right here for precisely the reason it was wrong there,
-  and the phone stays on the thing that dials, inside the film.
-
-  Sized in em off the head's own font-size so it never needs a breakpoint, and
-  matched to .contact__phone-badge's 1.8em so the two rows' discs are one size.
-
-  `flex: none` is what keeps it circular next to a title that may wrap: without
-  it the disc is a flex item free to be squeezed, and a squeezed 50% radius is an
-  ellipse rather than a smaller circle.
+  flex: none is what keeps it circular beside a title that may wrap — a squeezed
+  50% radius is an ellipse, not a smaller circle.
 */
 .contact__note-cue {
   display: inline-flex;
@@ -2821,23 +2197,17 @@ main > .section-dark:last-child {
 .contact__note-cue svg {
   width: 0.95em;
   height: 0.95em;
-  /* Black on the fill, never currentColor — currentColor would resolve to the
-     same --salt as the disc and the glyph would vanish. */
+  /* Black on the fill, never currentColor — it would resolve to the same --salt
+     as the disc and the glyph would vanish. */
   color: var(--black);
 }
 /*
-  Two glyphs, one at a time — a chevron closed, a cross open.
-
-  It was one glyph rotated a quarter turn, which is a common enough trick and is
-  wrong here: a chevron turned 90deg points *down*, and a downward chevron is
-  what a **closed** disclosure conventionally wears. The open card was therefore
-  showing the closed card's cue, which is worse than no state change at all. A
-  cross is unambiguous and needs no convention.
-
-  Toggled with `display`, so exactly one is ever in the flex flow and the disc
-  cannot be sized by whichever glyph happens to be wider. There is deliberately
-  no transition on the swap: the two shapes share no geometry, so nothing can
-  tween between them, and cross-fading a 15px icon reads as a flicker.
+  Two glyphs swapped by display, not one glyph rotated: a chevron turned 90deg
+  points DOWN, which is what a closed disclosure conventionally wears, so the
+  open card was showing the closed card's cue. Only one is ever in the flow, so
+  the disc cannot be sized by whichever is wider, and there is deliberately no
+  transition — the shapes share no geometry and a 15px cross-fade reads as a
+  flicker.
 */
 .contact__note-cue-close,
 .contact__note[open] .contact__note-cue-open {
@@ -2850,28 +2220,17 @@ main > .section-dark:last-child {
 /*
   Open, the title goes and the cue crosses to the other corner.
 
-  **The title has to go, and the first attempt at keeping it is what proved it.**
-  With the title still pinned bottom-left, the film had to reserve 5.5rem under
-  the paragraph to clear it — and the copy plus the call then needed 356px inside
-  a 326px card, so `margin-top: auto` collapsed and the phone number was drawn
-  straight through the title. Hiding it gives that space back and costs nothing:
-  the paragraph is a full sentence about the offer, so nothing on the open card
-  is unidentified.
+  The title HAS to go: kept, the film had to reserve 5.5rem under the paragraph
+  to clear it, and the copy plus the call then needed 356px inside a 326px card,
+  so margin-top: auto collapsed and the number drew through the title.
 
-  **`left: auto` is load-bearing and is not the same thing as aligning the cue
-  right.** The head is absolutely positioned inside the summary at z-index 4 —
-  above the film — and left+right together make it span the whole card. With the
-  title hidden that box is almost entirely empty, but it still sits directly over
-  the call link at the bottom of the film and swallows every click on it: the tap
-  landed on the summary and closed the card instead of dialling. Verified with
-  `elementFromPoint` at the badge and at the digits — both returned
-  `.contact__note-head` before this line and the anchor after it. Dropping
-  `left` shrinks the box to the disc itself, which puts the cue in the
-  bottom-right corner *and* leaves the rest of the row to the film.
-
-  So the open card reads "call" on one side and "close" on the other, on one
-  line. The head keeps its own right and bottom anchors, so nothing about the
-  closed state moves.
+  left: auto is LOAD-BEARING and is not a way of aligning the cue right. The
+  head is absolutely positioned at z-index 4, above the film, and left+right
+  together make it span the whole card — an almost empty box lying directly over
+  the call link, swallowing every click on it, so the tap closed the card
+  instead of dialling. Dropping left shrinks the box to the disc. A screenshot
+  cannot see this: test with elementFromPoint at the badge and at the digits,
+  and the answer must be the anchor.
 */
 .contact__note[open] .contact__note-title {
   display: none;
@@ -2881,18 +2240,14 @@ main > .section-dark:last-child {
 }
 
 /*
-  The film — near-opaque, and that is the whole reason this layout works.
+  The film — near-opaque, which is the whole reason this layout works: the
+  paragraph measures like text on a panel rather than text on a picture, so
+  swapping either photograph cannot change a contrast figure.
 
-  .contact__panel::before is a *gradient* because the picture has to stay visible
-  behind two short lines. This one is allowed to hide the photograph, so the
-  paragraph sits on what is effectively a flat surface: it measures like text on
-  a panel rather than text on a picture, and swapping either photograph cannot
-  change a single contrast figure.
-
-  z-index 3 puts it above the photo, the scrim and the wash, but below
-  .contact__note-head at 4 — so the title and the cue stay lit and clickable over
-  it, and the cue remains the way to close the card. The head does not create a
-  stacking context of its own, which is what lets it outrank a sibling's child.
+  z-index 3 puts it above the photo, scrim and wash but below
+  .contact__note-head at 4, so the cue stays lit and clickable over it. The head
+  creates no stacking context of its own, which is what lets it outrank a
+  sibling's child.
 */
 .contact__note-film {
   position: absolute;
@@ -2902,59 +2257,35 @@ main > .section-dark:last-child {
   flex-direction: column;
   gap: 0.75rem;
   padding: clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem);
-  /* Bottom padding matches .contact__note-head's own offset, which is what puts
-     the call and the cue on one line in opposite corners. */
+  /* Matches .contact__note-head's own offset, which is what puts the call and
+     the cue on one line in opposite corners. */
   padding-bottom: clamp(0.9rem, 0.6rem + 1.1vw, 1.4rem);
   /* Clear of the cue, so a long last line never runs under it. */
   padding-right: calc(clamp(1.1rem, 0.7rem + 1.4vw, 1.75rem) + 2.5rem);
   background: color-mix(in srgb, var(--black) 93%, transparent);
-  /* A long paragraph in a short card is the one thing that could overflow here.
-     At the measured sizes it does not, at any width in either locale — this is
-     the guard rather than the mechanism. */
+  /* The guard, not the mechanism: at the measured sizes the copy does not
+     overflow at any width in either locale. */
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 /*
-  **The card keeps its ratio when open — it does not grow, and that was checked
-  rather than assumed.**
-
-  The obvious worry is a paragraph too long for a fixed-height card, and the
-  obvious fix is to let the card size to its copy: put the film back in flow
-  (the summary is `position: absolute`, so the film would be the only in-flow
-  child) and the height follows the text. Two measurements killed that:
-
-  - On its own it *shrinks* the card — 348 → 202 on a 390px phone — so opening
-    one made it visibly jump smaller than its neighbour.
-  - `display: grid` was the fix for the shrink, on the theory that a grid item's
-    `auto` min-height sets a floor while `aspect-ratio` sets the base. It holds
-    the floor but **not** the ceiling: with the paragraph artificially tripled,
-    the film grew to 495px and the card stayed at 326 and clipped it. So the
-    "larger of ratio and content" behaviour does not actually exist here;
-    `aspect-ratio` wins.
-
-  Which is the right outcome anyway. A card that grew would break the row it
-  shares — and a uniform 2x2 is the entire point of this revision. So the film
-  stays absolute and fills the card by construction, the copy is sized to fit
-  (see `.contact__note-text`), and `overflow-y` above is the guard if the client
-  ever lengthens a paragraph past what the ratio allows. Measured at 1366, 1024,
-  768, 390 and 320 in both locales: zero overflow, and the card is the same size
-  open as closed at every one.
+  The card keeps its ratio when open — it does not grow, and that was checked.
+  Putting the film back in flow SHRINKS the card (348 to 202 on a 390px phone),
+  and display: grid holds the floor but not the ceiling: with the paragraph
+  tripled the film grew to 495px and the card stayed at 326 and clipped it.
+  aspect-ratio wins, which is the right outcome anyway — a card that grew would
+  break the row it shares, and a uniform 2x2 is the point. So the film stays
+  absolute, the copy is sized to fit, and overflow-y above is the guard.
 */
 
 /*
-  Hover, focus and press on the card itself — the same lift, the same photograph
-  drift and the same wash fade .contact__panel makes, so the two rows respond
-  identically to a pointer.
+  Hover, focus and press on the card — the same lift, drift and wash fade
+  .contact__panel makes, gated for the same reason and with :focus-visible
+  duplicated outside the gate.
 
-  Gated behind `hover: hover` and `pointer: fine` for the reason the rest of this
-  file repeats: a touch browser fakes :hover on tap and leaves it applied, and
-  these cards are tapped. `:focus-visible` is duplicated *outside* the gate
-  because a keyboard is not a pointer.
-
-  **Only while closed.** An open card has a film over the photograph, so lifting
-  and zooming a picture nobody can see is motion with nothing behind it — and
-  the wash fading under an opaque film is invisible work.
+  ONLY while closed: an open card has a film over the photograph, so lifting a
+  picture nobody can see is motion with nothing behind it.
 */
 @media (hover: hover) and (pointer: fine) {
   .contact__note:not([open]):hover {
@@ -3002,39 +2333,22 @@ main > .section-dark:last-child {
   }
 }
 
-/*
-  The paragraph, on the film rather than on the photograph — which is what lets
-  it be ordinary body copy at ordinary contrast. --text-muted resolves to
-  --light-stone on this tier; measured against the film further down.
-*/
+/* The paragraph, on the film rather than the photograph — which is what lets it
+   be ordinary body copy at ordinary contrast. */
 .contact__note-text {
   margin: 0;
-  /*
-    A step down from the --step-0 this copy had when it sat in a panel of its
-    own, because it now has to fit a card rather than set the card's height. At
-    --step-0 the Greek events paragraph plus the call needed 356px inside a 326px
-    card at 1366 — it fitted only after the title was dropped, with nothing to
-    spare, and Greek is the longer locale. This buys the margin back at every
-    width instead of at the one that was measured.
-  */
+  /* A step down from --step-0, because the copy now has to fit a card rather
+     than set its height: at --step-0 the Greek events paragraph plus the call
+     needed 356px inside a 326px card, and Greek is the longer locale. */
   font-size: var(--step--1);
   color: var(--text-muted);
 }
 
 /*
-  `margin-top: auto` pins the call to the bottom of the film whatever the
-  paragraph's length, so the two cards' badges land on one line when both are
-  open — the same job it did when the paragraph sat in a flat panel.
-
-  `align-self: start` keeps the target the width of its own content — a
-  full-width anchor would put a ~400px hit area under a ~150px control, and a
-  pointer landing in the empty half would dial the restaurant.
-
-  The radius is there so :focus-visible draws a capsule around the pill rather
-  than a rectangle through it, and it brings the tap-highlight opt-out with it:
-  Chrome paints that highlight against the border *box* and ignores
-  border-radius, so without it a tap flashes a hard-edged wood rectangle. It
-  cannot be seen with a mouse and does not show up in a screenshot either.
+  margin-top: auto pins the call to the bottom of the film whatever the
+  paragraph's length. align-self: start keeps the target the width of its own
+  content — a full-width anchor would put a ~400px hit area under a ~150px
+  control. The radius brings the tap-highlight opt-out with it.
 */
 .contact__note-call {
   display: inline-flex;
@@ -3056,17 +2370,12 @@ main > .section-dark:last-child {
   transition: transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 /*
-  Gated, because a touch browser fakes :hover on tap and then leaves it applied —
-  and this control opens the dialer, so the visitor comes back to a card still
-  sitting in its hover state with no pointer left to move away. `pointer: fine`
-  is in the query as well as `hover: hover` because a laptop with a touchscreen
-  reports both, and the pair asks the narrower question. :focus-visible stays
-  outside the gate: a keyboard is not a pointer and does not fire on a tap.
+  Gated: this control opens the dialer, so on touch the visitor comes back to a
+  card stuck in its hover state. :focus-visible stays outside the gate.
 
-  The lift is the whole signal, and that is a consequence rather than a
-  preference — there is no colour left to brighten. The number is already --salt
-  and the badge is already the site's lightest fill, so the only direction
-  available is darker, which reads as a press rather than as a hover.
+  The lift is the whole signal by necessity — the number is already --salt and
+  the badge the site's lightest fill, so the only direction left is darker,
+  which reads as a press.
 */
 @media (hover: hover) and (pointer: fine) {
   .contact__note-call:hover {
@@ -3082,8 +2391,8 @@ main > .section-dark:last-child {
 .contact__note-call:focus-visible .contact__phone-badge {
   transform: scale(1.08);
 }
-/* A press has to land under the finger, not 200ms after it — same override
-   .contact__panel:active makes, and for the same reason. */
+/* A press has to land under the finger — same override .contact__panel:active
+   makes. */
 .contact__note-call:active {
   transform: translateY(0);
   transition-duration: 0.1s;
@@ -3112,17 +2421,13 @@ main > .section-dark:last-child {
    -------------------------------------------------------------------------- */
 /*
   One text column beside the photograph — address, opening hours, phone, email
-  in a single stack, the same order it already read in below the breakpoint.
-  This band has been two text columns with no photo, and a photo beside a
-  single text column before that; this is the second arrangement again, with
-  the column's internal order kept from the two-column version rather than
-  reverted to whatever it was originally.
+  in a single stack. The grouping is "where and when" then "how to reach us",
+  which is why hours comes second; it has survived every layout this band has
+  had.
 
-  The breakpoint stays 55rem rather than dropping to the 48rem the rest of the
-  site uses, because .find__hours is a fixed-width block of rows and needs the
-  room; see the note on it further down. Below the breakpoint the grid has no
-  `grid-template-columns` of its own, so it is an implicit single column and
-  the photograph simply stacks after the text.
+  The breakpoint is 55rem, not the site's usual 48rem, because .find__hours is a
+  fixed-width block of rows and needs the room. Below it the grid has no
+  columns of its own and the photograph simply stacks after the text.
 */
 .find__grid {
   display: grid;
@@ -3130,15 +2435,9 @@ main > .section-dark:last-child {
 }
 @media (min-width: 55rem) {
   .find__grid {
-    /*
-      Even columns, not the `1fr 1.15fr` this band used the first time it had a
-      photo. That split gave the picture the wider track on the assumption that
-      a photo is the bigger object by default; the second time round the client
-      asked for the opposite — the photo should not read as bigger than the
-      information beside it — so the columns start equal and the real limit on
-      the photo's size is the height rule below, not an intentionally generous
-      width.
-    */
+    /* Even columns, not the 1fr 1.15fr this band used the first time it had a
+       photo: the client asked that the photo not read as bigger than the
+       information beside it. The real limit is the height rule below. */
     grid-template-columns: 1fr 1fr;
     align-items: stretch;
   }
@@ -3146,11 +2445,8 @@ main > .section-dark:last-child {
 
 /*
   The heading is centred over the whole band, above the grid rather than inside
-  a column — a --step-2 title over two columns, not a label on one of them. It
-  needs its own text-align now that it is no longer inheriting .find__col's.
-
-  --step-2 matches .plates__head and .goal__heading: the three band headings
-  are one size.
+  a column, so it reads as the band's title and not as a column label. --step-2
+  matches the other band headings.
 */
 .find__head {
   margin-bottom: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
@@ -3162,19 +2458,12 @@ main > .section-dark:last-child {
 }
 
 /*
-  Centred, the way the text in this band always has been. The hours list needs
-  its own centring on top of that because it is a fixed-width block of rows
-  rather than a run of text — text-align does nothing to it, so the 22rem cap
-  sits on the <ul>, where auto margins have a width to act on.
+  Centred. The hours list needs its own centring on top of that, because it is a
+  block of rows rather than a run of text — the auto margins sit on the <ul>,
+  where they have a width to act on.
 
-  align-content: start is defensive rather than load-bearing now. It mattered
-  when there were two `.find__col`s side by side and a taller one could stretch
-  the shorter one's grid row, pushing its content toward the middle unless told
-  to hug the top. There is one `.find__col` now, beside `.find__media` rather
-  than another text column, and .find__media is built to take its height *from*
-  this column (see below) rather than the other way round — so in the normal
-  case this column is never taller than its own content and the rule does
-  nothing. It stays in case that ever stops being true.
+  align-content: start is defensive now: it mattered when two .find__col could
+  stretch each other's row, and .find__media takes its height FROM this column.
 */
 .find__col {
   text-align: center;
@@ -3182,34 +2471,21 @@ main > .section-dark:last-child {
 }
 
 /*
-  Two different sizing rules either side of the 55rem breakpoint, because the
-  photograph is doing a different job in each layout.
+  Two sizing rules either side of 55rem, because the photograph does a different
+  job in each layout.
 
-  Below 55rem it stacks under the text as a normal photo frame, same idiom as
-  `.team__photo`: a fixed aspect-ratio and an `<img>` in normal flow, sized
-  `100%`/`100%` with `object-fit: cover`. Nothing here needs to match anything
-  else at that width, so a fixed ratio is the simple, predictable choice.
+  Below 55rem it stacks under the text as an ordinary photo frame: fixed
+  aspect-ratio, in-flow <img>, same idiom as .team__photo.
 
-  At 55rem and above it sits beside the text column, and *that* is where "the
-  photo shouldn't read as bigger than the information" is actually a layout
-  constraint rather than a preference — the first time this band had a photo, a
-  fixed 4:5 crop in the wider of two tracks made the picture noticeably taller
-  than the text beside it. The fix is to stop giving the photo a size of its own
-  at that width at all: `aspect-ratio` is reset to `auto` and the `<img>` is
-  taken out of normal flow with `position: absolute; inset: 0`. An out-of-flow
-  element contributes nothing to its parent's content size, so `.find__media`
-  has no natural height left for the grid's `auto` row-track sizing to measure.
-  The row's height is set by `.find__col` alone, `.find__media` stretches to
-  match it (grid's default `align-items: stretch`), and the image fills that
-  exact box via `object-fit: cover`. The photo ends up precisely as tall as the
-  information beside it, not the other way round — verified at 1366px and 880px,
-  where `.find__media`'s rendered height equals `.find__col`'s within a pixel.
+  At 55rem and up it must never read as bigger than the text beside it, so it is
+  given no size of its own: aspect-ratio is auto and the <img> is taken out of
+  flow with position: absolute; inset: 0. An out-of-flow element contributes
+  nothing to its parent's content size, so the row's height comes from
+  .find__col alone and .find__media stretches to match it. Verified equal to the
+  pixel at 1366 and 880.
 
-  min-height only applies in the second mode, as a floor for the case the text
-  column is unexpectedly short — a translated line that wraps less than Greek,
-  say — so the photo can't collapse to a sliver. 20rem is well short of anything
-  the real content produces at this breakpoint; it bounds an edge case, it does
-  not set the usual height.
+  min-height applies only in the second mode, as a floor if the text column is
+  unexpectedly short. It bounds an edge case; it is not the usual height.
 */
 .find__media {
   position: relative;
@@ -3238,22 +2514,14 @@ main > .section-dark:last-child {
   margin-top: 2rem;
 }
 /*
-  Sentence case, white, bold, and larger than the value under it.
+  Sentence case, salt, bold, and larger than the value under it — the emphasis
+  is inverted from where it started, so the block reads label-first. The strings
+  are already sentence case in the locale files, and the 0.16em tracking went
+  with text-transform: it is a caps measurement.
 
-  The strings are already sentence case in the locale files ("Ώρες
-  λειτουργίας", "Opening hours"), so dropping text-transform was the whole of
-  that change. The tracking went with it: 0.16em is a caps measurement, and on
-  lowercase it reads as letters drifting apart rather than as a label.
-
-  The emphasis is inverted from where it started. Labels used to be --step--1
-  wood over --step-1 values; they are --step-1 salt over --step-0 stone now, so
-  the block reads label-first. That gives the column a three-step ramp —
-  heading --step-2, label --step-1, value --step-0 — rather than two sizes
-  fighting over which is the heading.
-
-  Salt is 13.22:1 on this band's charcoal. The values below are --light-stone at
-  5.86:1; --stone itself is 2.6:1 here and fails, which is why "stone" in this
-  section always means the light one.
+  Salt is 13.22:1 on this band; the values are --light-stone at 5.86:1. --stone
+  is 2.6:1 here and fails, which is why "stone" in this section always means the
+  light one.
 */
 .find__label {
   font-size: var(--step-1);
@@ -3266,25 +2534,9 @@ main > .section-dark:last-child {
   line-height: 1.5;
 }
 /*
-  No underline at rest — the 1px rule that used to sit under the phone number
-  and the email is gone, as are the rules between the opening hours rows — but
-  a real underline on hover and focus, which is the only thing telling a visitor
-  these three are links.
-
-  It is a text-decoration rather than the old border-bottom on purpose: a border
-  sits under the whole box and skips nothing, while an underline follows the
-  text and clears descenders, which matters most on the email address. The
-  offset keeps it off the baseline of Greek and Latin alike.
-
-  These states are load-bearing, not decoration. At rest the address, the phone
-  and the email are the same colour and weight as the text around them, so there
-  is nothing else marking them as clickable. Do not remove them.
-*/
-/*
-  inline-flex so the icon and the text sit on one line with a real gap, and so
-  the pair centres as a single object in the centred column. It stays
-  inline-level, not block, or it would take the full column width and the
-  underline would run past the end of the text.
+  inline-flex so the icon and the text sit on one line and the pair centres as
+  one object. It stays inline-level: as a block it would take the full column
+  width and the underline would run past the end of the text.
 */
 .find__contact a,
 .find__map {
@@ -3297,23 +2549,14 @@ main > .section-dark:last-child {
   transition: color 0.18s var(--ease);
 }
 /*
-  The underline goes on the inner span, never on the anchor, and that is a
-  consequence of the anchor being `inline-flex`. A decoration set on a flex
-  container propagates to its flex items, and the icon is one of them, so the
-  rule would draw a line under the pin/phone/envelope as well as the words —
-  which is exactly the "border under the whole box" look this was written to
-  avoid. On the span it follows the text and clears descenders, which matters
-  most on the email address.
+  The underline goes on the inner span, NEVER on the anchor: a decoration set on
+  a flex container propagates to its flex items, and the icon is one — so on the
+  anchor it draws a line under the pin/phone/envelope glyphs as well as the
+  words. On the span it follows the text and clears descenders.
 
-  The sr-only span is excluded for tidiness rather than effect: it is clipped,
-  so an underline on it would not paint anything.
-
-  These are underlined **at rest** now. The client had asked for the underlines
-  to go and this reverses that, twice-reviewed: two rounds of feedback objected
-  that the address, phone and email are the same colour and weight as the text
-  around them with nothing marking them as links. Colour cannot do that job here
-  — they are the body colour on purpose — so the underline is the only
-  affordance available that does not add a control.
+  Underlined at rest, which reverses a client request: two rounds of review
+  objected that these read as static text, and they are the body colour and
+  weight on purpose, so colour cannot mark them. Do not remove.
 */
 .find__contact a > span,
 .find__map > span:not(.sr-only) {
@@ -3329,14 +2572,9 @@ main > .section-dark:last-child {
   height: 1.05em;
 }
 /*
-  Hover and focus go to --salt, the same white the .btn--primary fill lifts to,
-  rather than to --accent. The two hover states on this page now agree: a button
-  brightens to salt, and so does a link.
-
-  It lands on the same colour as .find__label above it, which is fine — the
-  label is 700 and a size larger, and the underline is doing the work of saying
-  "this one is a link". The icon follows for free: it is stroked in
-  currentColor.
+  Hover and focus go to --salt, matching every other hover on the site. The
+  underline is permanent, so these states only change colour; the icon follows
+  for free, being stroked in currentColor.
 */
 .find__contact a:hover,
 .find__contact a:focus-visible,
@@ -3344,10 +2582,8 @@ main > .section-dark:last-child {
 .find__map:focus-visible {
   color: var(--salt);
 }
-/* The values — address, hours, phone, email — are one size and one colour:
-   --step-0 in --light-stone, under a larger salt label. The hours list was
-   already at the inherited body size, so this brings the other three down to
-   meet it rather than moving all four. */
+/* The values — address, hours, phone, email — are one size and one colour under
+   a larger salt label. */
 .find__address,
 .find__contact,
 .find__hours {
@@ -3360,26 +2596,15 @@ main > .section-dark:last-child {
 }
 
 /*
-  `width: fit-content` is what puts this block on the same centre as everything
-  else in the column, and it is the whole of the fix for an alignment bug worth
-  understanding before anyone "tidies" it away.
+  width: fit-content is what puts this block on the same centre as the rest of
+  the column, and it fixes a real bug: at a flat 22rem with space-between, the
+  box was wider than the rows need, so the surplus went into the gap and pinned
+  the days and times to fixed x-positions while everything above them centred on
+  a different axis — three alignment axes in one centred column.
 
-  The list was a flat 22rem (352px) inside a 436px column, with rows laid out
-  `space-between`. 22rem is wider than the rows actually need — the widest is
-  163px of days beside 110px of times — so `space-between` spent the surplus on
-  the gap and pinned the days to x=261 and the times to x=613, while every label
-  and value above them centred on x=437. Three alignment axes in one column,
-  under headings that are all centred. Reported in review, and correctly.
-
-  Shrinking the box to its content leaves one: at ~297px wide with auto margins
-  the block centres on 436.5, hairline to the labels above it. `space-between`
-  stays, and now does the job it is actually for — the shorter row's time is
-  still pushed to the block's right edge, so the times right-align with each
-  other and the schedule still reads as a schedule rather than as two centred
-  phrases whose columns wander row to row.
-
-  The 22rem stays as a `max-width` for the case fit-content cannot handle: a
-  future long day range on a narrow screen. It is a ceiling now, not the width.
+  space-between stays and now does its actual job: the times right-align with
+  each other. A fixed width plus space-between is a distributed layout wearing a
+  table's clothes. The 22rem is a ceiling now, not the width.
 */
 .find__hours {
   width: fit-content;
@@ -3388,8 +2613,7 @@ main > .section-dark:last-child {
   font-variant-numeric: tabular-nums;
 }
 /* No dividing rules between rows, and the day names take the same muted stone
-   the times already had — the row reads as one line rather than as a table with
-   a bright left column. */
+   the times have — the row reads as one line, not as a table. */
 .find__hours li {
   display: flex;
   justify-content: space-between;
@@ -3417,7 +2641,7 @@ main > .section-dark:last-child {
   text-align: center;
 }
 
-/* Height, not width. The badge sits centred in a wide transparent field, so a
+/* Height, not width: the badge sits centred in a wide transparent field, so a
    width constraint would size the empty margins rather than the mark. */
 .footer__logo {
   width: auto;

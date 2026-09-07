@@ -6,17 +6,12 @@ import Footer from '../components/Footer.astro';
 import { defaultLocale } from '../lib/i18n';
 
 /*
-  The menu has its own page rather than an anchor on the homepage.
-
-  It is 98 items across 19 sections — over half of the site's DOM — and, more to
-  the point, a restaurant needs a URL that *is* the menu: for the QR code on the
-  table, the link in the Instagram bio, and the Google Business Profile menu
-  field. An anchor cannot carry its own title and description, or rank on its
-  own for "fokia menu".
+  Its own page rather than an anchor: 98 items across 19 sections, over half the
+  site's DOM, and a restaurant needs a URL that IS the menu — for the QR code on
+  the table, the Instagram bio and the Google Business Profile menu field.
 
   Structured data follows the split: the Restaurant graph stays on the homepage
-  with `hasMenu` pointing here, and the Menu/MenuSection/MenuItem graph is
-  emitted on this page via `menuSchema`.
+  with hasMenu pointing here, and the Menu graph is emitted here via menuSchema.
 */
 const locale = defaultLocale;
 ---
@@ -29,11 +24,8 @@ const locale = defaultLocale;
 >
   <Nav locale={locale} />
 
-  {/*
-    id="main" is what the skip link targets. The footer's "back to top" uses
-    href="#top", which needs no element — HTML treats the fragment "top" as the
-    top of the document when nothing carries that id.
-  */}
+  {/* id="main" is the skip link's target. The footer's "back to top" uses
+      href="#top", which needs no element. */}
   <main id="main">
     <Menu locale={locale} />
   </main>

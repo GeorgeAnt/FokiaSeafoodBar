@@ -11,16 +11,9 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 /*
-  Photos are chosen by gallery id, not by filename or position, for the same
-  reason Plates does it: gallery.json is ordered for the gallery, and reordering
-  it must not quietly change what the homepage shows. It throws at build time
-  rather than rendering a gap.
-
-  Both card sets in this band go through here, but they do **not** treat the alt
-  text the same way, and the difference is not an inconsistency — see the notes
-  on each block of markup. The panels are links, so their photographs are
-  decorative and carry alt=""; the note cards are not, so theirs are content and
-  carry the gallery's real, translated alt.
+  Photos are chosen by gallery id, never by position: gallery.json is ordered
+  for the gallery, and reordering it must not change what the homepage shows.
+  Throws at build time rather than rendering a gap.
 */
 function fromGallery(id: string, whose: string) {
   const image = gallery.images.find((candidate) => candidate.id === id);
@@ -35,19 +28,13 @@ function fromGallery(id: string, whose: string) {
 }
 
 /*
-  Each card is one control that places one call.
+  Each card is one control that places one call: the whole card is an
+  <a href="tel:…">, so it has to commit to one number before the tap.
 
-  The client asked for the panels to behave as buttons, so the whole card is an
-  <a href="tel:…"> rather than a photo with a link somewhere inside it. That
-  forces the question the previous version dodged by showing both numbers at
-  once: a control that dials has to know *which* number, and it has to decide
-  before the visitor taps.
-
-  `swaps: true` is that decision. The server renders the landline — correct
-  during service, and a number that is answered outside it — and the script
-  below replaces it with the mobile when the restaurant is shut, evaluated on the
-  restaurant's clock. Take away does not swap: it can only be done during
-  service, so the landline is the only number it could ever want.
+  swaps: true is that decision. The server renders the landline — correct during
+  service and answered outside it — and the script below swaps in the mobile
+  when the restaurant is shut. Take away does not swap: it can only be done
+  during service. Ask what the call is FOR, not which row the card is in.
 */
 const PANELS = [
   { id: 'table-setting', titleKey: 'contact.reserveTitle', swaps: true },
@@ -65,11 +52,9 @@ const panels = PANELS.map(({ id, titleKey, swaps }) => ({
 const schedule = JSON.stringify(site.hours.entries);
 
 /*
-  Every dialling control that can swap carries the same four attributes, so they
-  are written once here and spread rather than repeated per card. Two kinds of
-  card disagreeing about which number they offer is the worst failure this
-  section can have — it would look perfectly fine on screen — and one object is
-  what makes that impossible rather than merely unlikely.
+  Every dialling control that can swap carries the same four attributes, written
+  once and spread. Two kinds of card disagreeing about which number they offer
+  is the worst failure this section can have, and it would look fine on screen.
 */
 const swapAttrs = {
   'data-phone-swap': '',
@@ -79,40 +64,18 @@ const swapAttrs = {
 };
 
 /*
-  The two service notes — private events and special sourcing.
+  The two service notes. They swap and take away does not — a party enquiry or a
+  special order is the kind of call someone makes at midnight.
 
-  They swap, and take away still does not, which is the same rule applied to
-  three different cards rather than an inconsistency: take away can only be done
-  during service, so the landline is the only number it could ever want, while a
-  party enquiry or a special order is exactly the kind of call someone makes at
-  midnight. Both of these paragraphs ask to be contacted; neither is bound to a
-  service window.
-
-  The photographs are picked against the copy, not for variety, and both are the
-  client's own choices. `sushi-events.jpg` is a service being plated — trays of
-  rolls laid out in quantity — which is what "προγραμματίσουμε τη δική σου
-  εκδήλωση" is offering. `oysters-on-ice` is the sourcing card: the paragraph is
-  about getting hold of something particular, and oysters are the most legible
-  instance of that on the whole site.
-
-  Neither is used anywhere else on the homepage. When the events card was still
-  drawing from the gallery, `toast-outdoors` was the obvious pick for it and is
-  already Our Goal's photograph, and
-  `sushi-board-overhead` is one of the four plates directly above this band —
-  check both before changing an id here.
+  Neither photograph is used elsewhere on the homepage: toast-outdoors is Our
+  Goal's and sushi-board-overhead is one of the four plates directly above this
+  band, so check Goal.astro and Plates.astro before changing an id here.
 */
 /*
-  The events card's photograph does not come from the gallery and the sourcing
-  card's does, which is the one asymmetry in this band worth explaining.
-
-  `sushi-events.jpg` is the client's own shot of a service being plated, and
-  they did not want it as a tile on /gallery — so it is a named export from
-  lib/photos.ts with its alt in the locale files, rather than an id looked up in
-  gallery.json. See the note on `sushiEvents` there for why it is not simply
-  dropped into `gallery/` unlisted: `npm run check` would report it as "not
-  shown on the site", which would be false.
-
-  It replaced `shared-table`, which is consequently free again.
+  The events photograph is a named export from lib/photos.ts rather than a
+  gallery id, because the client did not want it as a tile on /gallery and every
+  gallery.json entry renders there. Dropping it into gallery/ unlisted is wrong:
+  npm run check walks that folder and would report it as unused.
 */
 const NOTES = [
   { key: 'contact.events', titleKey: 'contact.eventsTitle', photo: sushiEvents },
@@ -127,44 +90,19 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
 ---
 
 {/*
-  Charcoal, like every band below the hero — and this is the band where that
-  decision costs the most, so it is worth being explicit about.
-
-  This section was light *specifically* to keep two photo bands apart: From the
-  kitchen sits directly above it as four plates on a dark ground, and the strip
-  of light around these two inset panels was the boundary between the two photo
-  groups. That strip is gone. What separates them now is the 1px hairline
-  .section-dark puts on top of this section, which is a thinner boundary than a
-  whole tier change — a deliberate trade, not an oversight. The cards stay
-  inset rather than full-bleed, which is what keeps the two groups from reading
-  as one continuous run of photographs — and now that they are small and heavily
-  rounded, they read as controls rather than as photography at all.
-
-  The heading is visible now. It was `.sr-only` for as long as this band had no
-  title of its own — it carried the combined nav label, "Κλείστε τη θέση σας •
-  Take away", purely so the outline and the /#contact anchor had a heading, and
-  showing *that* string was never an option: it is word for word the two panel
-  titles directly beneath it, which is the two-titles-stacked failure the eyebrow
-  note in CLAUDE.md is entirely about. New copy is what made a visible heading
-  possible, not a change of mind about hiding it.
+  Charcoal like every band below the hero — and this is where that costs most:
+  From the kitchen sits directly above as four plates on a dark ground, and the
+  strip of light that used to separate the two photo groups is gone. What keeps
+  them apart now is .section-dark's 1px hairline plus these cards staying inset
+  rather than full-bleed. A ninth photograph in this neighbourhood is the thing
+  to argue about.
 */}
 <section class="section section-dark" id="contact">
   <div class="wrap">
     {/*
-      Heading plus one line, the same shape .plates__head has — this was the only
-      band below the hero without a visible title, so it is joining the pattern
-      rather than inventing one.
-
-      **It renders `nav.contact`, not a heading key of its own.** The nav label
-      and the title are now the same two words, and this codebase has already
-      decided that case once: `goal.heading` was deleted rather than kept beside
-      `nav.goal` holding identical text. `contact.heading` went the same way here.
-      Change the words in one place and the nav follows, which is the point.
-
-      The intro names the four services rather than explaining how to work the
-      cards. Saying "tap to see more" would have been wrong about half of them —
-      only the two note cards open; the panels dial on tap — and the arrows
-      already say which is which.
+      Renders nav.contact, not a heading key of its own: the nav label and the
+      title are the same two words, and this codebase already deleted
+      goal.heading rather than keep two keys holding identical text.
     */}
     <header class="contact__head" data-reveal>
       <h2 data-i18n="nav.contact">{t(locale, 'nav.contact')}</h2>
@@ -180,14 +118,11 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
             {...(panel.swaps ? swapAttrs : {})}
           >
             {/*
-              alt="" on purpose, and it is the whole card being a link that makes
-              it right. Everything inside an <a> is concatenated into the link's
-              accessible name, so the gallery's descriptive alt would prepend a
-              sentence about a table setting to "Κλείστε τη θέση σας 21 3099
-              1571" — the name a screen-reader user hears before deciding whether
-              to place a call. The picture illustrates the title; it does not
-              identify the control. On /gallery the same photograph keeps its
-              real alt, because there it is the content.
+              alt="" because the whole card is a link: everything inside an <a>
+              is concatenated into its accessible name, so a descriptive alt
+              would prepend a sentence about a table setting to the name a
+              screen-reader user hears before deciding to place a call. On
+              /gallery the same photograph keeps its real alt.
             */}
             <Picture
               src={panel.src}
@@ -203,27 +138,15 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
                 {t(locale, panel.titleKey)}
               </span>
               {/*
-                The number is shown, not just dialled. A control whose target is
-                invisible gives a visitor nothing to check before tapping, and a
-                visitor whose JavaScript never ran would otherwise have no way to
-                notice that the card is offering the landline outside service.
-
-                Icon in the SocialLinks / FindUs idiom — 24x24, fill none, stroke
-                currentColor at 1.6 — and aria-hidden, since the text beside it
-                is already part of the name. There is no arrow any more: an arrow
-                says "goes somewhere", and this places a call. It sits inside a
-                circular badge now — see the note just below — which is a
-                different fix for the same "doesn't read as a button" complaint
-                an arrow would otherwise have answered.
+                The number is shown, not just dialled: a control whose target is
+                invisible gives a visitor nothing to check before tapping, and
+                one whose JS never ran would not know it is offering the
+                landline. The icon is the SocialLinks / FindUs idiom and is
+                aria-hidden. A phone, never an arrow — an arrow says "goes
+                somewhere" and this places a call; the circular badge is what
+                answers the "doesn't read as a button" complaint instead.
               */}
               <span class="contact__panel-call">
-                {/*
-                  The circle is the affordance; the glyph inside it is still a
-                  phone, not an arrow. An arrow was tried and removed once
-                  already — see the note above — because it says "goes
-                  somewhere" and this places a call. The circle says "this is a
-                  button" without changing what the icon means.
-                */}
                 <span class="contact__phone-badge">
                   <svg class="contact__phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
                     <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
@@ -238,62 +161,30 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
     </div>
 
     {/*
-      The two service notes are cards now too, at the client's request that they
-      read as the pair above does. They are deliberately not the *same* card, and
-      every difference is forced rather than chosen.
+      Cards too, at the client's request, but deliberately not the SAME card.
 
-      **The picture is above the text, not behind it.** .contact__panel carries
-      its title over the photograph on a fixed-length scrim — dense to 8rem,
-      finished by 16rem — sized for two lines of --salt bold owing 3:1. These
-      paragraphs are ~60 words: at --step-0 they run to six or seven lines, so
-      most of the block would sit above 8rem in the thin part of that ramp, and
-      body copy owes 4.5:1 rather than 3:1. The one small tinted line that ever
-      sat on those cards measured 5.19:1 at its best and 3.49:1 at 390px under an
-      earlier ramp — that is the margin this would have been building on. Split
-      into a photograph and a flat --black panel beneath it, the copy is
-      --light-stone on --black at 6.55:1 with no scrim to measure at all.
+      The picture is above the text, not behind it: .contact__panel's scrim is a
+      fixed-length ramp sized for two short bold lines owing 3:1, and these are
+      ~60-word paragraphs owing 4.5:1. On a flat --black panel the copy is
+      --light-stone at 6.55:1 with no scrim to measure.
 
-      **The card is not a link; the call inside it is.** Everything inside an <a>
-      is concatenated into the link's accessible name — the reason the panel
-      photographs carry alt="" — so a 60-word paragraph inside the anchor would
-      be that same problem several times over. The paragraph is read, the badge
-      beneath it is tapped, and the link's name stays "Τηλέφωνο 21 3099 1571".
-
-      **Which is also why these photographs keep their real alt.** They are not
-      inside a control, so there is no name to pollute; they are content in an
-      editorial card, and the gallery entry already has the sentence in both
-      locales. data-i18n-alt hands it to the language switch, same as Goal.
+      The card is not a link; the call inside it is — so the link's name stays
+      "Τηλέφωνο 21 3099 1571" rather than swallowing the paragraph.
     */}
     <div class="contact__notes" data-reveal>
       {
         notes.map((note) => (
           /*
-            A <details>, and that is the whole interaction — there is no script
-            behind these cards at all.
-
-            The site's other hide-and-reveal is `.has-reveal`, which exists
-            because a CSS rule that hides content has to be owned by something
-            that can un-hide it; the danger there is a failed script leaving the
-            page at opacity 0. A native disclosure has no such failure mode. It
-            opens without JS, it is keyboard-operable without JS, it announces
-            its own expanded state without ARIA, and the paragraph inside is real
-            DOM the whole time, so search engines and screen readers get the copy
-            whether or not anyone clicks. Do not "upgrade" this to a button and a
-            class toggle: that would be strictly more code and strictly less
-            robust.
+            A native <details> — there is no script behind these cards. It
+            opens, keyboards and announces its expanded state without JS, and
+            the paragraph is real DOM throughout. Do not "upgrade" it to a
+            button and a class toggle: strictly more code, strictly less robust.
           */
           <details class="contact__note">
             {/*
-              The summary is the entire closed card — photograph, title and cue.
-
-              Which is exactly why the photograph is `alt=""` here, and it is the
-              same rule the panels above follow rather than a second one:
-              everything inside the control is concatenated into its accessible
-              name, so a descriptive alt would read a sentence about plated
-              sushi before the words that say what the control does. The picture
-              illustrates the title; the title identifies the control. This is
-              what the note cards' own real alt text was traded for when they
-              stopped being passive cards and became controls.
+              The summary is the entire closed card, which is why this
+              photograph is alt="": everything inside a control is concatenated
+              into its accessible name. Same rule the panels follow.
             */}
             <summary class="contact__note-summary">
               <Picture
@@ -310,23 +201,11 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
                   {t(locale, note.titleKey)}
                 </span>
                 {/*
-                  An arrow, where the panels carry a phone — and the difference
-                  is the point rather than an inconsistency.
-
-                  CLAUDE.md records an arrow being tried on the panels and
-                  removed, because an arrow says "goes somewhere" and those cards
-                  place a call. These cards genuinely do go somewhere: they open.
-                  So the arrow is correct here for the same reason it was wrong
-                  there, and the phone glyph moves inside the film, onto the
-                  thing that actually dials.
-
-                  **Two glyphs, not one rotated one.** The arrow used to turn a
-                  quarter circle when the card opened, which left a chevron
-                  pointing *down* — the icon a closed disclosure conventionally
-                  wears, so the open card was showing the closed card's cue. A
-                  cross says "close" and nothing else. Only one of the two is
-                  ever in the flow, so the disc's size never depends on which is
-                  showing.
+                  An arrow where the panels carry a phone: these cards do go
+                  somewhere — they open — so it is right here for the reason it
+                  was wrong there. Two glyphs, not one rotated: a chevron turned
+                  a quarter circle points down, which is what a CLOSED
+                  disclosure wears.
                 */}
                 <span class="contact__note-cue" aria-hidden="true">
                   <svg class="contact__note-cue-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -340,34 +219,20 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
             </summary>
 
             {/*
-              The film. Near-opaque rather than a gradient, and that is what
-              makes this layout possible at all.
-
-              These paragraphs are ~60 words. The panels' scrim is a fixed-length
-              ramp sized for two short bold lines owing 3:1, and body copy owes
-              4.5:1 — putting a paragraph on it is the failure this band spent a
-              whole revision avoiding by stacking photo above text. A film that
-              is *allowed* to hide the photograph has none of that difficulty:
-              the copy sits on what is effectively a flat surface, so it measures
-              like text on a panel rather than text on a picture.
+              The film is near-opaque rather than a gradient, which is what makes
+              this layout possible: the copy sits on what is effectively a flat
+              surface, so it measures like text on a panel, not on a picture.
             */}
             <div class="contact__note-film">
               <p class="contact__note-text" data-i18n={note.key}>
                 {t(locale, note.key)}
               </p>
               {/*
-                The same badge-and-number control the panels carry, so all four
-                cards end at one affordance. It swaps on the clock like the
-                reservations panel — see the note on NOTES above — and the href
-                and the digits are rewritten together by the one script below.
-
-                The .sr-only label is there because the visible text is bare
-                digits: out of context, a link named "21 3099 1571" says nothing
-                about what it does. It uses contact.phoneLabel, the key Find Us
-                already renders as a visible label, so nothing new is invented
-                and the switch owns both. Prefixed rather than appended, and the
-                visible number stays inside the accessible name either way,
-                which is what WCAG 2.5.3 asks for.
+                The same badge-and-number control the panels carry, swapping on
+                the clock. The .sr-only label is there because the visible text
+                is bare digits — a link named "21 3099 1571" says nothing out of
+                context. It reuses contact.phoneLabel, and prefixing keeps the
+                visible number inside the accessible name (WCAG 2.5.3).
               */}
               <a class="contact__note-call" href={`tel:${site.phone.href}`} {...swapAttrs}>
                 <span class="sr-only" data-i18n="contact.phoneLabel">
@@ -389,31 +254,22 @@ const notes = NOTES.map(({ id, key, titleKey, photo }) =>
 </section>
 
 <script>
-  // Outside opening hours the reservations card dials the mobile instead of the
-  // landline, and shows the number it will dial.
+  // Outside opening hours the swapping cards dial the mobile instead of the
+  // landline, and show the number they will dial.
   //
-  // Evaluated in Europe/Athens, never in the visitor's own timezone: someone
-  // calling from London at 22:00 is calling a restaurant where it is already
-  // midnight, and the number they need is the one that rings after service.
+  // Evaluated in Europe/Athens, never the visitor's timezone: someone calling
+  // from London at 22:00 is calling a restaurant where it is already midnight.
   // Intl does the conversion, so no offset is hard-coded and DST is handled.
   //
-  // The decision itself lives in lib/hours.ts so the shipped logic is the logic
-  // that can be tested; this script only supplies the clock and rewrites the
-  // href and the digits together — they must never disagree, since the digits
-  // are the only thing a visitor can check before tapping.
+  // The decision lives in lib/hours.ts so the shipped logic is testable. This
+  // script rewrites the href and the digits TOGETHER — they must never
+  // disagree, since the digits are all a visitor can check before tapping.
   //
-  // It selects on [data-phone-swap], spread from one object in the frontmatter
-  // onto every dialling control that can swap. An earlier version looked for a
-  // hand-typed id that had stopped being rendered, so the swap silently did
-  // nothing for weeks and neither `astro check` nor `npm run check` had anything
-  // to catch.
-  //
-  // **The attribute belongs on the anchor that dials, never on the card.** On a
-  // panel those are the same element — the whole card is the link. On a note
-  // card they are not: the card is a <div> and the control is the small call
-  // link inside it, so the attribute goes there. That keeps this query's
-  // contract exact — every match is an anchor with an href to rewrite and a
-  // .contact__phone-number inside it — rather than "a card, somehow".
+  // It selects on [data-phone-swap], spread from one object in the frontmatter.
+  // An earlier version looked for a hand-typed id that had stopped being
+  // rendered, so the swap silently did nothing and nothing caught it. The
+  // attribute belongs on the anchor that dials, never on the card: on a panel
+  // they are the same element, on a note card they are not.
   import { isOpenAt, type HoursEntry } from '../lib/hours';
 
   const cards = document.querySelectorAll<HTMLAnchorElement>('[data-phone-swap]');

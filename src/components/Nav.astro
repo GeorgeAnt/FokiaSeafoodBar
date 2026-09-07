@@ -10,28 +10,14 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 /*
-  Logo, then one list in reading order, with the utilities after it.
-
-  Source order is left-to-right and matches the tab order, but the link list
-  is never shown inline any more — `.nav__inner` in global.css always renders
-  it as a dropdown panel behind the burger toggle, at every viewport width.
-  Source order still governs the panel's reading order and the tab order, it
-  just no longer has to double as a visual layout. The logo is at the start,
-  the social icons follow it — they are centred in the bar, not ranged with the
-  utilities, so they are their own child rather than part of `.nav__utils` —
-  and the language button and the toggle end the row as one group.
-
-  It renders logo-clean.png, the same file the hero and the footer use, cropped
-  by `object-fit` rather than by a second asset — see the note on `.nav__logo`
-  in global.css for why that is safe and what it saves.
+  Logo, then one list in reading order, then the utilities. The link list is
+  never shown inline — .nav__inner always renders it as a dropdown panel behind
+  the burger toggle, at every viewport width — so source order governs reading
+  and tab order only, and a seventh link costs the bar nothing.
 
   Section links are rooted ("/#goal", not "#goal") because the nav also renders
-  on /menu, /gallery and /team, where those sections do not exist. From the
-  homepage a rooted fragment is still a same-document jump, so nothing reloads.
-
-  Four of the six entries are now whole pages rather than anchors. /team joined
-  them when the section was moved off the homepage for its height; it keeps the
-  same nav.team label and the same position in the run.
+  on /menu, /gallery and /team. From the homepage a rooted fragment is still a
+  same-document jump.
 */
 const links = [
   { href: '/#goal', key: 'nav.goal' },
@@ -42,10 +28,8 @@ const links = [
   { href: '/#find-us', key: 'nav.findUs' },
 ];
 
-/**
- * The language button names the locale it switches *to*, so everything about it
- * is derived from the other one rather than from the current one.
- */
+/** The language button names the locale it switches TO, so everything about it
+ *  is derived from the other locale rather than the current one. */
 const other = locale === 'el' ? 'en' : 'el';
 
 /** Marks the current page in the nav for assistive tech. */
@@ -62,18 +46,14 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
   >
     <a class="nav__logo" href="/" aria-label={t(locale, 'a11y.home')} data-i18n-label="a11y.home">
       {/*
-        alt="" on purpose. The link carries the accessible name, so a non-empty
-        alt here would announce the mark twice — and on the homepage the <h1> is
-        this same logo, whose alt is what gives the page its heading. Two
-        identical accessible names in one document is what that would produce.
+        alt="" on purpose: the link already carries the accessible name, and on
+        the homepage the h1 is this same mark.
       */}
       {/*
-        sizes is 142px, not the 80px the box actually measures. srcset picks a
-        candidate from the img's *layout* width, but object-fit: cover crops 47%
-        of this file away (1672x940, badge centred — see .nav__logo in
-        global.css), so a file laid out at 80px renders a 45px mark in an 80px
-        box. 80 x 1672/940 = 142 is the width that fills it, and 284 is its 2x.
-        Resize .nav__logo and both numbers move with it.
+        sizes is 142px, not the 80px the box measures: srcset picks from the
+        img's LAYOUT width, but object-fit: cover crops 47% of this file away
+        (1672x940, badge centred), so 80 x 1672/940 = 142 is the width that
+        fills the box, and 284 is its 2x. Resize .nav__logo and both move.
       */}
       <Image src={logoClean} alt="" widths={[142, 284]} sizes="142px" loading="eager" />
     </a>
@@ -98,32 +78,21 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
 
     <div class="nav__utils">
       {/*
-        One button, not a pair of them. It is labelled with the language it will
-        switch *to* — "English" on the Greek page, "ΕΛ" on the English one — so
-        the label is the action rather than a state the visitor has to read off
-        a highlighted segment. There is no `aria-pressed` and no `role="group"`
-        any more: this performs an action, it does not report a setting, and
-        `a11y.languageSwitcher` went with them.
+        One button, labelled with the language it switches TO, so the label is
+        the action rather than a state. No aria-pressed and no role="group": it
+        performs an action, it does not report a setting.
 
-        Four attributes travel together, and `apply()` in Base rewrites all four
-        to point at the other locale every time the language changes:
+        Four attributes travel together and apply() in Base re-aims all four at
+        the other locale on every switch: data-lang-target (the button's whole
+        state), lang (the text is a language's own name — without it a screen
+        reader says "English" with Greek phonemes), and data-i18n /
+        data-i18n-label, which stay dictionary lookups.
 
-          data-lang-target — what a click switches to, and what the click
-            handler reads. It is the button's whole state.
-          lang — the text is a language's own name, so it has to be marked as
-            that language. Without it a screen reader on the Greek page reads
-            "English" with Greek phonemes.
-          data-i18n / data-i18n-label — visible text and spoken label. Both stay
-            dictionary lookups: the script picks the key, never the string,
-            which is the same contract `setLabelKey` follows.
-
-        `lang.el` / `lang.en` are autonyms and are deliberately identical in both
-        locale files — a language names itself the same way whoever is reading,
-        like `footer.rights`. `a11y.lang.*` are sentences and do translate. Both
-        families are built at runtime from a locale code, so neither appears
-        literally anywhere and neither will grep. Deleting one breaks this button
-        silently; `npm run check` compares keys across locales and never asks
-        whether a key is used.
+        lang.el / lang.en are autonyms and are deliberately identical in both
+        locale files; a11y.lang.* are sentences and do translate. All are built
+        at runtime from a locale code, so none of them greps — deleting one
+        breaks this button silently, and npm run check only compares keys
+        across locales, never whether a key is used.
       */}
       <button
         type="button"
@@ -134,15 +103,10 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
         data-i18n-label={`a11y.lang.${other}`}
       >
         {/*
-          Two spans, but only .lang__name ever shows — .lang__code is CSS-hidden
-          unconditionally now that the button itself is small enough not to need
-          a narrower fallback. Both still carry data-i18n and both are still
-          re-aimed by apply() on every locale switch (see Base.astro), so the
-          hidden span stays correct if a narrow-width fallback is ever wanted
-          again — nothing here assumes which one is visible.
-
-          Hiding one is safe for assistive tech because the button's accessible
-          name comes from aria-label, not from this text.
+          Only .lang__name ever shows — .lang__code is hidden unconditionally
+          now the button is small enough not to need a narrower fallback. Both
+          still carry data-i18n and are re-aimed by apply(), so the swap could
+          be reinstated. Safe for assistive tech: the name comes from aria-label.
         */}
         <span class="lang__name" data-lang-name data-i18n={`lang.${other}`}>
           {t(locale, `lang.${other}`)}
@@ -153,12 +117,10 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
       </button>
 
       {/*
-        The toggle sits inside `.nav__utils` rather than beside it because the
-        bar is a three-track grid now (see `.nav__inner` in global.css) and the
-        social icons own the middle track. Everything to the right of them has
-        to be one grid item or it would need a track of its own, which is
-        exactly what would stop the icons centring against the *bar* rather
-        than against their neighbours.
+        The toggle sits inside .nav__utils rather than beside it because the bar
+        is a three-track grid and the social icons own the middle track:
+        everything right of them has to be one grid item, or the icons stop
+        centring against the bar.
       */}
       <button
         type="button"
@@ -187,9 +149,9 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
     const setOpen = (open: boolean) => {
       inner.dataset.open = String(open);
       toggle.setAttribute('aria-expanded', String(open));
-      // The label has to follow the state, not just aria-expanded: the key is
+      // The label follows the state, not just aria-expanded — and the KEY is
       // swapped rather than the string, so the language switch can still reach
-      // it afterwards. `a11y.closeMenu` had been in both dictionaries unused.
+      // it afterwards.
       window.fokiaI18n?.setLabelKey(toggle, open ? 'a11y.closeMenu' : 'a11y.openMenu');
     };
 
@@ -210,9 +172,8 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
       }
     });
 
-    // A click anywhere outside the bar closes the panel. The toggle itself is
-    // inside `inner`, so `contains` already excludes it — no need to guard
-    // against the click that opened the panel re-closing it.
+    // A click outside the bar closes the panel. The toggle is inside inner, so
+    // contains() already excludes the click that opened it.
     document.addEventListener('click', (event) => {
       if (inner.dataset.open !== 'true') return;
       if (!inner.contains(event.target as Node)) setOpen(false);

@@ -11,16 +11,10 @@ interface Props {
 }
 const { locale = defaultLocale } = Astro.props;
 
-// TEMP: same concrete ground as /team and /gallery — see .section--concrete-test
-// in global.css, which owns the overlay and the token changes. This only hands
-// it the optimised texture; the source jpg is 9.3MB.
-//
-// 2560, not the source's native 4666, works here because
-// `#menu.section--concrete-test { background-attachment: fixed }` in
-// global.css ties `cover`'s scaling to the viewport rather than to this page's
-// own (much taller) scrolling height — so 2560 covers it at a downscale, not
-// an upscale, and stays sharp at any menu length. Without that rule this would
-// need a much bigger source; see the note in Team.astro for the math.
+// TEMP: same concrete ground as /team and /gallery — see
+// .section--concrete-test in global.css, which owns the overlay, the token
+// changes and why 2560 is enough. This only hands it the optimised texture;
+// the source jpg is 9.3MB.
 const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
 
 const views = [
@@ -87,11 +81,8 @@ const views = [
     </div>
 
     <!--
-      Required on the menu by Greek regulation: allergens, the frozen-ingredient
-      list, the 24-hour freezing protocol, the consumer's right to information,
-      the receipt notice, tax inclusion, and the named commercial manager.
-      Always rendered, never behind a toggle, and bilingual — the client
-      supplied both versions.
+      Required on the menu by Greek regulation. Always rendered, never behind a
+      toggle, never shortened, and bilingual — the client supplied both.
     -->
     <aside class="menu__legal" lang={locale}>
       <h2 data-i18n="menu.legalHeading">{t(locale, 'menu.legalHeading')}</h2>
