@@ -209,5 +209,13 @@ const isCurrent = (href: string) => href.replace(/\/$/, '') === path;
         toggle.focus();
       }
     });
+
+    // A click anywhere outside the bar closes the panel. The toggle itself is
+    // inside `inner`, so `contains` already excludes it — no need to guard
+    // against the click that opened the panel re-closing it.
+    document.addEventListener('click', (event) => {
+      if (inner.dataset.open !== 'true') return;
+      if (!inner.contains(event.target as Node)) setOpen(false);
+    });
   }
 </script>
