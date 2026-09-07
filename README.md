@@ -21,10 +21,18 @@ npm run build     # production build into dist/
 npm run preview   # serve the built dist/ locally
 npm run check     # validate the content files (see below)
 npm run favicons  # regenerate the favicons from the logo (only if it changes)
+npm run og        # regenerate the social share card (only if its photo changes)
 ```
 
 Deploy by uploading `dist/` to any static host — Netlify, Vercel, Cloudflare
 Pages, GitHub Pages, or plain nginx. There is no server and no database.
+
+**Set `NOINDEX=1` on any deployment that is not the real domain.** A preview
+build serves byte-identical HTML to production, canonical tag included, so
+without it a `*.pages.dev` URL can be crawled and listed as a second copy of the
+restaurant. With it set, that build serves `robots.txt` as `Disallow: /` and
+carries a `noindex` meta tag. Production sets nothing — the default is
+indexable, which is the safer of the two to get wrong.
 
 `@playwright/cli` is a devDependency, used only to drive a real browser when
 verifying a change — nothing in the built site depends on it:
@@ -578,13 +586,14 @@ predates the page split — re-run it before quoting it.
 
 **Blocking — the site is wrong without these:**
 
-- **Production domain** — `site.seo.url`. Canonical URLs, Open Graph tags,
-  `sitemap.xml` and `robots.txt` all derive from it.
 - **Check the Greek spelling of the address.** The client supplied it in Latin
   script (`Laskou 3, Elefsína`); `site.json` renders `Λάσκου 3, Ελευσίνα` on the
   Greek page, which needs a native-speaker check.
 
-**Confirmed and in place:** address (Laskou 3, Elefsina 19200), phone
+**Confirmed and in place:** the production domain (`fokiaseafoodbar.gr`, set in
+`site.seo.url` — the single place it is written, feeding canonical URLs,
+`og:url`, `sitemap-index.xml` and `robots.txt`), the social share card
+(`public/og-image.jpg`), address (Laskou 3, Elefsina 19200), phone
 (21 3099 1571), email (fokiaseafoodbar@gmail.com), opening hours (Mon–Sat
 18:00–00:00, Sun 16:00–00:00, open seven days), Instagram and Facebook, and
 the map coordinates (38.04136874195106, 23.54054582764447), supplied by the
