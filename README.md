@@ -55,6 +55,7 @@ browser download. Its scratch files go in `.playwright-cli/`, which is ignored.
 | `/menu` | The full menu and the legally required notices |
 | `/gallery` | The photographs, each opening in a lightbox |
 | `/team` | The five team members, one photo-and-bio row each |
+| `/privacy` | The privacy policy, linked from the footer of every page |
 
 The menu has a page of its own rather than being a section on the homepage. It
 is 98 items across 19 sections — over half the site's DOM — but the real reason
@@ -323,6 +324,30 @@ the consumer-rights and receipt notices, and the named commercial manager.
 collapsed behind a toggle, and should not be shortened. It is bilingual, same
 as the rest of the menu now, because the client supplied both versions.
 
+### The privacy policy — `src/data/privacy.json`
+
+The page at `/privacy`, linked from the bottom of every page. Each section has a
+heading and a `body` of paragraphs (and, under "Your rights", one bulleted
+list), every one `{ "el": "…", "en": "…" }`. Change `updated` (written
+`YYYY-MM-DD`) whenever the text changes; the page shows it as the "last updated"
+date.
+
+**It is a draft written from what the site actually does, not legal advice**, and
+needs the client's sign-off before launch. Two values are still missing and are
+shown on the page as `PLACEHOLDER` until they are filled in:
+
+- `controller.name` — the business's registered name.
+- The first paragraph of the `hosting` section — who hosts the site and in which
+  country (and, if that is outside the EU, what covers the transfer).
+
+The address, email and phone shown under "Who we are" are taken from
+`site.json`, so there is nothing to keep in step here.
+
+**If the site starts doing something new with visitors' data — analytics, an
+embedded map, a booking form, a newsletter signup — this page becomes wrong and
+must be updated at the same time.** Today it says, truthfully, that the site
+collects almost nothing.
+
 ---
 
 ## Languages
@@ -589,6 +614,10 @@ predates the page split — re-run it before quoting it.
 - **Check the Greek spelling of the address.** The client supplied it in Latin
   script (`Laskou 3, Elefsína`); `site.json` renders `Λάσκου 3, Ελευσίνα` on the
   Greek page, which needs a native-speaker check.
+- **Finish and sign off the privacy policy.** `/privacy` shows `PLACEHOLDER` for
+  the registered business name and the hosting provider until they are filled
+  in `src/data/privacy.json`, and the client should read and approve the text —
+  see [The privacy policy](#the-privacy-policy--srcdataprivacyjson).
 
 **Confirmed and in place:** the production domain (`fokiaseafoodbar.gr`, set in
 `site.seo.url` — the single place it is written, feeding canonical URLs,
@@ -681,8 +710,9 @@ src/
   assets/photos/      downsampled masters — carousel, gallery, team,
                       backgrounds, sections
   components/         Nav, Hero, Goal, Plates, Menu, MenuCategory, MenuItem,
-                      Team, Gallery, Contact, FindUs, Footer
-  data/               ← content lives here (menu, team, gallery, site, legal)
+                      Team, Gallery, Contact, FindUs, Privacy, Footer
+  data/               ← content lives here (menu, team, gallery, site, legal,
+                      privacy)
   env.d.ts            types for the language switcher's window.fokiaI18n
   i18n/               ← UI strings, el.json + en.json
   layouts/Base.astro  meta tags, structured data, language-switch script

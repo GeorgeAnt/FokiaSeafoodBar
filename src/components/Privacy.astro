@@ -1,0 +1,70 @@
+---
+import { t, defaultLocale, type Locale } from '../lib/i18n';
+import { privacy } from '../lib/privacy';
+import site from '../data/site.json';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = defaultLocale } = Astro.props;
+
+// dd/mm/yyyy, which Greek and British English both read the same way: the
+// language switch swaps text by key and cannot reformat a date.
+const [year, month, day] = privacy.updated.split('-');
+---
+
+{/*
+  Plain --salt ground, not the TEMP concrete the other three pages are testing:
+  this is a page of long prose, and the texture's dark patches are exactly where
+  that experiment still fails contrast.
+
+  The "who we are" block reads the address, email and phone from site.json, so
+  they cannot drift from what the rest of the site shows.
+*/}
+<section class="section">
+  <div class="wrap">
+    <header class="section-head">
+      <h1 data-i18n="privacy.heading">{t(locale, 'privacy.heading')}</h1>
+      <p>
+        <span data-i18n="privacy.updated">{t(locale, 'privacy.updated')}</span>{' '}
+        <time datetime={privacy.updated}>{`${day}/${month}/${year}`}</time>
+      </p>
+    </header>
+
+    <div class="privacy__body">
+      <section class="privacy__section">
+        <h2 data-i18n="privacy.controller.heading">{t(locale, 'privacy.controller.heading')}</h2>
+        <p data-i18n="privacy.controller.intro">{t(locale, 'privacy.controller.intro')}</p>
+        <address class="privacy__controller">
+          <strong data-i18n="privacy.controller.name">{t(locale, 'privacy.controller.name')}</strong><br />
+          <span data-i18n="site.street">{t(locale, 'site.street')}</span>,{' '}
+          {site.address.postalCode} <span data-i18n="site.city">{t(locale, 'site.city')}</span>,{' '}
+          <span data-i18n="site.countryName">{t(locale, 'site.countryName')}</span><br />
+          <a href={`mailto:${site.email}`}>{site.email}</a><br />
+          <a href={`tel:${site.phone.href}`}>{site.phone.display}</a>
+        </address>
+      </section>
+
+      {
+        privacy.sections.map((section) => (
+          <section class="privacy__section">
+            <h2 data-i18n={`privacy.${section.id}.heading`}>{t(locale, `privacy.${section.id}.heading`)}</h2>
+            {section.body.map((block, i) =>
+              'list' in block ? (
+                <ul>
+                  {block.list.map((_, j) => (
+                    <li data-i18n={`privacy.${section.id}.${i}.${j}`}>
+                      {t(locale, `privacy.${section.id}.${i}.${j}`)}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p data-i18n={`privacy.${section.id}.${i}`}>{t(locale, `privacy.${section.id}.${i}`)}</p>
+              )
+            )}
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</section>

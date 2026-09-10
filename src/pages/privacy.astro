@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Privacy from '../components/Privacy.astro';
+import Footer from '../components/Footer.astro';
+import { defaultLocale } from '../lib/i18n';
+
+/*
+  The privacy notice. Reached from the footer on every page rather than from the
+  nav — it is somewhere people look for, not somewhere they browse to. The text
+  lives in src/data/privacy.json.
+*/
+const locale = defaultLocale;
+---
+
+<Base locale={locale} titleKey="meta.privacyTitle" descriptionKey="meta.privacyDescription">
+  <Nav locale={locale} />
+
+  <main id="main">
+    <Privacy locale={locale} />
+  </main>
+
+  <Footer locale={locale} />
+</Base>

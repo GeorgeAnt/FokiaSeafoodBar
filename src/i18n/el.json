@@ -11,6 +11,8 @@
   "meta.teamDescription": "Οι άνθρωποι πίσω από τον πάγκο και το bar του fokia: ο chef, η κουζίνα και το service.",
   "meta.galleryTitle": "Gallery | fokia — seafood bar",
   "meta.galleryDescription": "Φωτογραφίες από το fokia: ο χώρος, τα πιάτα, τα κοκτέιλ και η ομάδα.",
+  "meta.privacyTitle": "Πολιτική απορρήτου | fokia — seafood bar",
+  "meta.privacyDescription": "Ποια προσωπικά δεδομένα επεξεργάζεται ο ιστότοπος του fokia, για ποιο λόγο, και ποια είναι τα δικαιώματά σας.",
   "a11y.skipToContent": "Μετάβαση στο περιεχόμενο",
   "a11y.mainNav": "Κύρια πλοήγηση",
   "a11y.home": "fokia — αρχική σελίδα",
@@ -85,6 +87,9 @@
   "hours.Saturday": "Σάββατο",
   "hours.Sunday": "Κυριακή",
   "hours.rangeSeparator": "–",
+
+  "privacy.heading": "Πολιτική απορρήτου",
+  "privacy.updated": "Τελευταία ενημέρωση:",
 
   "footer.rights": "All rights reserved."
 }

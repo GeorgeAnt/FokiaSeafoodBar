@@ -11,6 +11,8 @@
   "meta.teamDescription": "The people behind the counter and the bar at fokia: the chef, the kitchen and the service.",
   "meta.galleryTitle": "Gallery | fokia — seafood bar",
   "meta.galleryDescription": "Photographs from fokia: the room, the plates, the cocktails and the team.",
+  "meta.privacyTitle": "Privacy policy | fokia — seafood bar",
+  "meta.privacyDescription": "What personal data the fokia website processes, why, and your rights.",
   "a11y.skipToContent": "Skip to content",
   "a11y.mainNav": "Main navigation",
   "a11y.home": "fokia — home",
@@ -85,6 +87,9 @@
   "hours.Saturday": "Saturday",
   "hours.Sunday": "Sunday",
   "hours.rangeSeparator": "–",
+
+  "privacy.heading": "Privacy policy",
+  "privacy.updated": "Last updated:",
 
   "footer.rights": "All rights reserved."
 }

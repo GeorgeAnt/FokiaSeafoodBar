@@ -10,12 +10,15 @@ interface Props {
 const { locale = defaultLocale } = Astro.props;
 
 const year = new Date().getFullYear();
+
+/* Same normalisation as Nav's current-page marker. */
+const onPrivacy = Astro.url.pathname.replace(/\/$/, '') === '/privacy';
 ---
 
 {/*
-  The mark and the copyright, and nothing else: the address, phone, email and
-  social links that used to sit here are all already on the page above, and the
-  Restaurant JSON-LD carries them for search.
+  The mark, the copyright and the privacy link, and nothing else: the address,
+  phone, email and social links that used to sit here are all already on the
+  page above, and the Restaurant JSON-LD carries them for search.
 */}
 <footer class="footer">
   <div class="wrap footer__inner">
@@ -36,5 +39,16 @@ const year = new Date().getFullYear();
     <p class="footer__rights">
       © {year} {site.name}. <span data-i18n="footer.rights">{t(locale, 'footer.rights')}</span>
     </p>
+
+    {/* Shares privacy.heading with the page's h1: the link and the title say the
+        same words, so they are one key. */}
+    <a
+      class="footer__link"
+      href="/privacy"
+      data-i18n="privacy.heading"
+      aria-current={onPrivacy ? 'page' : undefined}
+    >
+      {t(locale, 'privacy.heading')}
+    </a>
   </div>
 </footer>

@@ -1,7 +1,7 @@
 # fokia — seafood bar
 
-Astro marketing site for a Greek seafood restaurant. Four pages: `/` (scrolling
-homepage), `/menu`, `/gallery`, `/team`. `README.md` is for the person editing
+Astro marketing site for a Greek seafood restaurant. Five pages: `/` (scrolling
+homepage), `/menu`, `/gallery`, `/team`, `/privacy`. `README.md` is for the person editing
 content and deploying; this file is for whoever works on the code next.
 
 This file is **rules and traps**, not history. Every entry is here because
@@ -371,6 +371,28 @@ indicator* can carry this, a control someone must find on every slide cannot.
 The lightbox arrows use a two-triangle construction (light arrowhead over a
 larger dark one) for the same reason.
 
+## Privacy notice
+
+`/privacy`, text in `src/data/privacy.json`, linked from the footer only.
+**It is a description of what the code does, so it goes stale the moment the
+code changes.** It states: no forms, no analytics, no embeds, no cookies, no
+third-party requests, one `localStorage` key (`fokia:lang`), host server logs,
+email through Gmail. Adding analytics, an embedded map, a form, a font or script
+from another origin, or a new storage key makes it false — update `privacy.json`
+in the same change, and its `updated` date with it.
+
+- It is a **draft, not legal advice**, and the client signs it off. The
+  controller's business name and the hosting provider are `PLACEHOLDER`; they
+  render visibly and `npm run check` lists them.
+- The address, email and phone in its "who we are" block come from `site.json`.
+  Do not restate them in `privacy.json`.
+- Body keys are **positional** (`privacy.<id>.<i>`, list items
+  `privacy.<id>.<i>.<j>`), built in `lib/i18n.ts`, and will not grep. No section
+  may take the id `controller`; the checker enforces it.
+- It sits on plain `--salt`, not the TEMP concrete ground: long prose is where
+  that texture fails contrast.
+- The footer link shares `privacy.heading` with the page's `h1`.
+
 ## SEO / build
 
 **The production domain is written once, in `site.seo.url`**, and everything
@@ -573,6 +595,7 @@ Installed at `~/.claude/skills/` — **user-level, not in this repo**.
 | `web-design-guidelines` | Auditing UI against the Web Interface Guidelines (needs network) |
 | `playwright-cli` | Driving a browser to verify a change — prefer it over hand-rolled CDP |
 | `image-to-code-skill` | **Written for Codex**; its image-generation workflow will not run here |
+| `ponytail` (+ `-review`, `-audit`, `-debt`, `-gain`, `-help`) | Simplest-solution mode and over-engineering reviews. Skills only, without the plugin's always-on hooks. It still auto-triggers on coding tasks, so it should never override the rules above; a `ponytail-audit` hit is a lead, not a verdict (see dead-code sweeps) |
 
 `@playwright/cli` is a project devDependency:
 

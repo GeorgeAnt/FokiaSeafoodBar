@@ -1,0 +1,117 @@
+{
+  "$comment": "The privacy notice at /privacy. A DRAFT, written in September 2026 from what the code actually does: no forms, no analytics, no embeds, no cookies, no third-party requests (fonts and images are self-hosted), one localStorage key for the language choice, the host's server logs, and phone/email contact handled off-site. It is not legal advice — the client reviews it before launch. Two values are still to be supplied and `npm run check` lists them: the controller's registered business name and the hosting provider. This file describes the site's BEHAVIOUR: adding analytics, an embedded map, a form, a third-party font or a new storage key makes it false, so update it in the same change. The address, email and phone in the 'who we are' block are read from site.json, not written here. Paragraph keys are privacy.<id>.<i> and list items privacy.<id>.<i>.<j>, by position — see lib/i18n.ts. No section may use the id `controller`; that prefix belongs to the block above the sections.",
+  "updated": "2026-09-10",
+  "controller": {
+    "heading": { "el": "Ποιοι είμαστε", "en": "Who we are" },
+    "intro": {
+      "el": "Η παρούσα ενημέρωση εξηγεί ποια προσωπικά δεδομένα επεξεργάζεται ο ιστότοπος του fokia και για ποιο λόγο. Υπεύθυνος επεξεργασίας είναι:",
+      "en": "This notice explains what personal data the fokia website processes, and why. The data controller is:"
+    },
+    "name": {
+      "el": "PLACEHOLDER — η επωνυμία της επιχείρησης όπως είναι καταχωρισμένη",
+      "en": "PLACEHOLDER — registered business name"
+    }
+  },
+  "sections": [
+    {
+      "id": "website",
+      "heading": { "el": "Τι συλλέγει ο ιστότοπος", "en": "What this website collects" },
+      "body": [
+        {
+          "el": "Ελάχιστα. Ο ιστότοπος δεν έχει φόρμες, λογαριασμούς χρηστών, εργαλεία στατιστικών, διαφημίσεις ή cookies παρακολούθησης. Οι γραμματοσειρές και οι φωτογραφίες φορτώνονται από τον ίδιο τον ιστότοπο, οπότε το άνοιγμα μιας σελίδας δεν επικοινωνεί με τη Google, το Facebook ή οποιονδήποτε άλλο τρίτο.",
+          "en": "Very little. The site has no forms, no user accounts, no analytics, no advertising and no tracking cookies. Its fonts and photographs are served from the site itself, so opening a page does not contact Google, Facebook or any other third party."
+        },
+        {
+          "el": "Δεν χρησιμοποιούμε δεδομένα σας για κατάρτιση προφίλ ή για αυτοματοποιημένη λήψη αποφάσεων.",
+          "en": "We do not use your data for profiling or for automated decision-making."
+        }
+      ]
+    },
+    {
+      "id": "hosting",
+      "heading": { "el": "Αρχεία καταγραφής του διακομιστή", "en": "Server logs" },
+      "body": [
+        {
+          "el": "Όπως κάθε ιστότοπος, ο δικός μας φιλοξενείται από έναν πάροχο φιλοξενίας: PLACEHOLDER (επωνυμία και χώρα του παρόχου· αν βρίσκεται εκτός ΕΕ, η εγγύηση για τη διαβίβαση των δεδομένων).",
+          "en": "Like every website, ours is served by a hosting provider: PLACEHOLDER (the provider's name and country; if it is outside the EU, the safeguard that covers the transfer)."
+        },
+        {
+          "el": "Όταν ανοίγετε μια σελίδα, οι διακομιστές του καταγράφουν αυτόματα τεχνικά στοιχεία που στέλνει το πρόγραμμα περιήγησής σας: τη διεύθυνση IP, την ημερομηνία και την ώρα, τη σελίδα που ζητήθηκε και τον τύπο του προγράμματος περιήγησης. Αυτό είναι απαραίτητο για να λειτουργεί ο ιστότοπος και να προστατεύεται από κακόβουλη χρήση, και αποτελεί έννομο συμφέρον μας (άρθρο 6 παρ. 1 στʹ του Γενικού Κανονισμού Προστασίας Δεδομένων, ΓΚΠΔ). Τα αρχεία διατηρούνται για περιορισμένο διάστημα, σύμφωνα με την πολιτική του παρόχου.",
+          "en": "When you open a page, its servers automatically record technical information your browser sends: your IP address, the date and time, the page requested and the type of browser. This is needed to deliver the site and to protect it from abuse, and is our legitimate interest (Article 6(1)(f) of the General Data Protection Regulation, GDPR). The logs are kept for a limited period, under the provider's own policy."
+        }
+      ]
+    },
+    {
+      "id": "language",
+      "heading": { "el": "Η επιλογή γλώσσας", "en": "Your language choice" },
+      "body": [
+        {
+          "el": "Αν χρησιμοποιήσετε το κουμπί γλώσσας, το πρόγραμμα περιήγησής σας θυμάται την επιλογή (στον τοπικό του χώρο αποθήκευσης, με το όνομα fokia:lang), ώστε η επόμενη σελίδα να ανοίξει στην ίδια γλώσσα. Η πληροφορία μένει στη συσκευή σας, δεν αποστέλλεται ποτέ σε εμάς και δεν είναι cookie. Μπορείτε να τη διαγράψετε καθαρίζοντας τα δεδομένα του ιστότοπου στο πρόγραμμα περιήγησής σας.",
+          "en": "If you use the language button, your browser remembers the choice (in its local storage, under the name fokia:lang) so that the next page opens in the same language. It stays on your device, is never sent to us, and is not a cookie. You can remove it by clearing this site's data in your browser."
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "heading": { "el": "Όταν μας τηλεφωνείτε ή μας στέλνετε email", "en": "When you call or email us" },
+      "body": [
+        {
+          "el": "Αν επικοινωνήσετε μαζί μας για κράτηση, take away ή κάποια εκδήλωση, χρησιμοποιούμε το όνομά σας, τον αριθμό τηλεφώνου, τη διεύθυνση email και ό,τι άλλο μας πείτε αποκλειστικά για να σας απαντήσουμε και να κανονίσουμε αυτό που ζητήσατε (άρθρο 6 παρ. 1 βʹ ΓΚΠΔ). Τα διατηρούμε μόνο όσο χρειάζεται γι’ αυτό ή όσο προβλέπει ο νόμος.",
+          "en": "If you contact us about a reservation, take away or an event, we use your name, phone number, email address and anything else you tell us only to answer you and to arrange what you asked for (Article 6(1)(b) GDPR). We keep it only as long as that takes, or as long as the law requires."
+        },
+        {
+          "el": "Ο λογαριασμός email μας παρέχεται από τη Google (Gmail), επομένως τα μηνύματα που μας στέλνετε αποθηκεύονται και στους διακομιστές της Google.",
+          "en": "Our email account is provided by Google (Gmail), so messages you send us are also stored on Google's servers."
+        }
+      ]
+    },
+    {
+      "id": "links",
+      "heading": { "el": "Σύνδεσμοι προς άλλες υπηρεσίες", "en": "Links to other services" },
+      "body": [
+        {
+          "el": "Η διεύθυνσή μας ανοίγει τους Χάρτες Google και τα εικονίδια ανοίγουν τις σελίδες μας στο Instagram και στο Facebook. Τίποτα δεν φορτώνεται από αυτές τις υπηρεσίες μέχρι να ακολουθήσετε έναν σύνδεσμο· από εκεί και πέρα ισχύουν οι δικές τους πολιτικές απορρήτου.",
+          "en": "Our address opens Google Maps, and the icons open our Instagram and Facebook pages. Nothing is loaded from these services until you follow a link; from then on, their own privacy policies apply."
+        }
+      ]
+    },
+    {
+      "id": "rights",
+      "heading": { "el": "Τα δικαιώματά σας", "en": "Your rights" },
+      "body": [
+        { "el": "Σύμφωνα με τον ΓΚΠΔ έχετε δικαίωμα:", "en": "Under the GDPR you have the right:" },
+        {
+          "list": [
+            {
+              "el": "πρόσβασης στα προσωπικά δεδομένα που τηρούμε για εσάς·",
+              "en": "to access the personal data we hold about you;"
+            },
+            { "el": "διόρθωσης ή διαγραφής τους·", "en": "to have it corrected or erased;" },
+            {
+              "el": "περιορισμού της επεξεργασίας τους ή εναντίωσης σε αυτήν·",
+              "en": "to restrict its processing, or to object to it;"
+            },
+            {
+              "el": "φορητότητας, δηλαδή να τα λάβετε σε μορφή που μεταφέρεται.",
+              "en": "to receive it in a portable format."
+            }
+          ]
+        },
+        {
+          "el": "Για να ασκήσετε οποιοδήποτε από αυτά, στείλτε μας email στη διεύθυνση που αναφέρεται παραπάνω· απαντάμε εντός ενός μηνός. Αν θεωρείτε ότι η επεξεργασία των δεδομένων σας παραβιάζει τον νόμο, έχετε επίσης δικαίωμα να υποβάλετε καταγγελία στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr).",
+          "en": "To exercise any of these, email us at the address above; we reply within one month. If you believe your data has been handled unlawfully, you also have the right to complain to the Hellenic Data Protection Authority (www.dpa.gr)."
+        }
+      ]
+    },
+    {
+      "id": "changes",
+      "heading": { "el": "Αλλαγές στην παρούσα ενημέρωση", "en": "Changes to this notice" },
+      "body": [
+        {
+          "el": "Αν αλλάξει ο τρόπος λειτουργίας του ιστότοπου, θα ενημερώσουμε αυτή τη σελίδα και την ημερομηνία στην κορυφή της.",
+          "en": "If what the site does changes, we will update this page and the date at the top of it."
+        }
+      ]
+    }
+  ]
+}

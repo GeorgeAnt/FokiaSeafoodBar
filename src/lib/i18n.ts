@@ -4,7 +4,7 @@
  * Everything is translated, the menu included: keys live in
  * src/i18n/{el,en}.json, plus the content keys derived below from locale-keyed
  * JSON ({ "el": "…", "en": "…" } per field) in team.json, gallery.json,
- * menu-food.json and menu-drinks.json.
+ * menu-food.json, menu-drinks.json and privacy.json.
  *
  * Some values are deliberately identical in both locales rather than
  * translated: a dish or brand name that is already English ("Tuna tacos"), and
@@ -22,6 +22,7 @@ import legalData from '../data/legal.json';
 import galleryData from '../data/gallery.json';
 import siteData from '../data/site.json';
 import { foodCategories, drinkCategories, type MenuGroup, type LocalizedText } from './menu';
+import { privacy } from './privacy';
 
 export const locales = ['el', 'en'] as const;
 export type Locale = (typeof locales)[number];
@@ -57,6 +58,19 @@ function contentKeys(locale: Locale): Dict {
   out['legal.manager.name'] = legalData.commercialManager[locale].name;
 
   for (const img of galleryData.images) out[`gallery.${img.id}.alt`] = img.alt[locale];
+
+  out['privacy.controller.heading'] = privacy.controller.heading[locale];
+  out['privacy.controller.intro'] = privacy.controller.intro[locale];
+  out['privacy.controller.name'] = privacy.controller.name[locale];
+  // By position: a paragraph is privacy.<id>.<i>, a list item privacy.<id>.<i>.<j>,
+  // so reordering blocks in privacy.json renumbers its keys along with it.
+  for (const s of privacy.sections) {
+    out[`privacy.${s.id}.heading`] = s.heading[locale];
+    s.body.forEach((block, i) => {
+      if ('list' in block) block.list.forEach((item, j) => (out[`privacy.${s.id}.${i}.${j}`] = item[locale]));
+      else out[`privacy.${s.id}.${i}`] = block[locale];
+    });
+  }
 
   out['site.street'] = siteData.address.street[locale];
   out['site.city'] = siteData.address.city[locale];

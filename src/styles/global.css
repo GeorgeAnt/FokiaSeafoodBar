@@ -2652,3 +2652,55 @@ main > .section-dark:last-child {
   font-size: var(--step--1);
   color: var(--text-muted);
 }
+
+/* On a line of its own, so it takes the site's 44px target rather than an
+   inline link's exemption. The current-page underline is --accent while hover
+   is --salt, the same split as the nav: "the page you are on" must not look
+   like "the link under your pointer". Hover is gated — see CLAUDE.md, Touch. */
+.footer__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  text-underline-offset: 0.25em;
+}
+.footer__link[aria-current='page'] {
+  text-decoration-color: var(--accent);
+}
+.footer__link:active {
+  color: var(--salt);
+}
+@media (hover: hover) and (pointer: fine) {
+  .footer__link:hover {
+    color: var(--salt);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Privacy notice — /privacy
+   -------------------------------------------------------------------------- */
+.privacy__body {
+  max-width: var(--measure);
+}
+
+.privacy__section + .privacy__section {
+  margin-top: clamp(2rem, 1.6rem + 1.5vw, 3rem);
+}
+
+.privacy__section h2 {
+  font-size: var(--step-1);
+}
+
+.privacy__section > * + * {
+  margin-top: 0.75rem;
+}
+
+.privacy__section ul {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.privacy__section li + li {
+  margin-top: 0.35rem;
+}

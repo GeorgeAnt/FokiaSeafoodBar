@@ -9,7 +9,8 @@
  *   - duplicate item ids
  *   - malformed prices
  *
- * It also prints the list of items the client still has not priced.
+ * It also prints the list of items the client still has not priced, and the
+ * values in the privacy notice still waiting to be supplied.
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -140,6 +141,41 @@ walk(food.categories, []);
 walk(drinks.categories, []);
 console.log(`  ${itemCount} items across ${categoryCount} sections, all ids unique`);
 
+/* --- Privacy notice ------------------------------------------------------ */
+console.log('\nprivacy notice');
+const privacy = read('src/data/privacy.json');
+for (const field of ['heading', 'intro', 'name']) {
+  localeParity(`privacy controller ${field}`, privacy.controller?.[field]);
+}
+const privacyIds = new Set();
+for (const s of privacy.sections) {
+  // `controller` is the block above the sections; a section with that id would
+  // collide with its keys in lib/i18n.ts.
+  if (s.id === 'controller' || privacyIds.has(s.id)) fail(`privacy: section id "${s.id}" is taken`);
+  privacyIds.add(s.id);
+  localeParity(`privacy section "${s.id}" heading`, s.heading);
+  s.body.forEach((block, i) => {
+    if (block.list) block.list.forEach((item, j) => localeParity(`privacy "${s.id}" body[${i}] item ${j}`, item));
+    else localeParity(`privacy "${s.id}" body[${i}]`, block);
+  });
+}
+if (!/^\d{4}-\d{2}-\d{2}$/.test(privacy.updated)) {
+  fail(`privacy: "updated" must be YYYY-MM-DD, got ${JSON.stringify(privacy.updated)}`);
+}
+console.log(`  ${privacy.sections.length + 1} sections, last updated ${privacy.updated}`);
+
+/** Paths of every string in privacy.json that still carries the marker. */
+const privacyPlaceholders = (node, trail = []) =>
+  Object.entries(node).flatMap(([key, value]) => {
+    if (key.startsWith('$')) return [];
+    const path = [...trail, key];
+    if (value && typeof value === 'object') return privacyPlaceholders(value, path);
+    return typeof value === 'string' && value.includes('PLACEHOLDER') ? [path.join('.')] : [];
+  });
+const privacyOutstanding = privacyPlaceholders(privacy).map((p) =>
+  p.replace(/^sections\.(\d+)/, (_, n) => `sections[${privacy.sections[n].id}]`)
+);
+
 /* --- Placeholders still to be replaced ----------------------------------- */
 const site = read('src/data/site.json');
 
@@ -206,6 +242,11 @@ if (outstanding.length === 0) console.log('  · nothing outstanding');
 for (const o of outstanding) console.log(`  · ${o}`);
 
 console.log(`\nTeam entries still marked placeholder: ${placeholderTeam}/${team.members.length}`);
+
+// Rendered visibly on /privacy while they remain, so they cannot pass for real text.
+console.log(`\nprivacy.json (${privacyOutstanding.length} outstanding):`);
+if (privacyOutstanding.length === 0) console.log('  · nothing outstanding');
+for (const p of privacyOutstanding) console.log(`  · ${p} — still says PLACEHOLDER`);
 
 console.log(`\n${errors === 0 ? 'OK — no errors' : `${errors} error(s)`}`);
 process.exit(errors === 0 ? 0 : 1);
