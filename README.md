@@ -336,12 +336,13 @@ list), every one `{ "el": "…", "en": "…" }`. Change `updated` (written
 date.
 
 **It is a draft written from what the site actually does, not legal advice**, and
-needs the client's sign-off before launch. Two values are still missing and are
-shown on the page as `PLACEHOLDER` until they are filled in:
+needs the client's sign-off before launch. One value is still missing and is
+shown on the page as `PLACEHOLDER` until it is filled in:
 
 - `controller.name` — the business's registered name.
-- The first paragraph of the `hosting` section — who hosts the site and in which
-  country (and, if that is outside the EU, what covers the transfer).
+
+The hosting provider is Hostinger (Hostinger International Ltd, Cyprus — inside
+the EU, so no separate transfer safeguard is needed).
 
 The address, email and phone shown under "Who we are" are taken from
 `site.json`, so there is nothing to keep in step here.
@@ -618,9 +619,9 @@ predates the page split — re-run it before quoting it.
   script (`Laskou 3, Elefsína`); `site.json` renders `Λάσκου 3, Ελευσίνα` on the
   Greek page, which needs a native-speaker check.
 - **Finish and sign off the privacy policy.** `/privacy` shows `PLACEHOLDER` for
-  the registered business name and the hosting provider until they are filled
-  in `src/data/privacy.json`, and the client should read and approve the text —
-  see [The privacy policy](#the-privacy-policy--srcdataprivacyjson).
+  the registered business name until it is filled in `src/data/privacy.json`,
+  and the client should read and approve the text — see
+  [The privacy policy](#the-privacy-policy--srcdataprivacyjson).
 
 **Confirmed and in place:** the production domain (`fokiaseafoodbar.gr`, set in
 `site.seo.url` — the single place it is written, feeding canonical URLs,
@@ -749,7 +750,7 @@ tone:
 | Class | Background | Where |
 |---|---|---|
 | *(default)* | `--salt` | Menu, Team, Gallery — the other three pages |
-| `.section-dark` | `--charcoal` `#221F1F` | Our Goal, From the Kitchen, Reserve your spot • Take away, Where to Find Us |
+| `.section-dark` | `--charcoal` `#221F1F` | Our Goal, From the Kitchen, Reserve your spot • Take away, Where to Find Us; also `/privacy` and the 404 page |
 | — | `--black` `#181414` | Hero, navigation bar, footer |
 
 Charcoal is one step up from Deep Black, and the hero, the bar and the footer

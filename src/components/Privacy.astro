@@ -14,14 +14,14 @@ const [year, month, day] = privacy.updated.split('-');
 ---
 
 {/*
-  Plain --salt ground, not the TEMP concrete the other three pages are testing:
-  this is a page of long prose, and the texture's dark patches are exactly where
-  that experiment still fails contrast.
+  The homepage's charcoal band, like the 404 — not the TEMP concrete the other
+  three pages are testing: this is a page of long prose, and the texture's dark
+  patches are exactly where that experiment still fails contrast.
 
   The "who we are" block reads the address, email and phone from site.json, so
   they cannot drift from what the rest of the site shows.
 */}
-<section class="section">
+<section class="section section-dark">
   <div class="wrap">
     <header class="section-head">
       <h1 data-i18n="privacy.heading">{t(locale, 'privacy.heading')}</h1>

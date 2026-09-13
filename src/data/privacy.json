@@ -1,6 +1,6 @@
 {
   "$comment": "The privacy notice at /privacy. A DRAFT, written in September 2026 from what the code actually does: no forms, no analytics, no embeds, no cookies, no third-party requests (fonts and images are self-hosted), one localStorage key for the language choice, the host's server logs, and phone/email contact handled off-site. It is not legal advice — the client reviews it before launch. Two values are still to be supplied and `npm run check` lists them: the controller's registered business name and the hosting provider. This file describes the site's BEHAVIOUR: adding analytics, an embedded map, a form, a third-party font or a new storage key makes it false, so update it in the same change. The address, email and phone in the 'who we are' block are read from site.json, not written here. Paragraph keys are privacy.<id>.<i> and list items privacy.<id>.<i>.<j>, by position — see lib/i18n.ts. No section may use the id `controller`; that prefix belongs to the block above the sections.",
-  "updated": "2026-09-10",
+  "updated": "2026-09-13",
   "controller": {
     "heading": { "el": "Ποιοι είμαστε", "en": "Who we are" },
     "intro": {
@@ -32,8 +32,8 @@
       "heading": { "el": "Αρχεία καταγραφής του διακομιστή", "en": "Server logs" },
       "body": [
         {
-          "el": "Όπως κάθε ιστότοπος, ο δικός μας φιλοξενείται από έναν πάροχο φιλοξενίας: PLACEHOLDER (επωνυμία και χώρα του παρόχου· αν βρίσκεται εκτός ΕΕ, η εγγύηση για τη διαβίβαση των δεδομένων).",
-          "en": "Like every website, ours is served by a hosting provider: PLACEHOLDER (the provider's name and country; if it is outside the EU, the safeguard that covers the transfer)."
+          "el": "Όπως κάθε ιστότοπος, ο δικός μας φιλοξενείται από έναν πάροχο φιλοξενίας: Hostinger (Hostinger International Ltd, Κύπρος — εντός ΕΕ, άρα δεν απαιτείται επιπλέον εγγύηση για διαβίβαση δεδομένων).",
+          "en": "Like every website, ours is served by a hosting provider: Hostinger (Hostinger International Ltd, Cyprus — within the EU, so no additional data-transfer safeguard is required)."
         },
         {
           "el": "Όταν ανοίγετε μια σελίδα, οι διακομιστές του καταγράφουν αυτόματα τεχνικά στοιχεία που στέλνει το πρόγραμμα περιήγησής σας: τη διεύθυνση IP, την ημερομηνία και την ώρα, τη σελίδα που ζητήθηκε και τον τύπο του προγράμματος περιήγησης. Αυτό είναι απαραίτητο για να λειτουργεί ο ιστότοπος και να προστατεύεται από κακόβουλη χρήση, και αποτελεί έννομο συμφέρον μας (άρθρο 6 παρ. 1 στʹ του Γενικού Κανονισμού Προστασίας Δεδομένων, ΓΚΠΔ). Τα αρχεία διατηρούνται για περιορισμένο διάστημα, σύμφωνα με την πολιτική του παρόχου.",

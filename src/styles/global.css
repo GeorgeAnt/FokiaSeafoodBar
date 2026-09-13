@@ -2717,10 +2717,10 @@ main > .section-dark:last-child {
   min-height: calc(100svh - 6.0625rem);
 }
 
-/* The only .section-dark directly under the nav, whose own bottom rule already
-   draws this edge — the band's border-top would double it. Two classes so this
-   does not hang on source order against .section-dark. */
-.section-dark.not-found {
+/* A .section-dark directly under the nav (/privacy, the 404): the nav's own
+   bottom rule already draws this edge, so the band's border-top would double
+   it. ~ rather than +, because Nav renders a <script> between the two. */
+.nav ~ main > .section-dark:first-child {
   border-top: 0;
 }
 

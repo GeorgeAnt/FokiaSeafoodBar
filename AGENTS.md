@@ -391,8 +391,10 @@ in the same change, and its `updated` date with it.
 - Body keys are **positional** (`privacy.<id>.<i>`, list items
   `privacy.<id>.<i>.<j>`), built in `lib/i18n.ts`, and will not grep. No section
   may take the id `controller`; the checker enforces it.
-- It sits on plain `--salt`, not the TEMP concrete ground: long prose is where
-  that texture fails contrast.
+- It sits on `.section-dark`, like the 404, not the TEMP concrete ground: long
+  prose is where that texture fails contrast. A `.section-dark` that is the
+  first thing under the nav drops its `border-top` (the nav's rule draws that
+  edge); the selector uses `~`, not `+`, because Nav emits a `<script>` between.
 - The footer link shares `privacy.heading` with the page's `h1`.
 
 ## SEO / build
