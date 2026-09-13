@@ -1386,11 +1386,13 @@ main > .section-dark:last-child {
 /* --------------------------------------------------------------------------
    TEMP concrete ground — under test on /team, /menu and /gallery.
 
-   The texture comes from the component as --bg-texture (it has to go through
-   Astro's image pipeline); only the overlay lives here, so the pages cannot
-   drift. The overlay LIGHTENS: the texture's mean luma is 146.6 and the logo
-   badge's concrete is ~170, so no amount of black could reach it. --salt at 28%
-   lands the ground at 170.
+   The texture comes from the page as --bg-texture (it has to go through
+   Astro's image pipeline, and has to be computed before <head> is written —
+   see preloadImage on Base and the comment above each page's getImage call);
+   only the overlay lives here, so the pages cannot drift. The overlay
+   LIGHTENS: the texture's mean luma is 146.6 and the logo badge's concrete is
+   ~170, so no amount of black could reach it. --salt at 28% lands the ground
+   at 170.
 
    That makes it a light ground, so these pages keep the light tier. --text-muted
    is the one token that had to move: --stone measured 1.80:1 at the ground's
@@ -1398,8 +1400,17 @@ main > .section-dark:last-child {
    median). Cost: body copy is now the same ink as the headings.
 
    STILL OUTSTANDING: --accent (--wood) is 2.32:1 at the worst patches against
-   the 4.5 its small uppercase owes — the team role labels and menu subheads. */
+   the 4.5 its small uppercase owes — the team role labels and menu subheads.
+
+   background-color is a fallback, not decoration: even preloaded, a ~330KB
+   image is not guaranteed to win the race against first paint on a slow
+   connection, and painting the section's default (near-white) background in
+   the meantime read as a broken page. #a9abab is the same overlay math above
+   applied to the texture's own measured mean (sharp .stats() on the built
+   asset: rgb(146.8, 146.8, 146.8)) rather than a guess, so the fallback and
+   the image it is replaced by are the same tone. */
 .section--concrete-test {
+  background-color: #a9abab;
   background-image: linear-gradient(rgba(226, 232, 235, 0.28), rgba(226, 232, 235, 0.28)),
     var(--bg-texture);
   background-size: cover;

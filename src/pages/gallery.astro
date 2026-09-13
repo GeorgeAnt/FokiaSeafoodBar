@@ -1,9 +1,11 @@
 ---
+import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Gallery from '../components/Gallery.astro';
 import Footer from '../components/Footer.astro';
 import { defaultLocale } from '../lib/i18n';
+import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 /*
   Its own page for the same reason the menu has one: 23 full-width photographs
@@ -11,15 +13,32 @@ import { defaultLocale } from '../lib/i18n';
   gallery. No extra structured data — the Restaurant graph stays on the homepage.
 */
 const locale = defaultLocale;
+
+/*
+  Computed here, not inside Gallery.astro: a component's frontmatter runs
+  while its slot is rendered, which is after Base has already written <head>
+  to the stream, so it is too late to preload from there. See preloadImage on
+  Base for why this needs to be a preload at all — see .section--concrete-test
+  in global.css for the rest of the TEMP concrete-ground story. quality: 60 is
+  a deliberate cut from the pipeline's 80 default: this is a noisy texture
+  sitting under a 28% tint and mostly under page content, and it halves the
+  payload (654KB -> 329KB) with no visible difference at either quality.
+*/
+const bgTexture = await getImage({ src: greyConcrete, format: 'webp', width: 2560, quality: 60 });
 ---
 
-<Base locale={locale} titleKey="meta.galleryTitle" descriptionKey="meta.galleryDescription">
+<Base
+  locale={locale}
+  titleKey="meta.galleryTitle"
+  descriptionKey="meta.galleryDescription"
+  preloadImage={bgTexture.src}
+>
   <Nav locale={locale} />
 
   {/* id="main" is the skip link's target. The footer's "back to top" uses
       href="#top", which needs no element. */}
   <main id="main">
-    <Gallery locale={locale} />
+    <Gallery locale={locale} bgTexture={bgTexture.src} />
   </main>
 
   <Footer locale={locale} />

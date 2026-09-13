@@ -1,9 +1,11 @@
 ---
+import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Team from '../components/Team.astro';
 import Footer from '../components/Footer.astro';
 import { defaultLocale } from '../lib/i18n';
+import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 /*
   Its own page because of its height, not its weight: as five alternating rows
@@ -20,15 +22,32 @@ import { defaultLocale } from '../lib/i18n';
   describes a staff roster usefully, and the bios are prose, not credentials.
 */
 const locale = defaultLocale;
+
+/*
+  Computed here, not inside Team.astro: a component's frontmatter runs while
+  its slot is rendered, which is after Base has already written <head> to the
+  stream, so it is too late to preload from there. See preloadImage on Base
+  for why this needs to be a preload at all — see .section--concrete-test in
+  global.css for the rest of the TEMP concrete-ground story. quality: 60 is a
+  deliberate cut from the pipeline's 80 default: this is a noisy texture
+  sitting under a 28% tint and mostly under page content, and it halves the
+  payload (654KB -> 329KB) with no visible difference at either quality.
+*/
+const bgTexture = await getImage({ src: greyConcrete, format: 'webp', width: 2560, quality: 60 });
 ---
 
-<Base locale={locale} titleKey="meta.teamTitle" descriptionKey="meta.teamDescription">
+<Base
+  locale={locale}
+  titleKey="meta.teamTitle"
+  descriptionKey="meta.teamDescription"
+  preloadImage={bgTexture.src}
+>
   <Nav locale={locale} />
 
   {/* id="main" is the skip link's target. The footer's "back to top" uses
       href="#top", which needs no element. */}
   <main id="main">
-    <Team locale={locale} />
+    <Team locale={locale} bgTexture={bgTexture.src} />
   </main>
 
   <Footer locale={locale} />

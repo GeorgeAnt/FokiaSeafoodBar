@@ -1,21 +1,20 @@
 ---
-import { getImage } from 'astro:assets';
 import MenuCategory from './MenuCategory.astro';
 import { foodCategories, drinkCategories } from '../lib/menu';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 import legal from '../data/legal.json';
-import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 interface Props {
   locale?: Locale;
+  /**
+   * TEMP: same concrete ground as /team and /gallery — see
+   * .section--concrete-test in global.css, which owns the overlay and the
+   * token changes. Computed by menu.astro, not here: it also feeds Base's
+   * preloadImage, and that has to happen before <head> is written.
+   */
+  bgTexture: string;
 }
-const { locale = defaultLocale } = Astro.props;
-
-// TEMP: same concrete ground as /team and /gallery — see
-// .section--concrete-test in global.css, which owns the overlay, the token
-// changes and why 2560 is enough. This only hands it the optimised texture;
-// the source jpg is 9.3MB.
-const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
+const { locale = defaultLocale, bgTexture } = Astro.props;
 
 const views = [
   { id: 'food', key: 'menu.food', categories: foodCategories },
@@ -26,7 +25,7 @@ const views = [
 <section
   class="section section--concrete-test"
   id="menu"
-  style={`--bg-texture: url(${bgTest.src})`}
+  style={`--bg-texture: url(${bgTexture})`}
 >
   <div class="wrap">
     <header class="section-head" lang={locale}>

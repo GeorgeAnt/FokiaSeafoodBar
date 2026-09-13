@@ -450,8 +450,9 @@ there.
 
 `/menu`, `/gallery` and `/team` are under test with a concrete texture
 background (`.section--concrete-test` in `global.css`, `--bg-texture` handed in
-from each component because the source jpg is 9.3MB and has to go through the
-image pipeline). **Not meant to survive in this form.**
+from each page — not each component, see below — because the source jpg is
+9.3MB and has to go through the image pipeline). **Not meant to survive in this
+form.**
 
 - The overlay **lightens** (`--salt` at 28%): the texture's mean luma is 146.6
   and the logo badge's concrete is ~170, so no amount of black could reach it.
@@ -465,6 +466,26 @@ image pipeline). **Not meant to survive in this form.**
   than to each page's own growing height, so one 2560px source stays sharp. It
   works only because nothing between those sections and the viewport carries a
   `transform`.
+- **The `getImage()` call lives in `team.astro` / `menu.astro` / `gallery.astro`,
+  not in `Team.astro` / `Menu.astro` / `Gallery.astro`.** A component's
+  frontmatter runs while its slot is rendered, which is after `Base.astro` has
+  already written `<head>` to the stream — too late to preload from there. The
+  page computes the asset once and hands the URL down twice: to `Base` as
+  `preloadImage` (a `<link rel="preload" as="image" fetchpriority="high">`,
+  the same pattern the font preloads use) and to the section component as
+  `bgTexture`. **A CSS `background-image` is fetched at Low priority by
+  Chrome**, so without the preload this ~300KB image can lose the race against
+  everything else on the page and arrive visibly late — that was the white
+  flash on load and on scroll. `quality: 60` on the same `getImage()` call
+  roughly halves the file against the pipeline's 80 default (654KB → 329KB);
+  safe here because it's a noisy texture under a 28% tint and mostly under
+  page content, verified with a pixel crop before shipping.
+- **`.section--concrete-test` also carries a flat `background-color` fallback**
+  (`#a9abab`) so the gap before the image paints — preloaded or not — is the
+  same tone as the texture, not the section's bare near-white. It is the
+  overlay math above applied to the texture's own measured mean
+  (`sharp().stats()` on the built asset), not a guessed color; re-derive it if
+  the source photo or the overlay opacity ever changes.
 
 ## Gotchas
 

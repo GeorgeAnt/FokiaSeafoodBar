@@ -1,21 +1,22 @@
 ---
-import { Picture, getImage } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { t, defaultLocale, type Locale } from '../lib/i18n';
 import { teamPhoto } from '../lib/photos';
 import team from '../data/team.json';
-import greyConcrete from '../assets/photos/backgrounds/grunge-gray-cement-textured-background.jpg';
 
 interface Props {
   locale?: Locale;
+  /**
+   * TEMP: same concrete ground as /menu and /gallery — see
+   * .section--concrete-test in global.css, which owns the overlay, the token
+   * changes and why 2560 is enough (background-attachment: fixed ties cover's
+   * math to the viewport rather than to this list's own scrolling height).
+   * Computed by team.astro, not here: it also feeds Base's preloadImage, and
+   * that has to happen before <head> is written.
+   */
+  bgTexture: string;
 }
-const { locale = defaultLocale } = Astro.props;
-
-// TEMP: same concrete ground as /menu and /gallery — see
-// .section--concrete-test in global.css, which owns the overlay, the token
-// changes and why 2560 is enough (background-attachment: fixed ties cover's
-// math to the viewport rather than to this list's own scrolling height). This
-// only hands it the optimised texture; the source jpg is 9.3MB.
-const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 });
+const { locale = defaultLocale, bgTexture } = Astro.props;
 ---
 
 {/*
@@ -24,7 +25,7 @@ const bgTest = await getImage({ src: greyConcrete, format: 'webp', width: 2560 }
 <section
   class="section section--concrete-test"
   id="team"
-  style={`--bg-texture: url(${bgTest.src})`}
+  style={`--bg-texture: url(${bgTexture})`}
 >
   <div class="wrap">
     <header class="section-head" data-reveal>

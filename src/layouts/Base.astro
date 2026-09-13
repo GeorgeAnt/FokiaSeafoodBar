@@ -15,12 +15,22 @@ interface Props {
    * — the graph is ~14 KB, and it belongs on the page that actually shows it.
    */
   menuSchema?: boolean;
+  /**
+   * URL of a full-bleed CSS background-image the page paints behind its whole
+   * section — currently the /menu, /gallery, /team concrete texture. Chrome
+   * fetches background-images at Low priority, so without this hint it can
+   * lose the race against everything else on the page and arrive seconds late,
+   * showing the section's bare background until it does. Only pages that carry
+   * one pass it.
+   */
+  preloadImage?: string;
 }
 const {
   locale = defaultLocale,
   titleKey = 'meta.title',
   descriptionKey = 'meta.description',
   menuSchema = false,
+  preloadImage,
 } = Astro.props;
 
 /*
@@ -168,6 +178,8 @@ const dictJson = JSON.stringify(dictionaries);
     <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-greek-600-normal.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-latin-700-normal.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/manrope-greek-700-normal.woff2" crossorigin />
+
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
 
     <title data-i18n={titleKey}>{title}</title>
     <meta name="description" content={description} data-i18n-content={descriptionKey} />
