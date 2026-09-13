@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { defaultLocale, t } from '../lib/i18n';
+import { logoWordmark } from '../lib/photos';
+
+/*
+  Built to dist/404.html, which static hosts serve for any unknown path — so
+  this page renders at arbitrary depth (/menu/old/thing). Every link and asset
+  must stay root-relative; Astro's are.
+
+  The menu link comes first: the likeliest way to arrive here is an old QR code
+  or a bookmarked menu URL.
+*/
+const locale = defaultLocale;
+---
+
+<Base locale={locale} titleKey="meta.notFoundTitle">
+  <Nav locale={locale} />
+
+  <main id="main">
+    <section class="section section-dark not-found">
+      <div class="wrap">
+        {/* The hero's painted wordmark (see .hero__wordmark-mark). Decorative
+            here: the nav logo already names the site. */}
+        <span
+          class="not-found__mark"
+          style={`--wordmark: url(${logoWordmark.src})`}
+          aria-hidden="true"
+        />
+        <header class="section-head">
+          <h1 data-i18n="notFound.heading">{t(locale, 'notFound.heading')}</h1>
+          <p data-i18n="notFound.body">{t(locale, 'notFound.body')}</p>
+        </header>
+        <p class="not-found__links">
+          <a class="btn btn--primary" href="/menu" data-i18n="nav.menu">{t(locale, 'nav.menu')}</a>
+          <a class="btn btn--primary" href="/" data-i18n="notFound.home">{t(locale, 'notFound.home')}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <Footer locale={locale} />
+</Base>

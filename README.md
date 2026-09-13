@@ -26,6 +26,8 @@ npm run og        # regenerate the social share card (only if its photo changes)
 
 Deploy by uploading `dist/` to any static host — Netlify, Vercel, Cloudflare
 Pages, GitHub Pages, or plain nginx. There is no server and no database.
+The hosted services serve `dist/404.html` for unknown URLs on their own; nginx
+needs `error_page 404 /404.html;` and Apache `ErrorDocument 404 /404.html`.
 
 **Set `NOINDEX=1` on any deployment that is not the real domain.** A preview
 build serves byte-identical HTML to production, canonical tag included, so
@@ -56,6 +58,7 @@ browser download. Its scratch files go in `.playwright-cli/`, which is ignored.
 | `/gallery` | The photographs, each opening in a lightbox |
 | `/team` | The five team members, one photo-and-bio row each |
 | `/privacy` | The privacy policy, linked from the footer of every page |
+| any unknown URL | "Page not found", with links to the menu and the homepage (`dist/404.html`) |
 
 The menu has a page of its own rather than being a section on the homepage. It
 is 98 items across 19 sections — over half the site's DOM — but the real reason
@@ -720,6 +723,7 @@ src/
   pages/index.astro   homepage — hero, goal, plates, contact, find us
   pages/menu.astro    the menu, at /menu
   pages/gallery.astro the photographs, at /gallery
+  pages/404.astro     "page not found", served for any unknown URL
   styles/global.css   design tokens and all styling
 public/               fonts, favicons, robots.txt
 scripts/              prepare-photos.mjs, prepare-favicons.mjs, check-content.mjs

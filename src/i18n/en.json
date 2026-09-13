@@ -13,6 +13,7 @@
   "meta.galleryDescription": "Photographs from fokia: the room, the plates, the cocktails and the team.",
   "meta.privacyTitle": "Privacy policy | fokia — seafood bar",
   "meta.privacyDescription": "What personal data the fokia website processes, why, and your rights.",
+  "meta.notFoundTitle": "Page not found | fokia — seafood bar",
   "a11y.skipToContent": "Skip to content",
   "a11y.mainNav": "Main navigation",
   "a11y.home": "fokia — home",
@@ -87,6 +88,10 @@
   "hours.Saturday": "Saturday",
   "hours.Sunday": "Sunday",
   "hours.rangeSeparator": "–",
+
+  "notFound.heading": "Page not found",
+  "notFound.body": "The page you are looking for does not exist or has moved.",
+  "notFound.home": "Home page",
 
   "privacy.heading": "Privacy policy",
   "privacy.updated": "Last updated:",

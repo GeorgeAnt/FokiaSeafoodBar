@@ -816,7 +816,8 @@ main > .section-dark:last-child {
   display: flex;
   justify-content: center;
 }
-.hero__wordmark-mark {
+.hero__wordmark-mark,
+.not-found__mark {
   display: block;
   width: clamp(9rem, 7.9rem + 4.7vw, 12rem);
   aspect-ratio: 1.705;
@@ -836,7 +837,8 @@ main > .section-dark:last-child {
   mask-size: contain;
 }
 @supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
-  .hero__wordmark-mark {
+  .hero__wordmark-mark,
+  .not-found__mark {
     background: var(--light-stone);
   }
 }
@@ -2703,4 +2705,32 @@ main > .section-dark:last-child {
 
 .privacy__section li + li {
   margin-top: 0.35rem;
+}
+
+/* --------------------------------------------------------------------------
+   Not found — dist/404.html
+   -------------------------------------------------------------------------- */
+/* The only page shorter than the screen: without this the footer ends halfway
+   up and bare body ground shows beneath it. 6.0625rem is the nav bar (see
+   scroll-padding-top). */
+.not-found {
+  min-height: calc(100svh - 6.0625rem);
+}
+
+/* The only .section-dark directly under the nav, whose own bottom rule already
+   draws this edge — the band's border-top would double it. Two classes so this
+   does not hang on source order against .section-dark. */
+.section-dark.not-found {
+  border-top: 0;
+}
+
+.not-found__mark {
+  margin-bottom: clamp(2rem, 1.4rem + 2vw, 3rem);
+}
+
+/* Spaced like .hero__actions, but left-aligned under the heading. */
+.not-found__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }

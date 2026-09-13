@@ -1,7 +1,8 @@
 # fokia — seafood bar
 
 Astro marketing site for a Greek seafood restaurant. Five pages: `/` (scrolling
-homepage), `/menu`, `/gallery`, `/team`, `/privacy`. `README.md` is for the person editing
+homepage), `/menu`, `/gallery`, `/team`, `/privacy`, plus `404.astro` for any
+unknown URL. `README.md` is for the person editing
 content and deploying; this file is for whoever works on the code next.
 
 This file is **rules and traps**, not history. Every entry is here because
@@ -120,7 +121,8 @@ up undoes the palette.
   selected tab.
 - **"Stone" on a dark ground always means `--light-stone`, never `--stone`**,
   which measures 2.6-2.9:1 there and fails outright.
-- `.btn--primary` is every button on the site (three CTAs, all on the homepage).
+- `.btn--primary` is every button on the site (three homepage CTAs, plus the
+  404's two links — all on a dark ground).
   Its hover goes *lighter*, to `--salt`; darkening a mid stone walks the label
   back toward the 2.9:1 that ruled `--stone` out.
 - **A dark surface inside the light tier must carry the dark tier's tokens
@@ -437,7 +439,10 @@ already name them); the `Restaurant` JSON-LD does exist on every page, with the
 naive HTML-to-text pass, because `.lang__code` is `display: none`.
 
 Each page needs exactly one `h1`. Nav links to homepage sections must stay
-rooted (`/#goal`) so they work from the other three pages.
+rooted (`/#goal`) so they work from the other pages — and from the 404, which
+the host serves at whatever depth the missing URL had (`/menu/old/thing`), so
+a relative link or asset path on it resolves against a directory that is not
+there.
 
 ## TEMP: the concrete ground
 
